@@ -1,0 +1,41 @@
+{
+  "_vejledning": {
+    "opdater": "Rediger tallene nedenfor og gem filen. Dashboardet henter dem næste gang update_dashboard.py kører (eller kør det manuelt).",
+    "dato_format": "YYYY-MM-DD",
+    "AAII_Bull_Bear": "Bullish% minus Bearish%. Find det på aaii.com/sentimentsurvey hver torsdag.",
+    "Investors_Intel": "Bull/Bear ratio. Find det på investorsintelligence.com eller finansielle nyhedsmedier.",
+    "Short_Interest": "S&P 500 median short interest i %. FINRA offentliggør det biweekly.",
+    "Insider_Buy_Sell": "Ratio: insider køb / (køb + salg) de seneste 8 uger. openinsider.com eller insidermonitor.com.",
+    "Twitter_Bull": "FinTwit bull share %. Kan skønnes fra sociale medier eller sættes til null hvis ukendt."
+  },
+
+  "AAII Bull-Bear": {
+    "value": -17.3,
+    "date": "2026-06-11",
+    "note": "Bullish% minus Bearish% — typisk range: -40 til +50. Negativt = overvægt bearish."
+  },
+
+  "Investors Intel.": {
+    "value": 2.37,
+    "date": "2026-05-03",
+    "note": "Bull/Bear ratio — over 3.0 = ekstrem greed, under 1.0 = frygt."
+  },
+
+  "Short Interest": {
+    "value": 2.7,
+    "date": "2026-06-08",
+    "note": "S&P 500 median short interest i %. Typisk range: 1.5–4%."
+  },
+
+  "Insider Buy/Sell": {
+    "value": 0.3,
+    "date": "2026-06-01",
+    "note": "Ratio 0–1. Over 0.5 = overvægt køb (bullish). Under 0.2 = overvægt salg (bearish)."
+  },
+
+  "X / Twitter Bull": {
+    "value": null,
+    "date": null,
+    "note": "FinTwit bull share 0–100%. Over 60 = greed, under 40 = frygt."
+  }
+}

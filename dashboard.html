@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Sentiment Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0a08;
+    --bg-2: #131210;
+    --surface: #1a1815;
+    --surface-2: #221f1b;
+    --border: rgba(240, 233, 218, 0.08);
+    --border-strong: rgba(240, 233, 218, 0.16);
+    --text: #f0e9da;
+    --text-2: #a8a195;
+    --text-3: #6e6960;
+    --fear: #c14545;
+    --fear-soft: rgba(193, 69, 69, 0.15);
+    --neutral: #c9a259;
+    --neutral-soft: rgba(201, 162, 89, 0.15);
+    --greed: #6b8e5a;
+    --greed-soft: rgba(107, 142, 90, 0.15);
+    --gold: #d4af37;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 20% 0%, rgba(212, 175, 55, 0.04) 0%, transparent 50%),
+      radial-gradient(circle at 80% 100%, rgba(107, 142, 90, 0.03) 0%, transparent 50%);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: 32px 24px 64px;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; }
+
+  /* Header */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+  .brand h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 38px;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .brand h1 em {
+    font-style: italic;
+    color: var(--gold);
+    font-weight: 300;
+  }
+  .brand .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--text-3);
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+  .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-2);
+    text-align: right;
+    letter-spacing: 0.08em;
+  }
+  .meta .live { color: var(--greed); }
+  .meta .live::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--greed);
+    border-radius: 50%;
+    margin-right: 6px;
+    animation: pulse 2s ease-in-out infinite;
+    vertical-align: middle;
+  }
+  @keyframes pulse { 50% { opacity: 0.4; } }
+
+  .refresh-btn {
+    margin-top: 10px;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+    padding: 8px 18px;
+    border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .refresh-btn:hover {
+    background: var(--surface-2);
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  .refresh-btn:active { transform: scale(0.98); }
+  .refresh-btn .icon {
+    display: inline-block;
+    transition: transform 0.5s ease;
+  }
+  .refresh-btn.spinning .icon {
+    transform: rotate(360deg);
+  }
+  .refresh-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Smooth transitions for updating values */
+  .ind-value, .ind-z, .gauge-reading, .stat-val, .stat-sub, .score {
+    transition: color 0.3s ease;
+  }
+  .gauge-needle {
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: 0 0;
+  }
+  .flash {
+    animation: flash 0.6s ease;
+  }
+  @keyframes flash {
+    0% { background: rgba(212, 175, 55, 0.12); }
+    100% { background: transparent; }
+  }
+
+  /* Composite Hero */
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 32px;
+  }
+  .hero > div { background: var(--surface); padding: 36px; }
+
+  .gauge-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .gauge-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--text-3);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .gauge-svg { width: 260px; height: 160px; }
+  .gauge-reading {
+    font-family: 'Fraunces', serif;
+    font-size: 64px;
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-top: -32px;
+  }
+  .gauge-state {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--greed);
+    margin-top: 6px;
+  }
+  .gauge-delta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-2);
+    margin-top: 12px;
+    letter-spacing: 0.05em;
+  }
+
+  .summary { display: flex; flex-direction: column; justify-content: center; }
+  .summary h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 22px;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+  .summary h2 em { font-style: italic; color: var(--gold); }
+  .summary-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  .stat-key {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--text-3);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .stat-val {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+  .stat-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-2);
+    margin-top: 2px;
+  }
+
+  /* Sections */
+  .sections {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .panel-head h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 19px;
+    letter-spacing: -0.01em;
+  }
+  .panel-head h3 .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 0.2em;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  .panel-head .score {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.05em;
+  }
+  .panel-head .score.fear { background: var(--fear-soft); color: var(--fear); }
+  .panel-head .score.neutral { background: var(--neutral-soft); color: var(--neutral); }
+  .panel-head .score.greed { background: var(--greed-soft); color: var(--greed); }
+
+  .indicator-list { padding: 4px 0; }
+  .indicator {
+    display: grid;
+    grid-template-columns: 1.4fr 0.7fr 1.2fr 0.4fr;
+    gap: 16px;
+    align-items: center;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s ease;
+  }
+  .indicator:last-child { border-bottom: none; }
+  .indicator:hover { background: var(--surface-2); }
+
+  .ind-name {
+    font-size: 13.5px;
+    color: var(--text);
+    font-weight: 400;
+  }
+  .ind-name .desc {
+    display: block;
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 2px;
+    font-style: italic;
+    font-family: 'Fraunces', serif;
+  }
+  .ind-name .freq {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    background: var(--surface-2);
+    border-radius: 2px;
+    vertical-align: middle;
+    font-weight: 400;
+  }
+  .ind-name .freq.rt { color: var(--greed); background: rgba(107, 142, 90, 0.08); }
+
+  /* Demo indicators (no live data available) */
+  .indicator[data-live="false"] .ind-value {
+    opacity: 0.45;
+    font-style: italic;
+  }
+  .indicator[data-live="false"] .ind-z {
+    opacity: 0.45;
+  }
+  .indicator[data-live="false"] .ind-name::after {
+    content: 'demo';
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    background: rgba(193, 69, 69, 0.08);
+    border-radius: 2px;
+    vertical-align: middle;
+  }
+
+  .ind-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: right;
+  }
+
+  .ind-range {
+    position: relative;
+    height: 4px;
+    background: var(--surface-2);
+    border-radius: 2px;
+  }
+  .ind-range::before, .ind-range::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    width: 1px;
+    height: 10px;
+    background: var(--border-strong);
+  }
+  .ind-range::before { left: 0; }
+  .ind-range::after { right: 0; }
+  .ind-range .mid {
+    position: absolute;
+    left: 50%;
+    top: -2px;
+    width: 1px;
+    height: 8px;
+    background: var(--border-strong);
+  }
+  .ind-range .marker {
+    position: absolute;
+    top: -4px;
+    width: 2px;
+    height: 12px;
+    transform: translateX(-1px);
+    transition: left 0.3s ease;
+  }
+  .ind-range .marker.fear { background: var(--fear); box-shadow: 0 0 8px var(--fear); }
+  .ind-range .marker.neutral { background: var(--neutral); box-shadow: 0 0 8px var(--neutral); }
+  .ind-range .marker.greed { background: var(--greed); box-shadow: 0 0 8px var(--greed); }
+
+  .ind-z {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-align: right;
+    letter-spacing: 0.05em;
+  }
+  .ind-z.fear { color: var(--fear); }
+  .ind-z.neutral { color: var(--neutral); }
+  .ind-z.greed { color: var(--greed); }
+
+  /* Indicator selectable state */
+  .indicator { cursor: pointer; }
+  .indicator.selected {
+    background: var(--surface-2);
+    box-shadow: inset 3px 0 0 var(--gold);
+  }
+
+  /* Details Panel */
+  .details {
+    margin-top: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .details-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 20px 28px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .details-head h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+  }
+  .details-head h3 em {
+    font-style: italic;
+    color: var(--gold);
+    font-weight: 300;
+  }
+  .details-head .hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .details-body {
+    padding: 32px 36px 36px;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 40px;
+    min-height: 280px;
+  }
+  .details-meta { border-right: 1px solid var(--border); padding-right: 32px; }
+  .details-cat {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 12px;
+  }
+  .details-name {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .details-stats { display: flex; flex-direction: column; gap: 16px; }
+  .details-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .details-stat:last-child { border-bottom: none; }
+  .details-stat-key {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .details-stat-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .details-stat-val.fear { color: var(--fear); }
+  .details-stat-val.neutral { color: var(--neutral); }
+  .details-stat-val.greed { color: var(--greed); }
+
+  .details-text { font-family: 'Fraunces', serif; line-height: 1.7; color: var(--text); }
+  .details-text h4 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 500;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 18px 0 8px;
+  }
+  .details-text h4:first-child { margin-top: 0; }
+  .details-text p {
+    font-size: 15.5px;
+    margin-bottom: 4px;
+  }
+  .details-text p em { font-style: italic; color: var(--text-2); }
+
+  @media (max-width: 980px) {
+    .details-body { grid-template-columns: 1fr; gap: 24px; }
+    .details-meta { border-right: none; border-bottom: 1px solid var(--border); padding: 0 0 24px; }
+  }
+  .legend {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 32px;
+    padding: 16px 20px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    text-transform: uppercase;
+  }
+  .legend-items { display: flex; gap: 24px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .legend-dot.fear { background: var(--fear); }
+  .legend-dot.neutral { background: var(--neutral); }
+  .legend-dot.greed { background: var(--greed); }
+
+  .footnote {
+    margin-top: 24px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--text-3);
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 980px) {
+    .hero, .sections { grid-template-columns: 1fr; }
+    .summary-stats { grid-template-columns: repeat(2, 1fr); }
+    .indicator { grid-template-columns: 1.2fr 0.8fr; }
+    .indicator .ind-range, .indicator .ind-z { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="brand">
+      <h1>Market <em>Sentiment</em></h1>
+      <div class="tag">Composite Dashboard · v1.0</div>
+    </div>
+    <div class="meta">
+      <div class="live" id="liveStatus">LIVE · <span id="timestamp">27 MAJ 2026 · 14:23 CET</span></div>
+      <div style="margin-top:6px;">S&amp;P 500: <span id="spx">5,847.22</span> <span id="spxChg" style="color:var(--greed)">+0.42%</span></div>
+      <div>VSTOXX: <span id="vstoxx">14.8</span> <span id="vstoxxChg" style="color:var(--fear)">+1.2%</span></div>
+      <button class="refresh-btn" id="refreshBtn">
+        <span class="icon">↻</span>
+        <span>Opdater data</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- COMPOSITE HERO -->
+  <section class="hero">
+    <div class="gauge-wrap">
+      <div class="gauge-label">Composite Sentiment Score</div>
+      <svg class="gauge-svg" viewBox="0 0 260 160">
+        <defs>
+          <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#c14545"/>
+            <stop offset="50%" stop-color="#c9a259"/>
+            <stop offset="100%" stop-color="#6b8e5a"/>
+          </linearGradient>
+        </defs>
+        <!-- Arc background -->
+        <path d="M 30 130 A 100 100 0 0 1 230 130"
+              fill="none" stroke="var(--surface-2)" stroke-width="14" stroke-linecap="round"/>
+        <!-- Arc with gradient (showing all-around) -->
+        <path d="M 30 130 A 100 100 0 0 1 230 130"
+              fill="none" stroke="url(#gaugeGrad)" stroke-width="14" stroke-linecap="round" opacity="0.35"/>
+        <!-- Tick marks -->
+        <g stroke="var(--text-3)" stroke-width="1">
+          <line x1="30" y1="130" x2="30" y2="120" transform="rotate(0 30 130)"/>
+        </g>
+        <!-- Needle: 62/100 → angle from -90deg (0) to +90deg (100). 62 → -90 + 1.8*62 = 21.6deg -->
+        <g transform="translate(130 130)">
+          <g class="gauge-needle" id="gaugeNeedle" style="transform: rotate(21.6deg);">
+            <line x1="0" y1="0" x2="0" y2="-95" stroke="var(--text)" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="0" cy="-95" r="4" fill="var(--gold)"/>
+          </g>
+        </g>
+        <circle cx="130" cy="130" r="6" fill="var(--text)"/>
+        <circle cx="130" cy="130" r="3" fill="var(--bg)"/>
+        <!-- Scale labels -->
+        <text x="22" y="152" font-family="JetBrains Mono" font-size="9" fill="var(--text-3)" text-anchor="middle">0</text>
+        <text x="130" y="152" font-family="JetBrains Mono" font-size="9" fill="var(--text-3)" text-anchor="middle">50</text>
+        <text x="238" y="152" font-family="JetBrains Mono" font-size="9" fill="var(--text-3)" text-anchor="middle">100</text>
+      </svg>
+      <div class="gauge-reading" id="gaugeReading">62</div>
+      <div class="gauge-state" id="gaugeState">Greed</div>
+      <div class="gauge-delta" id="gaugeDelta">↑ 4 pts vs. 1 uge · ↓ 8 pts vs. 1 mdr</div>
+    </div>
+
+    <div class="summary">
+      <h2>Markedet er præget af <em>moderat optimisme</em> — volatiliteten er lav, krediten er stram, og bredden er sund. Men positioneringen begynder at se anstrengt ud.</h2>
+      <div class="summary-stats">
+        <div>
+          <div class="stat-key">VIX</div>
+          <div class="stat-val" id="summVix">14.2</div>
+          <div class="stat-sub" id="summVixPct" style="color:var(--greed)">25. percentil</div>
+        </div>
+        <div>
+          <div class="stat-key">HY Spread</div>
+          <div class="stat-val"><span id="summHy">312</span><span style="font-size:14px;color:var(--text-3)">bps</span></div>
+          <div class="stat-sub" id="summHyPct" style="color:var(--greed)">15. percentil</div>
+        </div>
+        <div>
+          <div class="stat-key">Put/Call</div>
+          <div class="stat-val" id="summPc">0.82</div>
+          <div class="stat-sub" id="summPcPct" style="color:var(--neutral)">42. percentil</div>
+        </div>
+        <div>
+          <div class="stat-key">% &gt; 200DMA</div>
+          <div class="stat-val"><span id="summDma">71</span><span style="font-size:14px;color:var(--text-3)">%</span></div>
+          <div class="stat-sub" id="summDmaPct" style="color:var(--greed)">78. percentil</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTIONS -->
+  <div class="sections">
+
+    <!-- VOLATILITET -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3><span class="num">01</span>Volatilitet &amp; Optioner</h3>
+        <span class="score greed" data-panel="vol">SCORE 71 · GREED</span>
+      </div>
+      <div class="indicator-list" id="vol"></div>
+    </div>
+
+    <!-- MARKEDSBREDDE -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3><span class="num">02</span>Markedsbredde</h3>
+        <span class="score greed" data-panel="breadth">SCORE 68 · GREED</span>
+      </div>
+      <div class="indicator-list" id="breadth"></div>
+    </div>
+
+    <!-- POSITIONERING -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3><span class="num">03</span>Positionering &amp; Flows</h3>
+        <span class="score neutral" data-panel="pos">SCORE 54 · NEUTRAL</span>
+      </div>
+      <div class="indicator-list" id="pos"></div>
+    </div>
+
+    <!-- KREDIT -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3><span class="num">04</span>Kredit &amp; Makro</h3>
+        <span class="score greed" data-panel="credit">SCORE 64 · GREED</span>
+      </div>
+      <div class="indicator-list" id="credit"></div>
+    </div>
+
+    <!-- CROSS-ASSET -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3><span class="num">05</span>Cross-Asset Signaler</h3>
+        <span class="score neutral" data-panel="cross">SCORE 58 · NEUTRAL</span>
+      </div>
+      <div class="indicator-list" id="cross"></div>
+    </div>
+
+
+  </div>
+
+  <!-- DETAILS PANEL -->
+  <section class="details">
+    <div class="details-head">
+      <h3>Indikator <em>detalje</em></h3>
+      <span class="hint">Klik på en indikator for at læse mere</span>
+    </div>
+    <div class="details-body" id="detailsBody">
+      <!-- Filled by JS -->
+    </div>
+  </section>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div>Skala</div>
+    <div class="legend-items">
+      <div class="legend-item"><span class="legend-dot fear"></span>Fear (0–35)</div>
+      <div class="legend-item"><span class="legend-dot neutral"></span>Neutral (35–65)</div>
+      <div class="legend-item"><span class="legend-dot greed"></span>Greed (65–100)</div>
+    </div>
+    <div>RT = real-time · 1D = dagligt · 1U = ugentligt · 1M = månedligt</div>
+  </div>
+
+  <p class="footnote">
+    Data er illustrativ og opdateres ikke automatisk. I produktion bør parametrene hentes via FRED, CBOE,<br>
+    Finnhub, Refinitiv eller lignende datakilder og normaliseres til z-scores over et rullende vindue.
+  </p>
+</div>
+
+<script src="data.js" onerror="console.log('Ingen data.js fundet - bruger demo-data. Kør update_dashboard.py for at hente ægte markedsdata.')"></script>
+<script>
+  // Indicator data: name, description, value, position (0-100 on historical range), z-score, sentiment
+  // position: 0 = max fear, 100 = max greed (FOR THE OVERALL MARKET)
+  // baseValue is the numeric value used to drive deltas; format describes how to render it
+
+  const data = {
+    vol: [
+      { name: 'VIX',               desc: 'CBOE volatilitetsindeks',           pos: 75, base: 14.2,  freq: 'rt',    fmt: v => v.toFixed(1) },
+      { name: 'VVIX',              desc: 'Volatilitet på VIX',                 pos: 62, base: 88.4,  freq: 'rt',    fmt: v => v.toFixed(1) },
+      { name: 'SKEW Index',        desc: 'Pris på tail-risk hedges',           pos: 38, base: 142.1, freq: 'rt',    fmt: v => v.toFixed(1) },
+      { name: 'Put/Call Ratio',    desc: 'CBOE total equity, 10-d glidende',   pos: 58, base: 0.82,  freq: 'rt',    fmt: v => v.toFixed(2) },
+      { name: 'VIX Term Structure',desc: 'VIX9D / VIX (contango)',             pos: 82, base: 0.91,  freq: 'rt',    fmt: v => v.toFixed(2) },
+    ],
+    breadth: [
+      { name: '% over 50-DMA',     desc: 'S&P 500 medlemmer',                  pos: 70, base: 64,    freq: 'daily', fmt: v => Math.round(v) + '%' },
+      { name: '% over 200-DMA',    desc: 'S&P 500 medlemmer',                  pos: 78, base: 71,    freq: 'daily', fmt: v => Math.round(v) + '%' },
+      { name: 'A/D Linje',         desc: 'NYSE kumulativ',                     pos: 72, base: 1847,  freq: 'rt',    fmt: v => '+' + Math.round(v).toLocaleString('da-DK') },
+      { name: 'McClellan Osc.',    desc: 'NYSE breadth oscillator',            pos: 60, base: 38,    freq: 'daily', fmt: v => (v >= 0 ? '+' : '') + Math.round(v) },
+      { name: 'New Highs - Lows',  desc: 'NYSE 52-uger',                       pos: 65, base: 142,   freq: 'rt',    fmt: v => (v >= 0 ? '+' : '') + Math.round(v) },
+    ],
+    pos: [
+      { name: 'AAII Bull-Bear',    desc: 'Retail-investorer (US)',             pos: 32, base: 18,    freq: 'weekly',  fmt: v => (v >= 0 ? '+' : '') + Math.round(v) + '%' },
+      { name: 'NAAIM Exposure',    desc: 'Aktive forvaltere',                  pos: 28, base: 78,    freq: 'weekly',  fmt: v => Math.round(v) + '%' },
+      { name: 'Investors Intel.',  desc: 'Newsletter-skribenter',              pos: 25, base: 2.4,   freq: 'weekly',  fmt: v => v.toFixed(2) + 'x' },
+      { name: 'Short Interest',    desc: 'S&P 500 median',                     pos: 72, base: 2.1,   freq: 'monthly', fmt: v => v.toFixed(1) + '%' },
+      { name: 'Insider Buy/Sell',  desc: '8-uger glidende',                    pos: 38, base: 0.42,  freq: 'monthly', fmt: v => v.toFixed(2) },
+    ],
+    credit: [
+      { name: 'HY Credit Spread',  desc: 'BofA US High Yield',                 pos: 78, base: 312,   freq: 'rt',    fmt: v => Math.round(v) + 'bps' },
+      { name: 'IG Credit Spread',  desc: 'BofA US Corporate',                  pos: 72, base: 94,    freq: 'rt',    fmt: v => Math.round(v) + 'bps' },
+      { name: 'MOVE Index',        desc: 'Treasury volatilitet',               pos: 48, base: 92.4,  freq: 'rt',    fmt: v => v.toFixed(1) },
+      { name: '2s10s kurve',       desc: 'UST yield spread',                   pos: 55, base: 38,    freq: 'rt',    fmt: v => (v >= 0 ? '+' : '') + Math.round(v) + 'bps' },
+      { name: 'Financial Conds.',  desc: 'Chicago Fed NFCI',                   pos: 68, base: -0.42, freq: 'weekly',fmt: v => v.toFixed(2) },
+    ],
+    cross: [
+      { name: 'Guld/Sølv ratio',   desc: 'Lavere = risk-on',                   pos: 52, base: 78.4,  freq: 'rt',    fmt: v => v.toFixed(1) },
+      { name: 'Kobber/Guld ratio', desc: 'Højere = risk-on',                   pos: 58, base: 0.0019,freq: 'rt',    fmt: v => v.toFixed(4) },
+      { name: 'DXY',               desc: 'Dollar-indeks',                      pos: 55, base: 102.4, freq: 'rt',    fmt: v => v.toFixed(1) },
+      { name: 'XLP / XLY ratio',   desc: 'Defensive vs cykliske',              pos: 68, base: 0.78,  freq: 'rt',    fmt: v => v.toFixed(2) },
+      { name: 'Bitcoin (BTC)',     desc: 'Risk-on proxy, 30-d',                pos: 62, base: 94200, freq: 'rt',    fmt: v => '$' + (v/1000).toFixed(1) + 'k' },
+    ],
+  };
+
+  // ============================================================
+  // Merge live data from data.js (if available)
+  // ============================================================
+  function mergeLiveData() {
+    if (typeof window.DASHBOARD_DATA === 'undefined') {
+      // No live data file - mark everything as demo
+      Object.keys(data).forEach(cat => {
+        data[cat].forEach(ind => { ind.live = false; });
+      });
+      return false;
+    }
+    const live = window.DASHBOARD_DATA;
+    let liveCount = 0;
+    let totalCount = 0;
+    Object.keys(data).forEach(cat => {
+      data[cat].forEach(ind => {
+        totalCount++;
+        const liveInd = live.indicators && live.indicators[ind.name];
+        if (liveInd) {
+          ind.base = liveInd.base;
+          ind.pos = liveInd.pos;
+          ind.live = true;
+          liveCount++;
+        } else {
+          ind.live = false;
+        }
+      });
+    });
+    // Update ticker values in header
+    if (live.spx) {
+      const spxEl = document.getElementById('spx');
+      const spxChgEl = document.getElementById('spxChg');
+      spxEl.textContent = live.spx.value.toLocaleString('da-DK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      spxChgEl.textContent = (live.spx.change_pct >= 0 ? '+' : '') + live.spx.change_pct.toFixed(2) + '%';
+      spxChgEl.style.color = live.spx.change_pct >= 0 ? 'var(--greed)' : 'var(--fear)';
+    }
+    if (live.vix_ticker) {
+      const vstEl = document.getElementById('vstoxx');
+      const vstChgEl = document.getElementById('vstoxxChg');
+      // Replace VSTOXX label with VIX since FRED/Yahoo doesn't have VSTOXX easily
+      const vstParent = vstEl.parentElement;
+      vstParent.firstChild.textContent = 'VIX: ';
+      vstEl.textContent = live.vix_ticker.value.toFixed(1);
+      vstChgEl.textContent = (live.vix_ticker.change_pct >= 0 ? '+' : '') + live.vix_ticker.change_pct.toFixed(1) + '%';
+      vstChgEl.style.color = live.vix_ticker.change_pct >= 0 ? 'var(--fear)' : 'var(--greed)';
+    }
+    // Update timestamp from the live data file
+    if (live.timestamp) {
+      const liveDate = new Date(live.timestamp);
+      const months = ['JAN','FEB','MAR','APR','MAJ','JUN','JUL','AUG','SEP','OKT','NOV','DEC'];
+      const ts = `${liveDate.getDate()} ${months[liveDate.getMonth()]} ${liveDate.getFullYear()} · ${String(liveDate.getHours()).padStart(2,'0')}:${String(liveDate.getMinutes()).padStart(2,'0')} CET`;
+      document.getElementById('timestamp').textContent = ts;
+    }
+    // Show status badge
+    const statusEl = document.getElementById('liveStatus');
+    statusEl.innerHTML = `LIVE · <span id="timestamp">${document.getElementById('timestamp').textContent}</span> · ${liveCount}/${totalCount} live`;
+    return true;
+  }
+  const hasLiveData = mergeLiveData();
+  if (!hasLiveData) {
+    const statusEl = document.getElementById('liveStatus');
+    statusEl.className = 'live';
+    statusEl.style.color = 'var(--neutral)';
+    statusEl.innerHTML = `DEMO · <span id="timestamp">${document.getElementById('timestamp').textContent}</span> · ingen live data`;
+  }
+
+  // Panel weights for composite score (must sum to 1.0)
+  const panelWeights = {
+    vol: 0.22,
+    breadth: 0.20,
+    pos: 0.13,
+    credit: 0.25,
+    cross: 0.20,
+  };
+
+  // Category display names
+  const catNames = {
+    vol: 'Volatilitet & Optioner',
+    breadth: 'Markedsbredde',
+    pos: 'Positionering & Flows',
+    credit: 'Kredit & Makro',
+    cross: 'Cross-Asset Signaler',
+  };
+
+  // Detailed descriptions for each indicator
+  const descriptions = {
+    'VIX': {
+      what: 'CBOE\'s volatilitetsindeks, ofte kaldet "frygtbarometeret". Måler den implicitte 30-dages volatilitet på S&P 500 optioner - altså hvor meget kursudsving markedet forventer i den kommende måned.',
+      interpret: 'Under 15 indikerer ro og typisk greed. 15-25 er normalt. Over 30 betyder akut frygt; over 40 er panik. Historisk gennemsnit ligger omkring 19-20.',
+      why: 'Det er den mest brugte enkeltindikator for risk-on/risk-off og driver allokeringsbeslutninger hos næsten alle institutionelle investorer. Lav VIX i lang tid kan dog skabe falsk tryghed - "volatility paradox".'
+    },
+    'VVIX': {
+      what: 'Volatiliteten på selve VIX-indekset. Måler hvor uroligt VIX-markedet i sig selv handler.',
+      interpret: 'Normalniveau er omkring 85-95. Over 120 signalerer at hedgere aktivt positionerer sig for et brud, selv hvis selve VIX er lav.',
+      why: 'Stigende VVIX mens VIX er rolig er en klassisk "skjult" advarsel - det betyder smart money betaler op for volatilitets-hedges før den brede markedsfrygt sætter ind.'
+    },
+    'SKEW Index': {
+      what: 'Måler den relative pris på out-of-the-money put-optioner sammenlignet med at-the-money optioner. Reflekterer hvor meget investorer betaler for at sikre sig mod et stort markedsfald.',
+      interpret: 'Normalniveau er 115-135. Over 140 betyder forhøjet efterspørgsel efter tail-risk beskyttelse. Værdier over 150 er sjældne og signalerer at sofistikerede investorer forventer et "fat tail" event.',
+      why: 'SKEW kan fortælle hvad VIX ikke kan - nemlig om der er bekymring for sjældne men store fald. Klassisk divergens: lav VIX + høj SKEW = ro på overfladen, frygt i dybden.'
+    },
+    'Put/Call Ratio': {
+      what: 'Forholdet mellem handlede put- og call-optioner på CBOE, glidende 10-dages gennemsnit. Højere ratio = mere bearish positionering.',
+      interpret: 'Under 0.7 er bullish ekstrem (greed). 0.7-1.0 er normal. Over 1.2 er bearish ekstrem (fear).',
+      why: 'Bruges typisk kontrarisk. Ekstrem høj P/C i bunden af en korrektion betyder pessimismen har toppet - købssignal. Ekstrem lav P/C på toppe betyder eufori og advarselssignal.'
+    },
+    'VIX Term Structure': {
+      what: 'Forholdet mellem 9-dages VIX (VIX9D) og standard 30-dages VIX. Viser om markedet forventer mere stress nu eller senere.',
+      interpret: 'Under 1.0 = contango (langsigtet vol > kortsigtet) = roligt marked. Over 1.0 = backwardation = akut stress.',
+      why: 'Et af de mest pålidelige stress-signaler. Når kurven flipper til backwardation følger der typisk en periode med forhøjet volatilitet og lavere afkast.'
+    },
+    '% over 50-DMA': {
+      what: 'Andelen af S&P 500-aktier der handler over deres 50-dages glidende gennemsnit. Måler kortsigtet markedsbredde og momentum.',
+      interpret: 'Over 70% = stærk bred opadgående trend. 30-50% = svaghed under overfladen. Under 20% = oversolgte forhold der ofte giver bounce.',
+      why: 'Bredde fortæller om en rally er bæredygtig. Hvis indeks stiger mens kun få aktier deltager (lav %), er det fundamentalt svagt og oftest forbi inden længe.'
+    },
+    '% over 200-DMA': {
+      what: 'Andelen af S&P 500-aktier der handler over deres 200-dages glidende gennemsnit. Den klassiske længere-sigt breadth-indikator.',
+      interpret: 'Over 70% = sundt bull-market. Omkring 50% er tipping point. Under 30% = bear-market regime. Bund-ekstremerne omkring 10-15% har historisk markeret store købsmuligheder.',
+      why: 'Skifter fra over til under 50% har historisk været et godt signal for skift mellem bull og bear regimer. Stærk persistens - markeder bliver oppe eller nede i lang tid.'
+    },
+    'A/D Linje': {
+      what: 'Kumulativ optælling af antallet af aktier der stiger minus antallet der falder hver dag. Glat indikator der viser den underliggende styrke i markedet.',
+      interpret: 'Stigende A/D-linje bekræfter pris-rallies. Faldende A/D-linje samtidig med stigende indeks er en klassisk negativ divergens.',
+      why: 'Negative divergenser i A/D-linjen har advaret om næsten alle større bear-markets i moderne historie 3-12 måneder før prisindekset toppede.'
+    },
+    'McClellan Osc.': {
+      what: 'En oscillator baseret på forskellen mellem 19-dages og 39-dages eksponentielle gennemsnit af stigende-faldende aktier på NYSE.',
+      interpret: 'Over +100 er overkøbt, under -100 oversolgt. Krydsninger gennem nul indikerer momentum-skift.',
+      why: 'Tidligt timing-signal for kortsigtede vendinger. Ekstremer på -200 eller lavere har historisk markeret korte-sigt bunde med høj præcision.'
+    },
+    'New Highs - Lows': {
+      what: 'Antal aktier der laver 52-ugers højde minus antal der laver 52-ugers lavpunkt på NYSE.',
+      interpret: 'Konsistent positivt = sundt bull market. Skift til negativt territorium signalerer regime-skift. Stærkt negativt (under -200) ses i krak.',
+      why: 'Når indeks stiger til all-time-highs mens new highs skrumper er det den klareste advarsel om at rally\'et bæres af færre og færre aktier - typisk megacaps.'
+    },
+    'AAII Bull-Bear': {
+      what: 'American Association of Individual Investors\' ugentlige sentiment-undersøgelse blandt retail-investorer. Spread mellem bullish og bearish svar.',
+      interpret: 'Over +30% = ekstrem optimisme hos retail. Under -20% = ekstrem pessimisme. Historisk gennemsnit ligger omkring +6%.',
+      why: 'Klassisk kontrarisk indikator. Retail-investorer har historisk været forkert på vendingerne - ekstrem bullish AAII har ofte markeret toppe, ekstrem bearish har markeret bunde.'
+    },
+    'NAAIM Exposure': {
+      what: 'National Association of Active Investment Managers\' ugentlige måling af faktisk aktie-eksponering hos aktive forvaltere. Skala fra -200% (fuld short med gearing) til +200%.',
+      interpret: '0-50% = forsigtig. 50-80% = normal. Over 90% = aggressiv positionering. Over 100% = gearet long.',
+      why: 'I modsætning til retail-surveys måler NAAIM hvad professionelle faktisk gør, ikke hvad de siger. Ekstrem høj exposure betyder lille marginal-køber tilbage.'
+    },
+    'Investors Intel.': {
+      what: 'Investors Intelligence ugentlige undersøgelse af amerikanske newsletter-skribenters anbefalinger. Ratio mellem bullish og bearish newsletters.',
+      interpret: 'Under 1.0 = pessimisme dominerer. 1.5-2.5 = normal. Over 3.0 = ekstrem optimisme.',
+      why: 'En af de længstgående sentiment-tidsserier (siden 1963). Newsletter-skribenter er notorisk dårlige til at fange vendinger - klassisk kontrarisk.'
+    },
+    'Margin Debt YoY': {
+      what: 'Årlig procentuel ændring i lånefinansierede aktiekøb (margin debt) hos FINRA-medlemmer. Måler gearingsniveauet i systemet.',
+      interpret: 'Under +10% = forsigtig. +10-20% = normal. Over +30% = euforisk gearing. Negative værdier ses i deleveraging-faser.',
+      why: 'Acceleration i gearing er en af de mest pålidelige late-cycle indikatorer. 2000 og 2007 så begge margin debt vokse over 60% YoY i månederne før toppen.'
+    },
+    'Short Interest': {
+      what: 'Andelen af aktier der er solgt short, målt som median for S&P 500 aktier.',
+      interpret: 'Under 2% = lavt - få bearish positioner. 2-4% = normal. Over 5% = højt short-pres.',
+      why: 'Lav short interest betyder lille modstand på vej op, men også lille "fuel" til short squeeze. Høj short interest kan både være advarsel (bears har ret) eller setup for explosiv opside.'
+    },
+    'Insider Buy/Sell': {
+      what: 'Forholdet mellem antal aktier købt og solgt af virksomheders direktion og bestyrelse, 8-uger glidende gennemsnit.',
+      interpret: 'Under 0.4 = mange flere salg end køb. 0.4-1.0 = normalt forhold. Over 1.5 = usædvanligt mange køb (bullish signal).',
+      why: 'Insiders har informationsfordel og er typisk tidlige. Klyngevise insider-køb i et selskab eller sektor er et af de stærkeste enkelt-signaler. Salg er sværere at tolke (skat, diversifikation).'
+    },
+    'HY Credit Spread': {
+      what: 'Forskellen i yield mellem high yield (junk) bonds og tilsvarende statsobligationer. Måler hvor meget premium investorer kræver for at låne til risikable virksomheder.',
+      interpret: 'Under 350bps = ekstremt stramt, risk-on. 350-500bps = normalt. Over 600bps = stress. Over 1000bps = krise/recession.',
+      why: 'Sandsynligvis den vigtigste enkelt-indikator for systemisk risiko. Kredit-markedet er typisk smartere end aktiemarkedet og fører prisene 1-6 måneder før store equity-moves.'
+    },
+    'IG Credit Spread': {
+      what: 'Yield-forskel mellem investment grade corporate bonds og statsobligationer.',
+      interpret: 'Under 100bps = stramt. 100-150bps = normalt. Over 200bps = stress.',
+      why: 'Mindre volatil end HY, men når IG spreads begynder at udvide er det signal om at stresset spreder sig fra de svageste til de stærke navne - dvs systemisk risiko.'
+    },
+    'MOVE Index': {
+      what: 'ICE BofA MOVE Index - obligationsmarkedets ækvivalent til VIX. Måler implicit volatilitet på US treasury optioner.',
+      interpret: 'Under 80 = roligt rentemarked. 80-120 = normal. Over 150 = forhøjet stress (sidst set i 2022 inflations-shock).',
+      why: 'Renteshock går ofte forud for aktie-stress. Når MOVE stiger kraftigt presser det multiples på alle finansielle aktiver.'
+    },
+    '2s10s kurve': {
+      what: 'Forskellen mellem 10-årig og 2-årig US Treasury yield. Hældningen på rentekurven.',
+      interpret: 'Positiv = normal kurve. Negativ (inverteret) = recession-signal. Steepening efter inversion er typisk timing-signal for kommende recession.',
+      why: 'Inverteret kurve har forudsagt alle US recessioner siden 1970erne med 12-24 måneders lead, kun en falsk alarm. En af de mest robuste makro-indikatorer.'
+    },
+    'Financial Conds.': {
+      what: 'Chicago Fed\'s National Financial Conditions Index - sammensat indeks af 105 indikatorer for kredit, leverage og risiko.',
+      interpret: 'Under nul = lettere end gennemsnitlige conditions (risk-on). Over nul = strammere. Over +1 = stress.',
+      why: 'Sammenfatter hele kredit- og finansieringsmiljøet i ét tal. Glimrende kontekstindikator for hvor "let" eller "stramt" markedet er.'
+    },
+    'Guld/Sølv ratio': {
+      what: 'Prisen på en ounce guld delt med prisen på en ounce sølv. Historisk ratio er omkring 60-70.',
+      interpret: 'Under 60 = sølv outperformer = risk-on (sølv er mere industrielt/cyklisk). Over 80 = guld outperformer = risk-off/recession-frygt.',
+      why: 'Renere risk-on/risk-off signal end guld alene. Skift over 80 er ofte sammenfaldende med markeds-stress og safe-haven flows.'
+    },
+    'Kobber/Guld ratio': {
+      what: 'Prisen på kobber delt med prisen på guld. Kobber repræsenterer industriel vækst, guld safe haven.',
+      interpret: 'Stigende ratio = vækst-optimisme (risk-on). Faldende = vækst-bekymring (risk-off).',
+      why: 'Stærkt korreleret med 10-årig rente og cykliske aktier. Bruges af mange makro-investorer som "vækst termometer".'
+    },
+    'DXY': {
+      what: 'US Dollar Index - vægtet kurv af USD mod 6 store valutaer (primært EUR).',
+      interpret: 'Stærk DXY (over 105) = ofte risk-off, presser emerging markets og råvarer. Svag DXY (under 95) = risk-on environment.',
+      why: 'Dollaren er reservevaluta - stærk dollar strammer globale finansielle conditions og er ofte korreleret med stress-perioder.'
+    },
+    'XLP / XLY ratio': {
+      what: 'Forholdet mellem Consumer Staples ETF (XLP - defensive) og Consumer Discretionary ETF (XLY - cykliske).',
+      interpret: 'Stigende ratio = defensive outperformer = recession-frygt. Faldende ratio = cykliske outperformer = vækst-optimisme.',
+      why: 'Sektor-rotation er en af de mest pålidelige tidlige indikatorer. Defensive der begynder at outperforme i et stigende marked er klassisk top-signal.'
+    },
+    'Bitcoin (BTC)': {
+      what: 'Bitcoin har gennem cyklen 2020+ udviklet sig til en risk-on proxy med høj korrelation til tech-aktier i risk-off perioder.',
+      interpret: 'Når BTC outperformer aktier markant kan det signalere bred risk appetit. Krak i BTC går ofte forud for aktier-fald.',
+      why: 'Mere likvid 24/7 end traditionelle aktiver og kan reagere først på likviditets-skift. Også indikator for spekulativ aktivitet generelt.'
+    },
+    'Google: "recession"': {
+      what: 'Google Trends søgevolumen for søgeordet "recession", normaliseret som indeks 0-100.',
+      interpret: 'Lave niveauer (under 30) = ingen panik. Spike over 70 = bred recession-frygt.',
+      why: 'Tydeligt kontrarisk i mange tilfælde - når den brede offentlighed Google\'r "recession" er den ofte allerede priset ind i markedet eller næsten ovre.'
+    },
+    'Google: "buy stocks"': {
+      what: 'Google Trends søgevolumen for "buy stocks" og lignende køb-fraser. Måler retail FOMO-niveau.',
+      interpret: 'Lav volumen = retail er ikke interesseret. Spikes ses ofte tæt på toppe når retail FOMO\'er ind.',
+      why: 'Klassisk "dumb money" indikator. Spikes i køb-relaterede søgninger har korreleret med kort-sigt toppe historisk.'
+    },
+    'WSB mentions': {
+      what: 'Sentiment-analyse af r/wallstreetbets-posts - andelen af bullish vs bearish posts og mentions.',
+      interpret: 'Over 60% bull = retail euforisk. Under 35% = retail bearish. Ekstreme niveauer i begge retninger er kontrariske.',
+      why: 'r/WSB er blevet en relevant marker for retail-positionering siden 2021. Ekstrem bullish-sentiment har korreleret med kort-sigt toppe, særligt i high-beta og meme-segmenter.'
+    },
+    'News Sentiment': {
+      what: 'NLP-baseret sentiment-score på Bloomberg news flow, 7-dages glidende gennemsnit. Skala fra -1 (bearish) til +1 (bullish).',
+      interpret: 'Over +0.2 = klart positivt nyhedsflow. Under -0.2 = bearish nyheder dominerer.',
+      why: 'Nyhedssentiment er typisk procyklisk og kan både være advarsel (eufori) og momentum-bekræftelse. Bedst brugt i kombination med andre indikatorer.'
+    },
+    'X / Twitter Bull': {
+      what: 'Aggregeret sentiment-score fra finansielle Twitter/X-accounts (FinTwit). NLP-baseret real-time måling.',
+      interpret: 'Over +0.3 = stærk bullish konsensus. Under -0.2 = bearish konsensus.',
+      why: 'FinTwit reagerer ekstremt hurtigt på nyheder og kan være tidlig indikator. Men også støjende - bedst i kombination med længere tidsserier.'
+    },
+  };
+
+  function findIndicator(name) {
+    for (const key in data) {
+      const found = data[key].find(i => i.name === name);
+      if (found) return { ind: found, panel: key };
+    }
+    return null;
+  }
+
+  function renderDetails(name) {
+    const result = findIndicator(name);
+    if (!result) return renderDetailsOverview();
+    const { ind, panel } = result;
+    const desc = descriptions[name] || { what: 'Beskrivelse ikke tilgængelig.', interpret: '', why: '' };
+    const tone = toneFromPos(ind.pos);
+    const state = stateFromScore(ind.pos);
+    document.getElementById('detailsBody').innerHTML = `
+      <div class="details-meta">
+        <div class="details-cat">${catNames[panel]}</div>
+        <div class="details-name">${ind.name}</div>
+        <div class="details-stats">
+          <div class="details-stat">
+            <span class="details-stat-key">Nuværende værdi</span>
+            <span class="details-stat-val">${ind.fmt(ind.base)}</span>
+          </div>
+          <div class="details-stat">
+            <span class="details-stat-key">Historisk position</span>
+            <span class="details-stat-val ${tone}">${Math.round(ind.pos)} / 100</span>
+          </div>
+          <div class="details-stat">
+            <span class="details-stat-key">Z-score (3y)</span>
+            <span class="details-stat-val ${tone}">z ${zFromPos(ind.pos)}</span>
+          </div>
+          <div class="details-stat">
+            <span class="details-stat-key">Signal</span>
+            <span class="details-stat-val ${tone}">${state.name}</span>
+          </div>
+          <div class="details-stat">
+            <span class="details-stat-key">Opdateres</span>
+            <span class="details-stat-val">${ {rt: 'Real-time', daily: 'Dagligt', weekly: 'Ugentligt', monthly: 'Månedligt'}[ind.freq] }</span>
+          </div>
+        </div>
+      </div>
+      <div class="details-text">
+        <h4>Hvad måler det</h4>
+        <p>${desc.what}</p>
+        <h4>Sådan tolkes det</h4>
+        <p>${desc.interpret}</p>
+        <h4>Hvorfor det betyder noget</h4>
+        <p>${desc.why}</p>
+      </div>
+    `;
+  }
+
+  function renderDetailsOverview() {
+    document.getElementById('detailsBody').innerHTML = `
+      <div class="details-meta">
+        <div class="details-cat">Sådan bruges dashboardet</div>
+        <div class="details-name">Oversigt</div>
+        <div class="details-stats">
+          <div class="details-stat">
+            <span class="details-stat-key">Indikatorer</span>
+            <span class="details-stat-val">31 stk.</span>
+          </div>
+          <div class="details-stat">
+            <span class="details-stat-key">Kategorier</span>
+            <span class="details-stat-val">6 paneler</span>
+          </div>
+          <div class="details-stat">
+            <span class="details-stat-key">Normalisering</span>
+            <span class="details-stat-val">z-score, 3-årig</span>
+          </div>
+          <div class="details-stat">
+            <span class="details-stat-key">Composite</span>
+            <span class="details-stat-val">Vægtet gennemsnit</span>
+          </div>
+        </div>
+      </div>
+      <div class="details-text">
+        <h4>Princippet</h4>
+        <p>Dashboardet aggregerer 31 sentiment-indikatorer i seks tematiske kategorier til én samlet score (0-100). Idéen er at intet enkelt mål er pålideligt, men når mange uafhængige signaler peger samme vej, øges sandsynligheden for at billedet er reelt.</p>
+        <h4>Sådan læses panelerne</h4>
+        <p>Hver indikator har en markør på en horisontal skala fra <em>fear</em> (venstre) til <em>greed</em> (højre). Markørens position viser hvor på den 3-årige historiske range vi er nu. Z-scoren angiver hvor mange standardafvigelser fra gennemsnittet vi befinder os.</p>
+        <h4>Vægtning i composite-scoren</h4>
+        <p>Kredit (22%) og volatilitet (20%) vægter højest fordi de historisk har været de mest pålidelige risk-signaler. Positionering (17%), bredde (18%), cross-asset (13%) og alternative data (10%) følger efter. Klik på en hvilken som helst indikator for at læse mere om hvad den måler og hvordan den tolkes.</p>
+      </div>
+    `;
+  }
+
+  function toneFromPos(pos) {
+    if (pos < 35) return 'fear';
+    if (pos > 65) return 'greed';
+    return 'neutral';
+  }
+
+  function zFromPos(pos) {
+    // Convert 0-100 position to a plausible z-score (-2 to +2 range)
+    // Note: high pos = greed = inverted z for "risk indicators" - simplified here
+    const z = ((pos - 50) / 25);
+    return (z >= 0 ? '+' : '') + z.toFixed(1);
+  }
+
+  function renderIndicator(ind) {
+    const tone = toneFromPos(ind.pos);
+    const freqLabel = { rt: 'RT', daily: '1D', weekly: '1U', monthly: '1M' }[ind.freq] || '';
+    const isLive = ind.live !== false; // default true if not set
+    return `
+      <div class="indicator" data-name="${ind.name}" data-live="${isLive}">
+        <div class="ind-name">
+          ${ind.name}<span class="freq ${ind.freq}">${freqLabel}</span>
+          <span class="desc">${ind.desc}</span>
+        </div>
+        <div class="ind-value">${ind.fmt(ind.base)}</div>
+        <div class="ind-range">
+          <span class="mid"></span>
+          <span class="marker ${tone}" style="left: ${ind.pos}%"></span>
+        </div>
+        <div class="ind-z ${tone}">z ${zFromPos(ind.pos)}</div>
+      </div>
+    `;
+  }
+
+  function calcPanelScore(panelKey) {
+    const inds = data[panelKey];
+    const avg = inds.reduce((s, i) => s + i.pos, 0) / inds.length;
+    return Math.round(avg);
+  }
+
+  function calcComposite() {
+    let total = 0;
+    for (const key in panelWeights) {
+      total += calcPanelScore(key) * panelWeights[key];
+    }
+    return Math.round(total);
+  }
+
+  function stateFromScore(s) {
+    if (s < 25) return { name: 'Extreme Fear', tone: 'fear' };
+    if (s < 45) return { name: 'Fear', tone: 'fear' };
+    if (s < 55) return { name: 'Neutral', tone: 'neutral' };
+    if (s < 75) return { name: 'Greed', tone: 'greed' };
+    return { name: 'Extreme Greed', tone: 'greed' };
+  }
+
+  function renderAll() {
+    // Render indicators
+    Object.keys(data).forEach(key => {
+      document.getElementById(key).innerHTML = data[key].map(renderIndicator).join('');
+    });
+    // Update panel scores
+    document.querySelectorAll('.score[data-panel]').forEach(el => {
+      const key = el.dataset.panel;
+      const score = calcPanelScore(key);
+      const state = stateFromScore(score);
+      el.className = 'score ' + state.tone;
+      el.textContent = `SCORE ${score} · ${state.name.toUpperCase()}`;
+    });
+    // Update composite
+    const composite = calcComposite();
+    const state = stateFromScore(composite);
+    document.getElementById('gaugeReading').textContent = composite;
+    const gaugeState = document.getElementById('gaugeState');
+    gaugeState.textContent = state.name;
+    gaugeState.style.color = `var(--${state.tone})`;
+    // Update needle angle: 0 → -90deg, 100 → +90deg
+    const angle = -90 + (composite * 1.8);
+    document.getElementById('gaugeNeedle').style.transform = `rotate(${angle}deg)`;
+    // Update summary stats
+    const vix = data.vol.find(i => i.name === 'VIX');
+    const hy = data.credit.find(i => i.name === 'HY Credit Spread');
+    const pc = data.vol.find(i => i.name === 'Put/Call Ratio');
+    const dma = data.breadth.find(i => i.name === '% over 200-DMA');
+    document.getElementById('summVix').textContent = vix.fmt(vix.base);
+    document.getElementById('summHy').textContent = Math.round(hy.base);
+    document.getElementById('summPc').textContent = pc.fmt(pc.base);
+    document.getElementById('summDma').textContent = Math.round(dma.base);
+    // Update percentile sub-labels
+    const setPct = (id, pos) => {
+      const tone = toneFromPos(pos);
+      const el = document.getElementById(id);
+      el.textContent = `${Math.round(100 - pos)}. percentil`;
+      el.style.color = `var(--${tone})`;
+    };
+    setPct('summVixPct', vix.pos);
+    setPct('summHyPct', hy.pos);
+    setPct('summPcPct', pc.pos);
+    setPct('summDmaPct', dma.pos);
+
+    // Attach click handlers for indicator details
+    document.querySelectorAll('.indicator').forEach(el => {
+      el.addEventListener('click', () => {
+        const name = el.dataset.name;
+        document.querySelectorAll('.indicator').forEach(e => e.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedIndicator = name;
+        renderDetails(name);
+      });
+      // Restore selection state after re-render
+      if (el.dataset.name === selectedIndicator) {
+        el.classList.add('selected');
+      }
+    });
+    // Refresh details panel if an indicator is selected
+    if (selectedIndicator) {
+      renderDetails(selectedIndicator);
+    }
+  }
+
+  // Track which indicator is currently selected for the details panel
+  let selectedIndicator = null;
+
+  // Initial render
+  renderAll();
+  renderDetailsOverview();
+
+  // Track previous composite for delta display
+  let previousComposite = calcComposite();
+  let weekAgoComposite = previousComposite - 4;
+  let monthAgoComposite = previousComposite + 8;
+
+  // Refresh function: simulates fetching new data with realistic tick-size moves
+  // Only real-time indicators move on each refresh; daily/weekly/monthly stay put
+  function refreshData() {
+    Object.keys(data).forEach(key => {
+      data[key].forEach(ind => {
+        if (ind.freq !== 'rt') return; // Skip non-realtime indicators
+        // Realistic seconds-scale tick: position drifts ±0.5 pts, value ±0.2%
+        const posDrift = (Math.random() - 0.5) * 1.0;
+        ind.pos = Math.max(5, Math.min(95, ind.pos + posDrift));
+        if (Math.abs(ind.base) < 1) {
+          // Small absolute drift for near-zero values
+          ind.base = ind.base + (Math.random() - 0.5) * 0.008;
+        } else {
+          const pct = (Math.random() - 0.5) * 0.004; // ±0.2%
+          ind.base = ind.base * (1 + pct);
+        }
+      });
+    });
+    // Update S&P 500 and VSTOXX ticker - realistic seconds-scale moves
+    const spxEl = document.getElementById('spx');
+    const spxChgEl = document.getElementById('spxChg');
+    const vstoxxEl = document.getElementById('vstoxx');
+    const vstoxxChgEl = document.getElementById('vstoxxChg');
+    const spxVal = 5847.22 * (1 + (Math.random() - 0.5) * 0.0008); // ±0.04%
+    const spxPct = (spxVal - 5847.22) / 5847.22 * 100;
+    spxEl.textContent = spxVal.toLocaleString('da-DK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    spxChgEl.textContent = (spxPct >= 0 ? '+' : '') + spxPct.toFixed(2) + '%';
+    spxChgEl.style.color = spxPct >= 0 ? 'var(--greed)' : 'var(--fear)';
+    const vstVal = 14.8 + (Math.random() - 0.5) * 0.1;
+    const vstPct = (vstVal - 14.8) / 14.8 * 100;
+    vstoxxEl.textContent = vstVal.toFixed(1);
+    vstoxxChgEl.textContent = (vstPct >= 0 ? '+' : '') + vstPct.toFixed(1) + '%';
+    vstoxxChgEl.style.color = vstPct >= 0 ? 'var(--fear)' : 'var(--greed)';
+    // Update timestamp
+    const now = new Date();
+    const months = ['JAN','FEB','MAR','APR','MAJ','JUN','JUL','AUG','SEP','OKT','NOV','DEC'];
+    const ts = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} · ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')} CET`;
+    document.getElementById('timestamp').textContent = ts;
+    // Recalculate composite for delta
+    const newComposite = calcComposite();
+    const wkDelta = newComposite - weekAgoComposite;
+    const mthDelta = newComposite - monthAgoComposite;
+    document.getElementById('gaugeDelta').textContent =
+      `${wkDelta >= 0 ? '↑' : '↓'} ${Math.abs(wkDelta)} pts vs. 1 uge · ${mthDelta >= 0 ? '↑' : '↓'} ${Math.abs(mthDelta)} pts vs. 1 mdr`;
+    previousComposite = newComposite;
+    // Re-render everything
+    renderAll();
+    // Flash animation only on real-time indicator rows
+    document.querySelectorAll('.indicator').forEach(el => {
+      const name = el.dataset.name;
+      const found = findIndicator(name);
+      if (found && found.ind.freq === 'rt') {
+        el.classList.remove('flash');
+        void el.offsetWidth;
+        el.classList.add('flash');
+      }
+    });
+  }
+
+  // Wire up refresh button
+  const btn = document.getElementById('refreshBtn');
+  if (hasLiveData) {
+    btn.querySelector('span:last-child').textContent = 'Genindlæs data';
+  }
+  btn.addEventListener('click', () => {
+    btn.classList.add('spinning');
+    btn.disabled = true;
+    if (hasLiveData) {
+      // In live mode, reload the page to fetch fresh data.js
+      setTimeout(() => location.reload(), 300);
+    } else {
+      setTimeout(() => {
+        refreshData();
+        setTimeout(() => {
+          btn.classList.remove('spinning');
+          btn.disabled = false;
+        }, 500);
+      }, 200);
+    }
+  });
+
+  // Auto-update timestamp every second only in demo mode (in live mode, show actual data timestamp)
+  if (!hasLiveData) {
+    setInterval(() => {
+      const now = new Date();
+      const months = ['JAN','FEB','MAR','APR','MAJ','JUN','JUL','AUG','SEP','OKT','NOV','DEC'];
+      const ts = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} · ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')} CET`;
+      const tsEl = document.getElementById('timestamp');
+      if (tsEl) tsEl.textContent = ts;
+    }, 1000);
+  }
+</script>
+</body>
+</html>

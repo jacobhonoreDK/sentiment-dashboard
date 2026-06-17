@@ -23,14 +23,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Opsæt Python
+      - name: Opsaet Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip'
 
-      - name: Installer afhængigheder
-        run: pip install yfinance pandas numpy requests beautifulsoup4 openpyxl pytrends pynacl
+      - name: Installer afhaengigheder
+        run: pip install yfinance pandas numpy requests beautifulsoup4 openpyxl pytrends
 
       - name: Kør opdateringsscript
         env:

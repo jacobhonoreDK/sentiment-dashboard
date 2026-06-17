@@ -1,4 +1,2 @@
-pcr_cache.json
-manual_cache.json
 __pycache__/
 *.pyc

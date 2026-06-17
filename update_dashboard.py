@@ -44,6 +44,8 @@ except ImportError as e:
 
 # ---- Configuration ----------------------------------------------------------
 FRED_API_KEY = os.environ.get("FRED_API_KEY", "").strip()
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "").strip()
+GITHUB_REPO = "jacobhonoreDK/sentiment-dashboard"
 OUTPUT_FILE = Path(__file__).parent / "data.js"
 PCR_CACHE_FILE = Path(__file__).parent / "pcr_cache.json"
 MANUAL_DATA_FILE = Path(__file__).parent / "manual_data.json"
@@ -632,6 +634,47 @@ def main():
     print(f"   Live indikatorer: {len(indicators_out)} / {len(INDICATORS)} mulige")
     print()
     print("✅ Færdig. Genindlæs dashboard.html i din browser for at se de nye tal.")
+
+    # ---- Push til GitHub Pages ----
+    # Kun når scriptet kører lokalt — i GitHub Actions håndterer workflow git push
+    if GITHUB_TOKEN and not os.environ.get("GITHUB_ACTIONS_RUN"):
+        _push_to_github(js_content)
+
+
+def _push_to_github(js_content: str):
+    """
+    Pusher data.js til GitHub via Contents API.
+    Bruger API direkte (ikke git) så lokalt repo aldrig divergerer fra remote.
+    """
+    import base64, subprocess
+    api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/data.js"
+    headers = {
+        "Authorization": f"token {GITHUB_TOKEN}",
+        "Content-Type": "application/json",
+    }
+    # Hent eksisterende fil-SHA (påkrævet for update)
+    r = requests.get(api_url, headers=headers, timeout=15)
+    sha = r.json().get("sha") if r.status_code == 200 else None
+
+    payload = {
+        "message": f"auto: opdater data.js {datetime.now().strftime('%Y-%m-%d %H:%M')}",
+        "content": base64.b64encode(js_content.encode()).decode(),
+    }
+    if sha:
+        payload["sha"] = sha
+
+    r2 = requests.put(api_url, headers=headers, json=payload, timeout=15)
+    if r2.status_code in (200, 201):
+        # Synkroniser lokalt repo med remote så manuelle pushes aldrig fejler
+        repo_dir = str(OUTPUT_FILE.parent)
+        remote = f"https://jacobhonoreDK:{GITHUB_TOKEN}@github.com/{GITHUB_REPO}.git"
+        subprocess.run(["git", "-C", repo_dir, "fetch", remote, "main:refs/remotes/origin/main"],
+                       capture_output=True)
+        subprocess.run(["git", "-C", repo_dir, "reset", "--soft", "origin/main"],
+                       capture_output=True)
+        print("🌐 GitHub Pages opdateret → https://jacobhonoredk.github.io/sentiment-dashboard/")
+    else:
+        print(f"⚠ GitHub push fejlede: {r2.status_code} {r2.json().get('message')}")
 
 
 if __name__ == "__main__":

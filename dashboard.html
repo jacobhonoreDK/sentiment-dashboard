@@ -598,7 +598,7 @@
   <header>
     <div class="brand">
       <h1>Market <em>Sentiment</em></h1>
-      <div class="tag">Composite Dashboard · v1.0</div>
+      <div class="tag">Composite Dashboard · v2.0</div>
     </div>
     <div class="meta">
       <div class="live" id="liveStatus">LIVE · <span id="timestamp">27 MAJ 2026 · 14:23 CET</span></div>
@@ -649,7 +649,11 @@
       </svg>
       <div class="gauge-reading" id="gaugeReading">62</div>
       <div class="gauge-state" id="gaugeState">Greed</div>
-      <div class="gauge-delta" id="gaugeDelta">↑ 4 pts vs. 1 uge · ↓ 8 pts vs. 1 mdr</div>
+      <div class="gauge-delta" id="compositeRoc">↑ 4 pts (1U) · ↓ 8 pts (4U)</div>
+      <div style="margin-top:14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:center;">
+        <span id="regimeBadge" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;padding:3px 8px;border-radius:2px;background:var(--greed-soft);color:var(--greed);">RISK-ON</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-3);">FAST: <span id="fastComposite" style="color:var(--greed);">62</span></span>
+      </div>
     </div>
 
     <div class="summary">
@@ -779,6 +783,7 @@
       { name: 'McClellan Osc.',    desc: 'NYSE breadth oscillator',            pos: 60, base: 38,    freq: 'daily', fmt: v => (v >= 0 ? '+' : '') + Math.round(v) },
       { name: 'New Highs - Lows',  desc: 'NYSE 52-uger',                       pos: 65, base: 142,   freq: 'rt',    fmt: v => (v >= 0 ? '+' : '') + Math.round(v) },
       { name: 'SPY / RSP ratio',   desc: 'Large-cap vs equal-weight bredde',   pos: 50, base: 3.55,  freq: 'rt',    fmt: v => v.toFixed(2) },
+      { name: '50/200 DMA divergence', desc: '% over 50DMA minus % over 200DMA', pos: 50, base: 0,  freq: 'daily', fmt: v => (v >= 0 ? '+' : '') + v.toFixed(1) + 'pp' },
     ],
     pos: [
       { name: 'AAII Bull-Bear',    desc: 'Retail-investorer (US)',             pos: 32, base: 18,    freq: 'weekly',  fmt: v => (v >= 0 ? '+' : '') + Math.round(v) + '%' },
@@ -792,7 +797,8 @@
       { name: 'IG Credit Spread',  desc: 'BofA US Corporate',                  pos: 72, base: 94,    freq: 'rt',    fmt: v => Math.round(v) + 'bps' },
       { name: 'MOVE Index',        desc: 'Treasury volatilitet',               pos: 48, base: 92.4,  freq: 'rt',    fmt: v => v.toFixed(1) },
       { name: '2s10s kurve',       desc: 'UST yield spread',                   pos: 55, base: 38,    freq: 'rt',    fmt: v => (v >= 0 ? '+' : '') + Math.round(v) + 'bps' },
-      { name: 'Financial Conds.',  desc: 'Chicago Fed NFCI',                   pos: 68, base: -0.42, freq: 'weekly',fmt: v => v.toFixed(2) },
+      { name: 'Financial Conds.',  desc: 'Chicago Fed NFCI',                   pos: 68, base: -0.42, freq: 'weekly', fmt: v => v.toFixed(2) },
+      { name: 'SOFR',              desc: 'Overnight funding rate (proxy)',       pos: 50, base: 5.30,  freq: 'daily',  fmt: v => v.toFixed(2) + '%' },
     ],
     cross: [
       { name: 'Guld/Sølv ratio',   desc: 'Lavere = risk-on',                   pos: 52, base: 78.4,  freq: 'rt',    fmt: v => v.toFixed(1) },
@@ -864,6 +870,36 @@
         vts.contango_back  = live.vix_contango.back;
       }
     }
+    // ── Consume Python composite (new model) ────────────────────────────────
+    if (live.composite) {
+      const c = live.composite;
+      // Override panel weights with regime-specific weights from Python
+      if (c.weights_used) {
+        panelWeights = { ...panelWeights, ...c.weights_used };
+      }
+      // Regime badge
+      const regimeEl = document.getElementById('regimeBadge');
+      if (regimeEl) {
+        const isRiskOff = c.regime === 'risk-off';
+        regimeEl.textContent = isRiskOff ? 'RISK-OFF' : 'RISK-ON';
+        regimeEl.style.color = isRiskOff ? 'var(--fear)' : 'var(--greed)';
+        regimeEl.style.background = isRiskOff ? 'var(--fear-soft)' : 'var(--greed-soft)';
+      }
+      // Fast composite badge
+      const fastEl = document.getElementById('fastComposite');
+      if (fastEl && c.fast != null) {
+        fastEl.textContent = Math.round(c.fast);
+        const tone = c.fast < 35 ? 'var(--fear)' : c.fast > 65 ? 'var(--greed)' : 'var(--neutral)';
+        fastEl.style.color = tone;
+      }
+      // Rate-of-change
+      const rocEl = document.getElementById('compositeRoc');
+      if (rocEl && c.roc) {
+        const w1 = c.roc['1w'], w4 = c.roc['4w'];
+        const fmt = v => v == null ? '—' : (v >= 0 ? '+' : '') + v + ' pts';
+        rocEl.textContent = `${fmt(w1)} (1U) · ${fmt(w4)} (4U)`;
+      }
+    }
     // Show status badge
     const statusEl = document.getElementById('liveStatus');
     statusEl.innerHTML = `LIVE · <span id="timestamp">${document.getElementById('timestamp').textContent}</span> · ${liveCount}/${totalCount} live`;
@@ -877,14 +913,14 @@
     statusEl.innerHTML = `DEMO · <span id="timestamp">${document.getElementById('timestamp').textContent}</span> · ingen live data`;
   }
 
-  // Panel weights for composite score (must sum to 1.0)
-  // Scores are computed as: (# green indicators in panel / total in panel) × 100
-  const panelWeights = {
-    vol:     0.25,   // 25% — Volatilitet & Optioner
-    credit:  0.25,   // 25% — Kredit & Makro
-    breadth: 0.20,   // 20% — Markedsbredde
-    pos:     0.15,   // 15% — Positionering & Flows
-    cross:   0.15,   // 15% — Cross-Asset Signaler
+  // Panel weights (risk-on baseline — mirrors CONFIG in update_dashboard.py).
+  // These are overridden at runtime if data.js contains composite.weights_used.
+  let panelWeights = {
+    credit:  0.28,
+    pos:     0.22,
+    breadth: 0.20,
+    vol:     0.17,
+    cross:   0.13,
   };
 
   // Category display names
@@ -1053,6 +1089,16 @@
       interpret: 'Stigende ratio = markedsbredden smaler ind (få megacaps driver indekset). Faldende ratio = bred deltagelse (mange aktier stiger).',
       why: 'Koncentration i toppen af indekset er en klassisk advarsel om skrøbelighed. Når de 10 største aktier bærer hele markedet, er nedsiderisikoen asymmetrisk.',
     },
+    'SOFR': {
+      what: 'Secured Overnight Financing Rate — den amerikanske pengemarkedsrente for sikrede overnight-lån (efterfølger for LIBOR siden 2023).',
+      interpret: 'Afspejler primært Fed Funds-niveauet. Stigende SOFR = strammere funding-vilkår. Bemærk: som standalone-indikator er tolkningen begrænset. TODO: SOFR-OIS spread (SOFR minus forventet Fed Funds path) ville give et renere stresssignal.',
+      why: 'Funding-renter er en leading indicator for kreditstress. Et frit tilgængeligt proxy; en SOFR-OIS spread er mere informativ men kræver derivatdata der ikke er gratis tilgængeligt.',
+    },
+    '50/200 DMA divergence': {
+      what: 'Forskellen i procentpoint: (andel S&P 500-aktier over 50-DMA) minus (andel over 200-DMA). Måler kortsigtet vs langsigtet bredde-divergens.',
+      interpret: 'Positiv: kortsigtede aktier breder sig normalt. Negativ: aktier falder under 50-DMA mens de stadig er over 200-DMA — tidligt faresignal om momentum-forringelse.',
+      why: 'Et divergens-signal er mere informativt end niveauet alene. Når 50-DMA-bredden falder under 200-DMA-bredden er det typisk 4–8 uger før bremserne sætter ind for alvor.',
+    },
     'X / Twitter Bull': {
       what: 'Aggregeret sentiment-score fra finansielle Twitter/X-accounts (FinTwit). NLP-baseret real-time måling.',
       interpret: 'Over +0.3 = stærk bullish konsensus. Under -0.2 = bearish konsensus.',
@@ -1142,9 +1188,10 @@
         <p>Dashboardet aggregerer 25 sentiment-indikatorer i fem tematiske kategorier til én samlet score (0-100). Idéen er at intet enkelt mål er pålideligt, men når mange uafhængige signaler peger samme vej, øges sandsynligheden for at billedet er reelt.</p>
         <h4>Sådan læses panelerne</h4>
         <p>Hver indikator har en markør på en horisontal skala fra <em>fear</em> (venstre) til <em>greed</em> (højre). Markørens position viser hvor på den 3-årige historiske range vi er nu. Z-scoren angiver hvor mange standardafvigelser fra gennemsnittet vi befinder os.</p>
-        <h4>Sådan beregnes composite-scoren</h4>
-        <p>For hvert panel tælles, hvor mange indikatorer der er <em>grønne (risk-on)</em> — dvs. befinder sig i den øverste tredjedel af den 3-årige historiske range (position &gt; 65). Panel-scoren er simpelthen denne andel: 4 ud af 5 grønne = 80 point.</p>
-        <p>Master Scoren er et vægtet gennemsnit af de fem panel-scores: <em>Volatilitet 25% · Kredit 25% · Bredde 20% · Positionering 15% · Cross-Asset 15%</em>. Summen af vægtene er 1,0, så scoren holder sig altid mellem 0 og 100.</p>
+        <h4>Sådan beregnes composite-scoren (model v2)</h4>
+        <p>Python-backend beregner en <em>vægtet gennemsnit-score</em> for hvert panel (0–100, baseret på den historiske percentil for hver indikator). Indenfor hvert panel reduceres dobbelt-tælling via en korrelationsmatrix: indikatorer med |r| &gt; 0,80 deler ét uafhængigt signal-slot.</p>
+        <p>Panelvægte er regime-betingede: <em>Kredit 28% · Positionering 22% · Bredde 20% · Volatilitet 17% · Cross-Asset 13%</em> (risk-on). I risk-off-regime op-vægtes Kredit (33%) og Volatilitet (25%). Regime bestemmes af SPX vs. 200-DMA og VIX vs. 1-års median.</p>
+        <p>Der beregnes to composites: <em>Full</em> (alle 29 indikatorer) og <em>Fast</em> (kun RT + daglige indikatorer). Signal Strength er en ikke-lineær transform der viser 0 i det neutrale bånd (35–65) og ±1 ved ekstremerne.</p>
       </div>
     `;
   }

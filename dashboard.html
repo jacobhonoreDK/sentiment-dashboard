@@ -1414,7 +1414,7 @@
     const newComposite = calcComposite();
     const wkDelta = newComposite - weekAgoComposite;
     const mthDelta = newComposite - monthAgoComposite;
-    document.getElementById('gaugeDelta').textContent =
+    document.getElementById('compositeRoc').textContent =
       `${wkDelta >= 0 ? '↑' : '↓'} ${Math.abs(wkDelta)} pts vs. 1 uge · ${mthDelta >= 0 ? '↑' : '↓'} ${Math.abs(mthDelta)} pts vs. 1 mdr`;
     previousComposite = newComposite;
     // Re-render everything

@@ -812,6 +812,25 @@
   // ============================================================
   // Merge live data from data.js (if available)
   // ============================================================
+  // Format a Date object in Europe/Copenhagen timezone (handles CET/CEST automatically)
+  const _cetMonths = ['JAN','FEB','MAR','APR','MAJ','JUN','JUL','AUG','SEP','OKT','NOV','DEC'];
+  function formatCET(date, showSeconds = false) {
+    const opts = {
+      timeZone: 'Europe/Copenhagen',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: showSeconds ? '2-digit' : undefined,
+      hour12: false,
+    };
+    const parts = new Intl.DateTimeFormat('da-DK', opts).formatToParts(date);
+    const p = {};
+    parts.forEach(({ type, value }) => { p[type] = value; });
+    const mon = _cetMonths[parseInt(p.month, 10) - 1];
+    const tz  = new Intl.DateTimeFormat('en', { timeZone: 'Europe/Copenhagen', timeZoneName: 'short' })
+                    .formatToParts(date).find(x => x.type === 'timeZoneName').value;
+    const time = showSeconds ? `${p.hour}:${p.minute}:${p.second}` : `${p.hour}:${p.minute}`;
+    return `${parseInt(p.day, 10)} ${mon} ${p.year} · ${time} ${tz}`;
+  }
+
   function mergeLiveData() {
     if (typeof window.DASHBOARD_DATA === 'undefined') {
       // No live data file - mark everything as demo
@@ -855,12 +874,10 @@
       vstChgEl.textContent = (live.vix_ticker.change_pct >= 0 ? '+' : '') + live.vix_ticker.change_pct.toFixed(1) + '%';
       vstChgEl.style.color = live.vix_ticker.change_pct >= 0 ? 'var(--fear)' : 'var(--greed)';
     }
-    // Update timestamp from the live data file
+    // Update timestamp from the live data file — always in Europe/Copenhagen (CET/CEST)
     if (live.timestamp) {
-      const liveDate = new Date(live.timestamp);
-      const months = ['JAN','FEB','MAR','APR','MAJ','JUN','JUL','AUG','SEP','OKT','NOV','DEC'];
-      const ts = `${liveDate.getDate()} ${months[liveDate.getMonth()]} ${liveDate.getFullYear()} · ${String(liveDate.getHours()).padStart(2,'0')}:${String(liveDate.getMinutes()).padStart(2,'0')} CET`;
-      document.getElementById('timestamp').textContent = ts;
+      const liveDate = new Date(live.timestamp + (live.timestamp.endsWith('Z') ? '' : 'Z'));
+      document.getElementById('timestamp').textContent = formatCET(liveDate, false);
     }
     // Attach contango flags to VIX Term Structure
     if (live.vix_contango) {
@@ -1406,11 +1423,8 @@
     vstoxxEl.textContent = vstVal.toFixed(1);
     vstoxxChgEl.textContent = (vstPct >= 0 ? '+' : '') + vstPct.toFixed(1) + '%';
     vstoxxChgEl.style.color = vstPct >= 0 ? 'var(--fear)' : 'var(--greed)';
-    // Update timestamp
-    const now = new Date();
-    const months = ['JAN','FEB','MAR','APR','MAJ','JUN','JUL','AUG','SEP','OKT','NOV','DEC'];
-    const ts = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} · ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')} CET`;
-    document.getElementById('timestamp').textContent = ts;
+    // Update timestamp in CET/CEST
+    document.getElementById('timestamp').textContent = formatCET(new Date(), true);
     // Recalculate composite for delta
     const newComposite = calcComposite();
     const wkDelta = newComposite - weekAgoComposite;
@@ -1457,11 +1471,8 @@
   // Auto-update timestamp every second only in demo mode (in live mode, show actual data timestamp)
   if (!hasLiveData) {
     setInterval(() => {
-      const now = new Date();
-      const months = ['JAN','FEB','MAR','APR','MAJ','JUN','JUL','AUG','SEP','OKT','NOV','DEC'];
-      const ts = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} · ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')} CET`;
       const tsEl = document.getElementById('timestamp');
-      if (tsEl) tsEl.textContent = ts;
+      if (tsEl) tsEl.textContent = formatCET(new Date(), true);
     }, 1000);
   }
 </script>

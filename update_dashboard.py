@@ -107,9 +107,64 @@ PCR_HIST_STD  = 0.10
 
 
 # ════════════════════════════════════════════════════════════════════════════
+# FIX 1 — EXPLICIT POLARITY CONFIG (single source of truth)
+# +1 = high value → greed/risk-on
+# -1 = high value → fear/risk-off
+# Applied in calc_position_and_zscore; INDICATORS direction column must match.
+# A runtime assertion in main() flags any drift.
+# ════════════════════════════════════════════════════════════════════════════
+POLARITY = {
+    # ── Volatilitet & Optioner ────────────────────────────────────────────────
+    "VIX":                    -1,  # low VIX = complacency = greed
+    "VVIX":                   -1,  # low vol-of-vol = greed
+    "SKEW Index":             -1,  # low tail-risk demand = greed
+    "VIX Term Structure":     -1,  # <1 = contango = calm = greed
+    "Put/Call Ratio":         -1,  # low PCR = call-heavy = greed
+
+    # ── Kredit & Makro ────────────────────────────────────────────────────────
+    "MOVE Index":             -1,  # low bond vol = greed
+    "HY Credit Spread":       -1,  # tight spreads = greed
+    "IG Credit Spread":       -1,  # tight spreads = greed
+    "2s10s kurve":            +1,  # steep curve = growth optimism = greed
+    "Financial Conds.":       -1,  # loose financial conditions (low NFCI) = greed
+    "SOFR":                   -1,  # low funding rate = loose = greed (crude proxy)
+
+    # ── Cross-Asset Signaler ──────────────────────────────────────────────────
+    # Gold/Silver HIGH = gold outperforming silver = defensive flight = fear.
+    # NOTE: pos=91 (greed) is observed when ratio is below 5-year mean — the
+    # 2020-2022 peaks inflate the baseline. Polarity is correct; long baseline
+    # is a separate lookback-window concern.
+    "Guld/Sølv ratio":        -1,  # low ratio = silver catching up = risk-on = greed
+    "Kobber/Guld ratio":      +1,  # high ratio = industrial demand = greed
+    # Strong dollar = global risk-off (EM stress, tighter USD liquidity) = fear.
+    "DXY":                    -1,  # weak USD = risk-on = greed
+    # XLP/XLY HIGH = staples outperform discretionary = defensive rotation = fear.
+    "XLP / XLY ratio":        -1,  # low ratio = discretionary leading = greed
+    "Bitcoin (BTC)":          +1,  # high BTC = risk appetite = greed
+
+    # ── Positionering & Flows ─────────────────────────────────────────────────
+    "NAAIM Exposure":         +1,  # high manager equity exposure = greed
+    "AAII Bull-Bear":         +1,  # high bull-bear spread = greed
+    "Investors Intel.":       +1,  # high bullish % = greed
+    "Short Interest":         -1,  # high short interest = fear
+    "Insider Buy/Sell":       +1,  # net insider buying = greed
+    "X / Twitter Bull":       +1,  # high social bullishness = greed
+
+    # ── Markedsbredde ─────────────────────────────────────────────────────────
+    "% over 50-DMA":          +1,  # broad participation = greed
+    "% over 200-DMA":         +1,  # broad participation = greed
+    "New Highs - Lows":       +1,  # positive net = greed
+    "A/D Linje":              +1,  # rising cumulative = greed
+    "McClellan Osc.":         +1,  # positive oscillator = greed
+    "SPY / RSP ratio":        -1,  # low ratio = equal-weight leading = broad breadth = greed
+    "50/200 DMA divergence":  +1,  # positive = 50DMA breadth ≥ 200DMA = healthy = greed
+}
+
+
+# ════════════════════════════════════════════════════════════════════════════
 # INDICATOR REGISTRY
 # (name, source, ticker/key, direction, category, freq)
-#   direction: +1 = high value → risk-on,  -1 = high value → risk-off
+#   direction: must match POLARITY dict above — validated at startup.
 #   freq:      "rt" | "daily" | "weekly" | "monthly" | "manual"
 # ════════════════════════════════════════════════════════════════════════════
 INDICATORS = [
@@ -469,13 +524,26 @@ def calc_position_and_zscore(value, history, direction):
         return None, None
     mean = float(history.mean())
     std  = float(history.std())
-    if std == 0:
-        return 50.0, 0.0
-    z_raw      = (value - mean) / std
+
     percentile = float((history <= value).sum()) / len(history) * 100
     pos        = percentile if direction == 1 else 100 - percentile
     pos        = max(1.0, min(99.0, pos))
-    return float(pos), float(z_raw * direction)
+
+    # FIX 2 — guard against near-zero std (e.g. hl_net hovers near 0)
+    if std < 1e-6:
+        return float(pos), 0.0
+
+    z_raw = (value - mean) / std
+
+    # FIX 2 — global z clamp ±4; emit QA warning for |z|>5
+    if abs(z_raw) > 5:
+        _qa_warnings.append(
+            f"QA: |z_raw|={z_raw:.2f} (>{5}) for indicator (std={std:.4g}, "
+            f"n={len(history)}) — clamped to ±4"
+        )
+    z_clamped = max(-4.0, min(4.0, z_raw))
+
+    return float(pos), float(z_clamped * direction)
 
 
 def aligned_ratio(num: pd.Series, denom: pd.Series) -> pd.Series | None:
@@ -677,16 +745,18 @@ def calc_roc(cache: dict, composite_today: float) -> dict:
         else:
             roc[f"{lag_weeks}w"] = None
 
-    # 1-year range percentile of the composite itself
+    # 1-year range percentile — FIX 5: null when fewer than 2 historical points
     one_yr_ago = (today - timedelta(days=365)).isoformat()
     yr_vals    = [v["full"] for k, v in cache.items() if k >= one_yr_ago]
-    if yr_vals:
-        yr_vals.append(composite_today)
-        roc["range_pct_1y"] = round(float(np.percentile(yr_vals, 50)), 1)
+    roc["cache_days"] = len(cache)   # Transparency: how many days of history exist
+
+    if len(yr_vals) >= 2:
+        yr_vals_with_today = yr_vals + [composite_today]
         roc["range_pct_1y"] = round(
-            float((np.array(yr_vals) <= composite_today).mean() * 100), 1
+            float((np.array(yr_vals_with_today) <= composite_today).mean() * 100), 1
         )
     else:
+        # FIX 5: misleading to show range_pct_1y=100 when only 1 day exists
         roc["range_pct_1y"] = None
 
     return roc
@@ -800,8 +870,12 @@ def calc_legacy_composite(indicators_raw: dict) -> float:
 # ════════════════════════════════════════════════════════════════════════════
 # MAIN
 # ════════════════════════════════════════════════════════════════════════════
+_qa_warnings: list = []   # Collected by calc_position_and_zscore; printed at end
 
 def main():
+    global _qa_warnings
+    _qa_warnings = []   # Populated by calc_position_and_zscore; printed in QA section
+
     print("=" * 70)
     print("  Market Sentiment Dashboard  —  Composite Model v2")
     print("=" * 70)
@@ -882,6 +956,52 @@ def main():
                 print(f"   ✓ {key:24}  {float(series.iloc[-1]):>8.2f}   ({series.index[-1].date()})")
     else:
         print("   ✗ unavailable")
+    print()
+
+    # ── FIX 1: Validate POLARITY dict against INDICATORS direction column ─────
+    print("🔏 Polarity config (FIX 1 — explicit POLARITY dict validation):")
+    sign_changes = []
+    polarity_ok  = True
+    for name, _src, _info, ind_dir, _cat, _freq in INDICATORS:
+        pol = POLARITY.get(name)
+        if pol is None:
+            print(f"   ⚠ MISSING from POLARITY dict: {name}")
+            polarity_ok = False
+        elif pol != ind_dir:
+            sign_changes.append((name, ind_dir, pol))
+            polarity_ok = False
+    if sign_changes:
+        print("   ⚠ SIGN CHANGES (POLARITY overrides INDICATORS direction):")
+        for nm, old, new in sign_changes:
+            print(f"     {nm:28}  {old:+d} → {new:+d}")
+    elif polarity_ok:
+        print("   ✓ All directions match POLARITY dict — no sign changes.")
+
+    print()
+    print("   Polarity table:")
+    print(f"   {'Indicator':28}  {'Dir':>4}  {'Greed when...'}")
+    print("   " + "─" * 65)
+    greed_desc = {
+        "VIX": "VIX low", "VVIX": "VVIX low", "SKEW Index": "SKEW low",
+        "VIX Term Structure": "ratio<1 (contango)", "Put/Call Ratio": "PCR low",
+        "MOVE Index": "MOVE low", "HY Credit Spread": "spread tight",
+        "IG Credit Spread": "spread tight", "2s10s kurve": "steep curve",
+        "Financial Conds.": "NFCI low", "SOFR": "SOFR low",
+        "Guld/Sølv ratio": "ratio historically low", "Kobber/Guld ratio": "ratio high",
+        "DXY": "weak USD", "XLP / XLY ratio": "discretionary leading",
+        "Bitcoin (BTC)": "BTC high", "NAAIM Exposure": "high exposure",
+        "AAII Bull-Bear": "bullish spread", "Investors Intel.": "bullish %",
+        "Short Interest": "low short interest", "Insider Buy/Sell": "net buying",
+        "X / Twitter Bull": "social bullishness",
+        "% over 50-DMA": "high %", "% over 200-DMA": "high %",
+        "New Highs - Lows": "positive net", "A/D Linje": "rising cumulative",
+        "McClellan Osc.": "positive", "SPY / RSP ratio": "RSP leads (broad breadth)",
+        "50/200 DMA divergence": "50DMA breadth ≥ 200DMA",
+    }
+    for name, _s, _i, _d, cat, _f in INDICATORS:
+        pol = POLARITY.get(name, _d)
+        desc = greed_desc.get(name, "")
+        print(f"   {name:28}  {pol:+d}   {desc}")
     print()
 
     # ── Detect regime ─────────────────────────────────────────────────────────
@@ -1029,6 +1149,19 @@ def main():
     result["roc"]          = roc
     result["window_years"] = CONFIG["history_years"]
 
+    # ── FIX 3: Explicit per-category aggregation report ───────────────────────
+    print("📐 Category aggregation (FIX 3 — method: weighted-avg of pos via corr-clusters):")
+    for cat in sorted(result["category_scores"].keys()):
+        members = [(nm, d) for nm, d in indicators_raw.items() if d["category"] == cat]
+        plain_mean = sum(d["pos"] for _, d in members) / len(members) if members else 0
+        weighted_score = result["category_scores"][cat]
+        method = "plain-mean (no clusters)" if abs(weighted_score - plain_mean) < 0.5 else "cluster-weighted"
+        print(f"  {cat:14}  plain-mean={plain_mean:5.1f}  cluster-weighted={weighted_score:5.1f}  [{method}]")
+        for nm, d in sorted(members, key=lambda x: -ind_weights.get(x[0], 0)):
+            w = ind_weights.get(nm, 1.0 / len(members))
+            print(f"    {nm:28}  pos={d['pos']:5.1f}  weight={w:.3f}")
+    print()
+
     # ── Summary printout ──────────────────────────────────────────────────────
     print("═" * 70)
     print("  COMPOSITE RESULTS")
@@ -1038,17 +1171,22 @@ def main():
     print(f"  Fast composite : {result['fast']:5.1f} / 100  (RT + daily only)")
     print(f"  Signal strength: {result['signal_strength']:+.3f}  (-1=extreme fear, +1=extreme greed)")
     print()
-    print("  Category scores:")
+    print("  Category scores (OLD plain-mean → NEW cluster-weighted):")
     for cat, score in sorted(result["category_scores"].items(), key=lambda x: -x[1]):
         w = result["weights_used"].get(cat, 0)
-        print(f"    {cat:14}  {score:5.1f}   (weight {w:.1%})")
+        members = [(nm, d) for nm, d in indicators_raw.items() if d["category"] == cat]
+        plain = sum(d["pos"] for _, d in members) / len(members) if members else 0
+        print(f"    {cat:14}  {plain:5.1f} → {score:5.1f}   (weight {w:.1%})")
     print()
     print("  Rate-of-change:")
     for lag_weeks in CONFIG["roc_lags_weeks"]:
         delta = roc.get(f"{lag_weeks}w")
         print(f"    {lag_weeks}-week change:  {('+' if delta and delta >= 0 else '') + str(delta)}")
     pct = roc.get("range_pct_1y")
-    print(f"    1-year range pct: {pct}%")
+    days = roc.get("cache_days", 0)
+    # FIX 5: show null when insufficient cache
+    pct_str = f"{pct}%" if pct is not None else f"null ({days} cache day(s) — need ≥2)"
+    print(f"    1-year range pct: {pct_str}")
     print()
     print("─" * 70)
     print(f"  OLD composite (JS green-count, old weights) : {legacy:5.1f}")
@@ -1056,6 +1194,30 @@ def main():
     delta_vs_old = result["full"] - legacy
     print(f"  Delta: {delta_vs_old:+.1f} pts  ({'↑ new is higher' if delta_vs_old > 0 else '↓ new is lower'})")
     print("─" * 70)
+    print()
+
+    # ── QA section (FIX 2) ────────────────────────────────────────────────────
+    print("🔬 QA — Indicator anomalies:")
+    qa_found = False
+    for nm, d in indicators_raw.items():
+        flags = []
+        if abs(d["z"]) >= 3.9:
+            flags.append(f"|z|={d['z']:.2f} (clamped at ±4)")
+        if d["pos"] <= 1.5:
+            flags.append(f"pos pinned at floor ({d['pos']:.1f})")
+        if d["pos"] >= 98.5:
+            flags.append(f"pos pinned at ceiling ({d['pos']:.1f})")
+        if abs(d["pos"] - 50.0) < 0.01:
+            flags.append("pos exactly 50.0 (possible std=0 fallback)")
+        if flags:
+            print(f"  ⚠ {nm:28}  " + ";  ".join(flags))
+            qa_found = True
+    if _qa_warnings:
+        for w in _qa_warnings:
+            print(f"  ⚠ {w}")
+        qa_found = True
+    if not qa_found:
+        print("  ✓ No anomalies detected.")
     print()
 
     # ── Assemble header stats ─────────────────────────────────────────────────

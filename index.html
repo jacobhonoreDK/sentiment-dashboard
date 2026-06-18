@@ -878,12 +878,13 @@
   }
 
   // Panel weights for composite score (must sum to 1.0)
+  // Scores are computed as: (# green indicators in panel / total in panel) × 100
   const panelWeights = {
-    vol: 0.22,
-    breadth: 0.20,
-    pos: 0.13,
-    credit: 0.25,
-    cross: 0.20,
+    vol:     0.25,   // 25% — Volatilitet & Optioner
+    credit:  0.25,   // 25% — Kredit & Makro
+    breadth: 0.20,   // 20% — Markedsbredde
+    pos:     0.15,   // 15% — Positionering & Flows
+    cross:   0.15,   // 15% — Cross-Asset Signaler
   };
 
   // Category display names
@@ -1141,8 +1142,9 @@
         <p>Dashboardet aggregerer 25 sentiment-indikatorer i fem tematiske kategorier til én samlet score (0-100). Idéen er at intet enkelt mål er pålideligt, men når mange uafhængige signaler peger samme vej, øges sandsynligheden for at billedet er reelt.</p>
         <h4>Sådan læses panelerne</h4>
         <p>Hver indikator har en markør på en horisontal skala fra <em>fear</em> (venstre) til <em>greed</em> (højre). Markørens position viser hvor på den 3-årige historiske range vi er nu. Z-scoren angiver hvor mange standardafvigelser fra gennemsnittet vi befinder os.</p>
-        <h4>Vægtning i composite-scoren</h4>
-        <p>Kredit (22%) og volatilitet (20%) vægter højest fordi de historisk har været de mest pålidelige risk-signaler. Positionering (17%), bredde (18%), cross-asset (13%) og alternative data (10%) følger efter. Klik på en hvilken som helst indikator for at læse mere om hvad den måler og hvordan den tolkes.</p>
+        <h4>Sådan beregnes composite-scoren</h4>
+        <p>For hvert panel tælles, hvor mange indikatorer der er <em>grønne (risk-on)</em> — dvs. befinder sig i den øverste tredjedel af den 3-årige historiske range (position &gt; 65). Panel-scoren er simpelthen denne andel: 4 ud af 5 grønne = 80 point.</p>
+        <p>Master Scoren er et vægtet gennemsnit af de fem panel-scores: <em>Volatilitet 25% · Kredit 25% · Bredde 20% · Positionering 15% · Cross-Asset 15%</em>. Summen af vægtene er 1,0, så scoren holder sig altid mellem 0 og 100.</p>
       </div>
     `;
   }
@@ -1211,12 +1213,25 @@
     `;
   }
 
+  // Returns 0–100: percentage of green (risk-on) indicators in the panel.
+  // Green = historical position > 65 (i.e. in the upper third of 3-year range).
+  // Example: 4 out of 5 green → 80. Used for both panel badges and composite.
   function calcPanelScore(panelKey) {
     const inds = data[panelKey];
-    const avg = inds.reduce((s, i) => s + i.pos, 0) / inds.length;
-    return Math.round(avg);
+    if (!inds || inds.length === 0) return 0;
+    const greenCount = inds.filter(i => i.pos > 65).length;
+    return Math.round((greenCount / inds.length) * 100);
   }
 
+  // Returns the raw green count and total for a panel (used in score tooltip)
+  function calcPanelGreenCount(panelKey) {
+    const inds = data[panelKey];
+    if (!inds || inds.length === 0) return { green: 0, total: 0 };
+    return { green: inds.filter(i => i.pos > 65).length, total: inds.length };
+  }
+
+  // Master Score 0–100: each panel contributes (green%) × weight.
+  // All weights sum to 1.0, so maximum score = 100.
   function calcComposite() {
     let total = 0;
     for (const key in panelWeights) {
@@ -1242,9 +1257,10 @@
     document.querySelectorAll('.score[data-panel]').forEach(el => {
       const key = el.dataset.panel;
       const score = calcPanelScore(key);
+      const { green, total } = calcPanelGreenCount(key);
       const state = stateFromScore(score);
       el.className = 'score ' + state.tone;
-      el.textContent = `SCORE ${score} · ${state.name.toUpperCase()}`;
+      el.textContent = `${green}/${total} GRØNNE · ${score}`;
     });
     // Update composite
     const composite = calcComposite();

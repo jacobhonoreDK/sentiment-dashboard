@@ -518,8 +518,8 @@ def detect_regime(yf_data: dict) -> str:
         flags.append(vix_last > vix_med)               # True = elevated fear
 
     if any(flags):
-        return "risk-off"
-    return "risk-on"
+        return "risk_off"
+    return "risk_on"
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -1023,7 +1023,7 @@ def main():
 
     # Persist today's composite
     today_str              = datetime.now().strftime("%Y-%m-%d")
-    comp_cache[today_str]  = {"full": result["full"], "fast": result["fast"], "regime": regime}
+    comp_cache[today_str]  = {"full": result["full"], "fast": result["fast"], "regime": result["regime"]}
     save_composite_cache(comp_cache)
 
     result["roc"]          = roc

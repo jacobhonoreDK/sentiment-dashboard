@@ -880,7 +880,7 @@
       // Regime badge
       const regimeEl = document.getElementById('regimeBadge');
       if (regimeEl) {
-        const isRiskOff = c.regime === 'risk-off';
+        const isRiskOff = c.regime === 'risk_off';
         regimeEl.textContent = isRiskOff ? 'RISK-OFF' : 'RISK-ON';
         regimeEl.style.color = isRiskOff ? 'var(--fear)' : 'var(--greed)';
         regimeEl.style.background = isRiskOff ? 'var(--fear-soft)' : 'var(--greed-soft)';

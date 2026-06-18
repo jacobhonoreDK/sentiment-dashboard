@@ -905,16 +905,9 @@
     statusEl.innerHTML = `LIVE · <span id="timestamp">${document.getElementById('timestamp').textContent}</span> · ${liveCount}/${totalCount} live`;
     return true;
   }
-  const hasLiveData = mergeLiveData();
-  if (!hasLiveData) {
-    const statusEl = document.getElementById('liveStatus');
-    statusEl.className = 'live';
-    statusEl.style.color = 'var(--neutral)';
-    statusEl.innerHTML = `DEMO · <span id="timestamp">${document.getElementById('timestamp').textContent}</span> · ingen live data`;
-  }
-
   // Panel weights (risk-on baseline — mirrors CONFIG in update_dashboard.py).
   // These are overridden at runtime if data.js contains composite.weights_used.
+  // MUST be declared before mergeLiveData() is called (closure reads this via let TDZ).
   let panelWeights = {
     credit:  0.28,
     pos:     0.22,
@@ -922,6 +915,14 @@
     vol:     0.17,
     cross:   0.13,
   };
+
+  const hasLiveData = mergeLiveData();
+  if (!hasLiveData) {
+    const statusEl = document.getElementById('liveStatus');
+    statusEl.className = 'live';
+    statusEl.style.color = 'var(--neutral)';
+    statusEl.innerHTML = `DEMO · <span id="timestamp">${document.getElementById('timestamp').textContent}</span> · ingen live data`;
+  }
 
   // Category display names
   const catNames = {

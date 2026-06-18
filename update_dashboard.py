@@ -94,6 +94,7 @@ INDICATORS = [
     ("New Highs - Lows",   "breadth", "hl_net",         1, "breadth"),
     ("A/D Linje",          "breadth", "ad_cumulative",  1, "breadth"),
     ("McClellan Osc.",     "breadth", "mcclellan",      1, "breadth"),
+    ("SPY / RSP ratio",    "derived", "spy_rsp",        -1, "breadth"),
 ]
 
 
@@ -449,7 +450,7 @@ def main():
     print()
 
     # Find alle yfinance tickere vi skal bruge
-    yf_tickers_needed = {"^GSPC"}
+    yf_tickers_needed = {"^GSPC", "^VIX3M"}
     for name, source, info, _, _ in INDICATORS:
         if source == "yf":
             yf_tickers_needed.add(info)
@@ -459,6 +460,7 @@ def main():
                 "gold_silver": ["GC=F", "SI=F"],
                 "copper_gold": ["HG=F", "GC=F"],
                 "xlp_xly":     ["XLP", "XLY"],
+                "spy_rsp":     ["SPY", "RSP"],
             }
             yf_tickers_needed.update(mapping.get(info, []))
 
@@ -560,6 +562,8 @@ def main():
                 series = aligned_ratio(yf_data.get("HG=F"), yf_data.get("GC=F"))
             elif info == "xlp_xly":
                 series = aligned_ratio(yf_data.get("XLP"), yf_data.get("XLY"))
+            elif info == "spy_rsp":
+                series = aligned_ratio(yf_data.get("SPY"), yf_data.get("RSP"))
             else:
                 series = None
             if series is not None and len(series) > 0:
@@ -615,11 +619,22 @@ def main():
         vix_prev = float(vix_data.iloc[-2])
         vix_payload = {"value": vix_value, "change_pct": (vix_value - vix_prev) / vix_prev * 100}
 
+    # ---- VIX term structure contango flags ----
+    vix_contango = {}
+    vix9d_s = yf_data.get("^VIX9D")
+    vix_s   = yf_data.get("^VIX")
+    vix3m_s = yf_data.get("^VIX3M")
+    if vix9d_s is not None and vix_s is not None:
+        vix_contango["front"] = bool(float(vix9d_s.iloc[-1]) < float(vix_s.iloc[-1]))
+    if vix_s is not None and vix3m_s is not None:
+        vix_contango["back"] = bool(float(vix_s.iloc[-1]) < float(vix3m_s.iloc[-1]))
+
     # ---- Saml output ----
     output = {
         "timestamp": datetime.now().isoformat(timespec="seconds"),
         "spx": spx_payload,
         "vix_ticker": vix_payload,
+        "vix_contango": vix_contango,
         "indicators": indicators_out,
     }
 

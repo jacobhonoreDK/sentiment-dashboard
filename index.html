@@ -537,6 +537,59 @@
     .indicator { grid-template-columns: 1.2fr 0.8fr; }
     .indicator .ind-range, .indicator .ind-z { display: none; }
   }
+
+  /* Thermometer bar for % over 50-DMA */
+  .thermometer-bar {
+    position: relative;
+    height: 20px;
+    background: var(--surface-2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .thermometer-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+    opacity: 0.7;
+  }
+  .thermometer-fill.fear    { background: var(--fear); }
+  .thermometer-fill.neutral { background: var(--neutral); }
+  .thermometer-fill.greed   { background: var(--greed); }
+  .therm-tick {
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: rgba(240, 233, 218, 0.12);
+    z-index: 1;
+  }
+  .therm-label {
+    position: absolute;
+    right: 6px; top: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text);
+    z-index: 2;
+    mix-blend-mode: difference;
+  }
+
+  /* Contango / Backwardation badge */
+  .contango-badge {
+    display: inline-block;
+    margin-top: 3px;
+    padding: 1px 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    border-radius: 2px;
+    vertical-align: middle;
+  }
+  .contango-badge.contango      { background: var(--greed-soft); color: var(--greed); }
+  .contango-badge.backwardation { background: var(--fear-soft);  color: var(--fear);  }
+  .contango-badge.mixed         { background: var(--neutral-soft); color: var(--neutral); }
 </style>
 </head>
 <body>
@@ -720,11 +773,12 @@
       { name: 'VIX Term Structure',desc: 'VIX9D / VIX (contango)',             pos: 82, base: 0.91,  freq: 'rt',    fmt: v => v.toFixed(2) },
     ],
     breadth: [
-      { name: '% over 50-DMA',     desc: 'S&P 500 medlemmer',                  pos: 70, base: 64,    freq: 'daily', fmt: v => Math.round(v) + '%' },
+      { name: '% over 50-DMA',     desc: 'S&P 500 medlemmer',                  pos: 70, base: 64,    freq: 'daily', fmt: v => Math.round(v) + '%', thermometer: true },
       { name: '% over 200-DMA',    desc: 'S&P 500 medlemmer',                  pos: 78, base: 71,    freq: 'daily', fmt: v => Math.round(v) + '%' },
       { name: 'A/D Linje',         desc: 'NYSE kumulativ',                     pos: 72, base: 1847,  freq: 'rt',    fmt: v => '+' + Math.round(v).toLocaleString('da-DK') },
       { name: 'McClellan Osc.',    desc: 'NYSE breadth oscillator',            pos: 60, base: 38,    freq: 'daily', fmt: v => (v >= 0 ? '+' : '') + Math.round(v) },
       { name: 'New Highs - Lows',  desc: 'NYSE 52-uger',                       pos: 65, base: 142,   freq: 'rt',    fmt: v => (v >= 0 ? '+' : '') + Math.round(v) },
+      { name: 'SPY / RSP ratio',   desc: 'Large-cap vs equal-weight bredde',   pos: 50, base: 3.55,  freq: 'rt',    fmt: v => v.toFixed(2) },
     ],
     pos: [
       { name: 'AAII Bull-Bear',    desc: 'Retail-investorer (US)',             pos: 32, base: 18,    freq: 'weekly',  fmt: v => (v >= 0 ? '+' : '') + Math.round(v) + '%' },
@@ -801,6 +855,14 @@
       const months = ['JAN','FEB','MAR','APR','MAJ','JUN','JUL','AUG','SEP','OKT','NOV','DEC'];
       const ts = `${liveDate.getDate()} ${months[liveDate.getMonth()]} ${liveDate.getFullYear()} · ${String(liveDate.getHours()).padStart(2,'0')}:${String(liveDate.getMinutes()).padStart(2,'0')} CET`;
       document.getElementById('timestamp').textContent = ts;
+    }
+    // Attach contango flags to VIX Term Structure
+    if (live.vix_contango) {
+      const vts = data.vol.find(i => i.name === 'VIX Term Structure');
+      if (vts) {
+        vts.contango_front = live.vix_contango.front;
+        vts.contango_back  = live.vix_contango.back;
+      }
     }
     // Show status badge
     const statusEl = document.getElementById('liveStatus');
@@ -985,6 +1047,11 @@
       interpret: 'Over +0.2 = klart positivt nyhedsflow. Under -0.2 = bearish nyheder dominerer.',
       why: 'Nyhedssentiment er typisk procyklisk og kan både være advarsel (eufori) og momentum-bekræftelse. Bedst brugt i kombination med andre indikatorer.'
     },
+    'SPY / RSP ratio': {
+      what: 'Forholdet mellem S&P 500 cap-weighted ETF (SPY) og equal-weighted ETF (RSP). Når large caps dominerer stiger ratio\'en.',
+      interpret: 'Stigende ratio = markedsbredden smaler ind (få megacaps driver indekset). Faldende ratio = bred deltagelse (mange aktier stiger).',
+      why: 'Koncentration i toppen af indekset er en klassisk advarsel om skrøbelighed. Når de 10 største aktier bærer hele markedet, er nedsiderisikoen asymmetrisk.',
+    },
     'X / Twitter Bull': {
       what: 'Aggregeret sentiment-score fra finansielle Twitter/X-accounts (FinTwit). NLP-baseret real-time måling.',
       interpret: 'Over +0.3 = stærk bullish konsensus. Under -0.2 = bearish konsensus.',
@@ -1096,18 +1163,49 @@
   function renderIndicator(ind) {
     const tone = toneFromPos(ind.pos);
     const freqLabel = { rt: 'RT', daily: '1D', weekly: '1U', monthly: '1M' }[ind.freq] || '';
-    const isLive = ind.live !== false; // default true if not set
+    const isLive = ind.live !== false;
+
+    // Contango badge for VIX Term Structure
+    let badgeHtml = '';
+    if (ind.contango_front !== undefined) {
+      const frontOk = ind.contango_front === true;
+      const backOk  = ind.contango_back  === true;
+      const frontLabel = frontOk ? 'CONTANGO' : 'BACKWARDATION';
+      const frontCls   = frontOk ? 'contango'  : 'backwardation';
+      const backLabel  = backOk  ? 'VIX3M ▲'  : 'VIX3M ▼';
+      const backCls    = backOk  ? 'contango'  : 'backwardation';
+      badgeHtml = `<br><span class="contango-badge ${frontCls}">${frontLabel}</span> <span class="contango-badge ${backCls}">${backLabel}</span>`;
+    }
+
+    // Thermometer bar for % over 50-DMA
+    let rangeHtml;
+    if (ind.thermometer) {
+      const pct = Math.min(100, Math.max(0, ind.base));
+      const fillCls = pct < 30 ? 'fear' : pct < 60 ? 'neutral' : 'greed';
+      rangeHtml = `
+        <div class="thermometer-bar">
+          <div class="thermometer-fill ${fillCls}" style="width: ${pct}%"></div>
+          <span class="therm-tick" style="left:25%"></span>
+          <span class="therm-tick" style="left:50%"></span>
+          <span class="therm-tick" style="left:75%"></span>
+          <span class="therm-label">${Math.round(pct)}%</span>
+        </div>`;
+    } else {
+      rangeHtml = `
+        <div class="ind-range">
+          <span class="mid"></span>
+          <span class="marker ${tone}" style="left: ${ind.pos}%"></span>
+        </div>`;
+    }
+
     return `
       <div class="indicator" data-name="${ind.name}" data-live="${isLive}">
         <div class="ind-name">
           ${ind.name}<span class="freq ${ind.freq}">${freqLabel}</span>
           <span class="desc">${ind.desc}</span>
         </div>
-        <div class="ind-value">${ind.fmt(ind.base)}</div>
-        <div class="ind-range">
-          <span class="mid"></span>
-          <span class="marker ${tone}" style="left: ${ind.pos}%"></span>
-        </div>
+        <div class="ind-value">${ind.fmt(ind.base)}${badgeHtml}</div>
+        ${rangeHtml}
         <div class="ind-z ${tone}">z ${zFromPos(ind.pos)}</div>
       </div>
     `;

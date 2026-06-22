@@ -1068,6 +1068,11 @@ def main():
         if value is not None and history is not None:
             pos, z = calc_position_and_zscore(value, history, direction)
             if pos is not None:
+                # Date of the latest observation (for display in dashboard)
+                try:
+                    data_date = history.index[-1].strftime("%Y-%m-%d")
+                except Exception:
+                    data_date = None
                 indicators_raw[name] = {
                     "base":     value,
                     "pos":      pos,
@@ -1075,8 +1080,9 @@ def main():
                     "category": category,
                     "freq":     freq,
                     "history":  history,
+                    "date":     data_date,
                 }
-                print(f"   ✓ {name:28}  pos={pos:5.1f}  z={z:+.2f}  base={value:.4g}")
+                print(f"   ✓ {name:28}  pos={pos:5.1f}  z={z:+.2f}  base={value:.4g}  ({data_date})")
             else:
                 print(f"   ⚠ {name:28}  insufficient history")
         else:
@@ -1244,7 +1250,7 @@ def main():
 
     # ── Build output — strip history from indicators_raw before serializing ───
     indicators_out = {
-        nm: {"base": d["base"], "pos": d["pos"], "z": d["z"], "freq": d["freq"]}
+        nm: {"base": d["base"], "pos": d["pos"], "z": d["z"], "freq": d["freq"], "date": d.get("date")}
         for nm, d in indicators_raw.items()
     }
 

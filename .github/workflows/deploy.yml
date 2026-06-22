@@ -2,7 +2,7 @@ name: Opdater og deploy sentiment dashboard
 
 on:
   schedule:
-    - cron: '0 * * * *'  # Hver time
+    - cron: '*/30 * * * *'  # Hvert 30. minut
   push:
     branches: [main]
   workflow_dispatch:  # Kan køres manuelt fra GitHub

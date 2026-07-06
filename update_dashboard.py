@@ -13,6 +13,8 @@ Run:
 Requires FRED_API_KEY environment variable for credit/macro indicators.
 """
 
+from __future__ import annotations
+
 import io, itertools, json, os, sys
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -145,6 +147,7 @@ POLARITY = {
     # ── Positionering & Flows ─────────────────────────────────────────────────
     "NAAIM Exposure":         +1,  # high manager equity exposure = greed
     "AAII Bull-Bear":         +1,  # high bull-bear spread = greed
+    "CNN Fear & Greed":       +1,  # high index = greed (by construction)
     "Investors Intel.":       +1,  # high bullish % = greed
     "Short Interest":         -1,  # high short interest = fear
     "Insider Buy/Sell":       +1,  # net insider buying = greed
@@ -196,7 +199,11 @@ INDICATORS = [
 
     # ── Positionering & Flows ────────────────────────────────────────────────
     ("NAAIM Exposure",     "naaim",   "naaim_number",     1, "pos",     "weekly"),
-    ("AAII Bull-Bear",     "manual",  "AAII Bull-Bear",   1, "pos",     "weekly"),
+    # AAII: auto-downloaded xls with full history since 1987; falls back to
+    # manual_data.json if the download fails.
+    ("AAII Bull-Bear",     "aaii",    "bull_bear",        1, "pos",     "weekly"),
+    # CNN Fear & Greed composite (free JSON endpoint, ~1y history)
+    ("CNN Fear & Greed",   "cnn",     "fng",              1, "pos",     "daily"),
     ("Investors Intel.",   "manual",  "Investors Intel.", 1, "pos",     "weekly"),
     ("Short Interest",     "manual",  "Short Interest",  -1, "pos",     "monthly"),
     ("Insider Buy/Sell",   "manual",  "Insider Buy/Sell", 1, "pos",     "monthly"),
@@ -447,6 +454,68 @@ def fetch_naaim() -> pd.Series | None:
         ).dropna()
     except Exception as e:
         print(f"  ⚠ NAAIM: {e}")
+        return None
+
+
+def fetch_aaii() -> pd.Series | None:
+    """
+    Downloads the official AAII sentiment survey xls (full history since 1987)
+    and returns the Bullish% - Bearish% spread as a weekly series.
+    Requires xlrd for the legacy .xls format.
+    """
+    try:
+        r = requests.get(
+            "https://www.aaii.com/files/surveys/sentiment.xls",
+            headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"},
+            timeout=30,
+        )
+        r.raise_for_status()
+        df = pd.read_excel(io.BytesIO(r.content), header=None)
+        # Layout: header row has 'Date','Bullish','Neutral','Bearish'; data below.
+        rows = []
+        for _, row in df.iterrows():
+            d, bull, bear = row.iloc[0], row.iloc[1], row.iloc[3]
+            if isinstance(d, datetime) and pd.notna(bull) and pd.notna(bear):
+                b, s = float(bull), float(bear)
+                # Values stored as fractions (0.38) in some vintages, pct (38.0) in others
+                if b <= 1.0 and s <= 1.0:
+                    b, s = b * 100, s * 100
+                rows.append((pd.Timestamp(d), b - s))
+        if len(rows) < 100:
+            print(f"  ⚠ AAII: only {len(rows)} parsed rows — treating as failure")
+            return None
+        idx, vals = zip(*rows)
+        return pd.Series(vals, index=pd.DatetimeIndex(idx)).sort_index()
+    except Exception as e:
+        print(f"  ⚠ AAII download: {e}")
+        return None
+
+
+def fetch_cnn_fng() -> pd.Series | None:
+    """
+    CNN Fear & Greed composite via the free graphdata endpoint (~1y history).
+    The Referer header is required — CNN returns 418 without it.
+    """
+    try:
+        r = requests.get(
+            "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+            headers={
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                              "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0 Safari/537.36",
+                "Referer": "https://edition.cnn.com/markets/fear-and-greed",
+                "Accept":  "application/json",
+            },
+            timeout=20,
+        )
+        r.raise_for_status()
+        pts = r.json().get("fear_and_greed_historical", {}).get("data", [])
+        if not pts:
+            return None
+        idx  = pd.DatetimeIndex([pd.Timestamp(p["x"], unit="ms") for p in pts])
+        vals = [float(p["y"]) for p in pts]
+        return pd.Series(vals, index=idx).sort_index()
+    except Exception as e:
+        print(f"  ⚠ CNN Fear & Greed: {e}")
         return None
 
 
@@ -940,6 +1009,23 @@ def main():
         print("   ✗ unavailable")
     print()
 
+    print("📋 AAII Sentiment Survey (auto-download):")
+    aaii_series = fetch_aaii()
+    if aaii_series is not None:
+        print(f"   ✓ Bull-Bear spread {float(aaii_series.iloc[-1]):+.1f}  "
+              f"({aaii_series.index[-1].date()}, {len(aaii_series)} ugers historik)")
+    else:
+        print("   ✗ download fejlede — falder tilbage til manual_data.json")
+    print()
+
+    print("📋 CNN Fear & Greed:")
+    cnn_series = fetch_cnn_fng()
+    if cnn_series is not None:
+        print(f"   ✓ {float(cnn_series.iloc[-1]):.1f}  ({cnn_series.index[-1].date()})")
+    else:
+        print("   ✗ unavailable")
+    print()
+
     print("📊 CBOE Equity Put/Call Ratio:")
     cboe_pcr_value, cboe_pcr_history = fetch_cboe_pcr()
     if cboe_pcr_value is not None:
@@ -992,7 +1078,7 @@ def main():
         "Bitcoin (BTC)": "BTC high", "NAAIM Exposure": "high exposure",
         "AAII Bull-Bear": "bullish spread", "Investors Intel.": "bullish %",
         "Short Interest": "low short interest", "Insider Buy/Sell": "net buying",
-        "X / Twitter Bull": "social bullishness",
+        "X / Twitter Bull": "social bullishness", "CNN Fear & Greed": "index high",
         "% over 50-DMA": "high %", "% over 200-DMA": "high %",
         "New Highs - Lows": "positive net", "A/D Linje": "rising cumulative",
         "McClellan Osc.": "positive", "SPY / RSP ratio": "RSP leads (broad breadth)",
@@ -1054,6 +1140,19 @@ def main():
         elif source == "naaim":
             if naaim_series is not None and len(naaim_series) > 0:
                 value, history = float(naaim_series.iloc[-1]), naaim_series
+
+        elif source == "aaii":
+            if aaii_series is not None and len(aaii_series) > 0:
+                value, history = float(aaii_series.iloc[-1]), aaii_series
+            else:
+                # Fallback: manual entry if the xls download failed
+                entry = manual_data.get("AAII Bull-Bear")
+                if entry is not None:
+                    value, history = entry
+
+        elif source == "cnn":
+            if cnn_series is not None and len(cnn_series) > 0:
+                value, history = float(cnn_series.iloc[-1]), cnn_series
 
         elif source == "cboe":
             if cboe_pcr_value is not None:
@@ -1154,6 +1253,12 @@ def main():
 
     result["roc"]          = roc
     result["window_years"] = CONFIG["history_years"]
+    # Trailing composite history for the dashboard sparkline (last 90 days)
+    spark_cutoff = (datetime.now() - timedelta(days=90)).strftime("%Y-%m-%d")
+    result["history"] = [
+        {"date": k, "full": v["full"]}
+        for k, v in sorted(comp_cache.items()) if k >= spark_cutoff
+    ]
 
     # ── FIX 3: Explicit per-category aggregation report ───────────────────────
     print("📐 Category aggregation (FIX 3 — method: weighted-avg of pos via corr-clusters):")
@@ -1259,7 +1364,7 @@ def main():
         "spx":        spx_payload,
         "vix_ticker": vix_payload,
         "vix_contango": vix_contango,
-        "composite":  {k: v for k, v in result.items() if k != "history"},
+        "composite":  result,
         "indicators": indicators_out,
     }
 

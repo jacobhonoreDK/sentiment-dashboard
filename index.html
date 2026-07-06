@@ -654,6 +654,10 @@
         <span id="regimeBadge" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;padding:3px 8px;border-radius:2px;background:var(--greed-soft);color:var(--greed);">RISK-ON</span>
         <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-3);">FAST: <span id="fastComposite" style="color:var(--greed);">62</span></span>
       </div>
+      <div id="sparklineWrap" style="display:none; margin-top:16px; text-align:center;">
+        <svg id="sparkline" width="220" height="44" viewBox="0 0 220 44" style="overflow:visible;"></svg>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.14em;color:var(--text-3);margin-top:2px;">COMPOSITE · SENESTE 90 DAGE</div>
+      </div>
     </div>
 
     <div class="summary">
@@ -787,6 +791,7 @@
     ],
     pos: [
       { name: 'AAII Bull-Bear',    desc: 'Retail-investorer (US)',             pos: 32, base: 18,    freq: 'weekly',  fmt: v => (v >= 0 ? '+' : '') + Math.round(v) + '%' },
+      { name: 'CNN Fear & Greed',  desc: 'CNN composite (7 inputs)',           pos: 44, base: 44,    freq: 'daily',   fmt: v => Math.round(v) + '/100' },
       { name: 'NAAIM Exposure',    desc: 'Aktive forvaltere',                  pos: 28, base: 78,    freq: 'weekly',  fmt: v => Math.round(v) + '%' },
       { name: 'Investors Intel.',  desc: 'Newsletter-skribenter',              pos: 25, base: 2.4,   freq: 'weekly',  fmt: v => v.toFixed(2) + 'x' },
       { name: 'Short Interest',    desc: 'S&P 500 median',                     pos: 72, base: 2.1,   freq: 'monthly', fmt: v => v.toFixed(1) + '%' },
@@ -917,6 +922,23 @@
         const fmt = v => v == null ? '—' : (v >= 0 ? '+' : '') + v + ' pts';
         rocEl.textContent = `${fmt(w1)} (1U) · ${fmt(w4)} (4U)`;
       }
+      // Composite sparkline (last 90 days from Python cache)
+      if (c.history && c.history.length >= 3) {
+        const svg = document.getElementById('sparkline');
+        const W = 220, H = 44, pad = 3;
+        const vals = c.history.map(p => p.full);
+        const lo = Math.min(...vals) - 2, hi = Math.max(...vals) + 2;
+        const x = i => pad + i * (W - 2 * pad) / (vals.length - 1);
+        const y = v => H - pad - (v - lo) * (H - 2 * pad) / (hi - lo);
+        const pts = vals.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+        const last = vals[vals.length - 1];
+        const tone = last < 35 ? 'var(--fear)' : last > 65 ? 'var(--greed)' : 'var(--neutral)';
+        svg.innerHTML = `
+          <line x1="${pad}" y1="${y(50)}" x2="${W - pad}" y2="${y(50)}" stroke="var(--border)" stroke-dasharray="3 3" stroke-width="1"/>
+          <polyline points="${pts}" fill="none" stroke="${tone}" stroke-width="1.5" stroke-linejoin="round"/>
+          <circle cx="${x(vals.length - 1)}" cy="${y(last)}" r="2.5" fill="${tone}"/>`;
+        document.getElementById('sparklineWrap').style.display = 'block';
+      }
     }
     // Show status badge
     const statusEl = document.getElementById('liveStatus');
@@ -1007,6 +1029,11 @@
       what: 'American Association of Individual Investors\' ugentlige sentiment-undersøgelse blandt retail-investorer. Spread mellem bullish og bearish svar.',
       interpret: 'Over +30% = ekstrem optimisme hos retail. Under -20% = ekstrem pessimisme. Historisk gennemsnit ligger omkring +6%.',
       why: 'Klassisk kontrarisk indikator. Retail-investorer har historisk været forkert på vendingerne - ekstrem bullish AAII har ofte markeret toppe, ekstrem bearish har markeret bunde.'
+    },
+    'CNN Fear & Greed': {
+      what: 'CNNs sammensatte frygt/grådigheds-indeks bygget på 7 markedsindikatorer: momentum, aktiestyrke, bredde, put/call, junk bond-efterspørgsel, volatilitet og safe haven-flows. Skala 0-100.',
+      interpret: 'Under 25 = ekstrem frygt. 25-45 = frygt. 45-55 = neutral. 55-75 = grådighed. Over 75 = ekstrem grådighed.',
+      why: 'Bredt fulgt reference-indeks som mange investorer bruger som kontrarisk signal. Sammenligning med dette dashboards egen composite kan afsløre om vores model afviger fra konsensus-billedet.'
     },
     'NAAIM Exposure': {
       what: 'National Association of Active Investment Managers\' ugentlige måling af faktisk aktie-eksponering hos aktive forvaltere. Skala fra -200% (fuld short med gearing) til +200%.',
@@ -1237,6 +1264,16 @@
     const freqLabel = { rt: 'RT', daily: '1D', weekly: '1U', monthly: '1M' }[ind.freq] || '';
     const isLive = ind.live !== false;
 
+    // Stale-data flag: data older than the cadence implies (weekend-tolerant)
+    let staleHtml = '';
+    if (ind.date) {
+      const ageDays = (Date.now() - new Date(ind.date + 'T12:00:00Z')) / 86400000;
+      const maxAge = { rt: 4, daily: 4, weekly: 10, monthly: 35 }[ind.freq] || 45;
+      if (ageDays > maxAge) {
+        staleHtml = `<span style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.08em;padding:1px 5px;border-radius:2px;background:var(--neutral-soft);color:var(--neutral);margin-left:6px;" title="Data er fra ${ind.date}">${Math.round(ageDays)}D GAMMEL</span>`;
+      }
+    }
+
     // Contango badge for VIX Term Structure
     let badgeHtml = '';
     if (ind.contango_front !== undefined) {
@@ -1273,7 +1310,7 @@
     return `
       <div class="indicator" data-name="${ind.name}" data-live="${isLive}">
         <div class="ind-name">
-          ${ind.name}<span class="freq ${ind.freq}">${freqLabel}</span>
+          ${ind.name}<span class="freq ${ind.freq}">${freqLabel}</span>${staleHtml}
           <span class="desc">${ind.desc}</span>
         </div>
         <div class="ind-value">${ind.fmt(ind.base)}${badgeHtml}</div>

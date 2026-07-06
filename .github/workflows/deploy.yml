@@ -29,7 +29,7 @@ jobs:
           python-version: '3.11'
 
       - name: Installer afhaengigheder
-        run: pip install yfinance pandas numpy requests beautifulsoup4 openpyxl pytrends
+        run: pip install yfinance pandas numpy requests beautifulsoup4 openpyxl xlrd pytrends
 
       - name: Kør opdateringsscript
         env:

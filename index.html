@@ -798,10 +798,11 @@
       { name: 'Insider Buy/Sell',  desc: '8-uger glidende',                    pos: 38, base: 0.42,  freq: 'monthly', fmt: v => v.toFixed(2) },
     ],
     credit: [
-      { name: 'HY Credit Spread',  desc: 'BofA US High Yield',                 pos: 78, base: 312,   freq: 'rt',    fmt: v => Math.round(v) + 'bps' },
-      { name: 'IG Credit Spread',  desc: 'BofA US Corporate',                  pos: 72, base: 94,    freq: 'rt',    fmt: v => Math.round(v) + 'bps' },
+      // FRED delivers these three in percent (2.70 = 270bps) — fmt converts to bps.
+      { name: 'HY Credit Spread',  desc: 'BofA US High Yield',                 pos: 78, base: 3.12,  freq: 'rt',    fmt: v => Math.round(v * 100) + 'bps' },
+      { name: 'IG Credit Spread',  desc: 'BofA US Corporate',                  pos: 72, base: 0.94,  freq: 'rt',    fmt: v => Math.round(v * 100) + 'bps' },
       { name: 'MOVE Index',        desc: 'Treasury volatilitet',               pos: 48, base: 92.4,  freq: 'rt',    fmt: v => v.toFixed(1) },
-      { name: '2s10s kurve',       desc: 'UST yield spread',                   pos: 55, base: 38,    freq: 'rt',    fmt: v => (v >= 0 ? '+' : '') + Math.round(v) + 'bps' },
+      { name: '2s10s kurve',       desc: 'UST yield spread',                   pos: 55, base: 0.38,  freq: 'rt',    fmt: v => (v >= 0 ? '+' : '') + Math.round(v * 100) + 'bps' },
       { name: 'Financial Conds.',  desc: 'Chicago Fed NFCI',                   pos: 68, base: -0.42, freq: 'weekly', fmt: v => v.toFixed(2) },
       { name: 'SOFR',              desc: 'Overnight funding rate (proxy)',       pos: 50, base: 5.30,  freq: 'daily',  fmt: v => v.toFixed(2) + '%' },
     ],
@@ -1385,20 +1386,23 @@
     const pc = data.vol.find(i => i.name === 'Put/Call Ratio');
     const dma = data.breadth.find(i => i.name === '% over 200-DMA');
     document.getElementById('summVix').textContent = vix.fmt(vix.base);
-    document.getElementById('summHy').textContent = Math.round(hy.base);
+    document.getElementById('summHy').textContent = Math.round(hy.base * 100);
     document.getElementById('summPc').textContent = pc.fmt(pc.base);
     document.getElementById('summDma').textContent = Math.round(dma.base);
-    // Update percentile sub-labels
-    const setPct = (id, pos) => {
+    // Update percentile sub-labels.
+    // pos is greed-adjusted, so the raw percentile of the value itself is
+    // (100 - pos) for fear-direction indicators and pos for greed-direction ones.
+    const setPct = (id, pos, greedDirection) => {
       const tone = toneFromPos(pos);
       const el = document.getElementById(id);
-      el.textContent = `${Math.round(100 - pos)}. percentil`;
+      const rawPct = greedDirection ? pos : 100 - pos;
+      el.textContent = `${Math.round(rawPct)}. percentil`;
       el.style.color = `var(--${tone})`;
     };
-    setPct('summVixPct', vix.pos);
-    setPct('summHyPct', hy.pos);
-    setPct('summPcPct', pc.pos);
-    setPct('summDmaPct', dma.pos);
+    setPct('summVixPct', vix.pos, false);
+    setPct('summHyPct', hy.pos, false);
+    setPct('summPcPct', pc.pos, false);
+    setPct('summDmaPct', dma.pos, true);   // % over 200-DMA: high value = greed
 
     // Attach click handlers for indicator details
     document.querySelectorAll('.indicator').forEach(el => {

@@ -15,7 +15,7 @@ Requires FRED_API_KEY environment variable for credit/macro indicators.
 
 from __future__ import annotations
 
-import io, itertools, json, os, sys
+import io, itertools, json, os, re, sys
 from collections import defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -429,31 +429,93 @@ def fetch_manual() -> dict:
 
 
 def fetch_naaim() -> pd.Series | None:
+    """
+    NAAIM Exposure Index.
+
+    NAAIM retired the public xlsx download; the data now lives behind two
+    embeddable widgets:
+      /embeddable/chart  → ~130 weeks of history (lags a few months)
+      /embeddable/number → the current week's reading as plain text
+    History and current value are stitched together here.
+    """
+    import html as _html
+
+    headers = {"User-Agent": "Mozilla/5.0"}
+    history = None
+
+    # ── Historical series from the Chart.js config embedded in the widget ──
     try:
-        r = requests.get(
-            "https://www.naaim.org/programs/naaim-exposure-index/",
-            headers={"User-Agent": "Mozilla/5.0"},
-            timeout=15,
-        )
-        soup       = BeautifulSoup(r.text, "html.parser")
-        xlsx_links = [
-            a["href"] for a in soup.find_all("a", href=True)
-            if ".xlsx" in a["href"].lower() and "naaim" in a["href"].lower()
-        ]
-        if not xlsx_links:
-            print("  ⚠ NAAIM: no xlsx link found")
-            return None
-        r2 = requests.get(xlsx_links[0], headers={"User-Agent": "Mozilla/5.0"}, timeout=20)
-        r2.raise_for_status()
-        df = pd.read_excel(io.BytesIO(r2.content))
-        df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
-        df = df.dropna(subset=["Date", "NAAIM Number"]).sort_values("Date")
-        return pd.Series(
-            df["NAAIM Number"].values,
-            index=pd.DatetimeIndex(df["Date"].values),
-        ).dropna()
+        r = requests.get("https://index.naaim.org/embeddable/chart",
+                         headers=headers, timeout=25)
+        r.raise_for_status()
+        m = re.search(r'data-symfony--ux-chartjs--chart-view-value="([^"]+)"', r.text)
+        if m:
+            cfg    = json.loads(_html.unescape(m.group(1)))
+            labels = cfg["data"]["labels"]
+            series = next(
+                (d for d in cfg["data"]["datasets"] if "naaim" in str(d.get("label", "")).lower()),
+                None,
+            )
+            if series:
+                rows = [
+                    (pd.Timestamp(lbl), float(val))
+                    for lbl, val in zip(labels, series["data"])
+                    if val is not None
+                ]
+                if rows:
+                    idx, vals = zip(*rows)
+                    history = pd.Series(vals, index=pd.DatetimeIndex(idx)).sort_index()
     except Exception as e:
-        print(f"  ⚠ NAAIM: {e}")
+        print(f"  ⚠ NAAIM chart: {e}")
+
+    # ── Current reading (fresher than the chart, which lags) ──
+    current = None
+    try:
+        r2 = requests.get("https://index.naaim.org/embeddable/number",
+                          headers=headers, timeout=20)
+        r2.raise_for_status()
+        text = re.sub(r"<[^>]+>", " ", r2.text[r2.text.find("<body"):])
+        nums = re.findall(r"-?\d+\.\d+", text)
+        if nums:
+            current = float(nums[0])
+    except Exception as e:
+        print(f"  ⚠ NAAIM number: {e}")
+
+    if history is None:
+        return None
+
+    # Append the current value if it postdates the chart's last point
+    if current is not None:
+        today = pd.Timestamp(datetime.now().date())
+        if today > history.index[-1]:
+            history = pd.concat([history, pd.Series([current], index=[today])])
+
+    return history.sort_index().dropna()
+
+
+def fetch_cboe_index(symbol: str, years: int = None) -> pd.Series | None:
+    """
+    Daily close history for a CBOE volatility index straight from CBOE's CDN.
+
+    yfinance stopped serving history for ^VIX9D and ^VIX3M (returns only the
+    latest row), which silently dropped VIX Term Structure from the composite.
+    CBOE publishes the full series back to 2011 as CSV.
+    """
+    if years is None:
+        years = CONFIG["history_years"]
+    url = f"https://cdn.cboe.com/api/global/us_indices/daily_prices/{symbol}_History.csv"
+    try:
+        r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=25)
+        r.raise_for_status()
+        df = pd.read_csv(io.StringIO(r.text))
+        df.columns = [c.strip().upper() for c in df.columns]
+        df["DATE"] = pd.to_datetime(df["DATE"], errors="coerce")
+        df = df.dropna(subset=["DATE", "CLOSE"])
+        s = pd.Series(df["CLOSE"].astype(float).values, index=pd.DatetimeIndex(df["DATE"]))
+        cutoff = pd.Timestamp.today() - pd.Timedelta(days=int(years * 365.25))
+        return s[s.index >= cutoff].sort_index()
+    except Exception as e:
+        print(f"  ⚠ CBOE {symbol}: {e}")
         return None
 
 
@@ -965,6 +1027,10 @@ def main():
         elif source == "derived":
             yf_tickers_needed.update(derived_map.get(info, []))
 
+    # yfinance no longer serves history for these — sourced from CBOE instead.
+    CBOE_SOURCED = {"^VIX9D": "VIX9D", "^VIX3M": "VIX3M"}
+    yf_tickers_needed -= set(CBOE_SOURCED)
+
     # ── Fetch Yahoo Finance ────────────────────────────────────────────────────
     print(f"📈 Yahoo Finance ({len(yf_tickers_needed)} tickers, {CONFIG['history_years']}y):")
     yf_data = {}
@@ -975,6 +1041,24 @@ def main():
             print(f"   ✓ {ticker:14}  {float(h.iloc[-1]):>10.4g}   ({h.index[-1].date()})")
         else:
             print(f"   ✗ {ticker:14}  no data")
+    print()
+
+    # ── Fetch CBOE index history (VIX9D / VIX3M) ──────────────────────────────
+    print(f"📉 CBOE index history ({len(CBOE_SOURCED)} series):")
+    for ticker, symbol in sorted(CBOE_SOURCED.items()):
+        h = fetch_cboe_index(symbol)
+        if h is not None and len(h) > 0:
+            yf_data[ticker] = h
+            print(f"   ✓ {ticker:14}  {float(h.iloc[-1]):>10.4g}   ({h.index[-1].date()}, {len(h)} obs)")
+        else:
+            # Last resort: yfinance still returns the latest print, enough for
+            # the contango badge though not for percentile scoring.
+            h = fetch_yf(ticker)
+            if h is not None and len(h) > 0:
+                yf_data[ticker] = h
+                print(f"   ⚠ {ticker:14}  CBOE fejlede — yfinance fallback ({len(h)} obs)")
+            else:
+                print(f"   ✗ {ticker:14}  no data")
     print()
 
     # ── Fetch FRED ─────────────────────────────────────────────────────────────

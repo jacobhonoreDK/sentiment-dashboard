@@ -440,8 +440,8 @@
     "regime": "risk_on"
   },
   "2026-09-14": {
-    "fast": 53.4,
-    "full": 56.9,
-    "regime": "risk_on"
+    "fast": 54.8,
+    "full": 58.0,
+    "regime": "risk_off"
   }
 }

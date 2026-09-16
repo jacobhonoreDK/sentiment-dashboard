@@ -450,8 +450,8 @@
     "regime": "risk_off"
   },
   "2026-09-16": {
-    "fast": 53.6,
-    "full": 58.0,
-    "regime": "risk_off"
+    "fast": 50.7,
+    "full": 55.5,
+    "regime": "risk_on"
   }
 }

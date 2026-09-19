@@ -463,5 +463,10 @@
     "fast": 53.5,
     "full": 57.6,
     "regime": "risk_on"
+  },
+  "2026-09-19": {
+    "fast": 53.6,
+    "full": 57.0,
+    "regime": "risk_on"
   }
 }

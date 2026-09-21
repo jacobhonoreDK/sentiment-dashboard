@@ -837,6 +837,76 @@
     return `${parseInt(p.day, 10)} ${mon} ${p.year} · ${time} ${tz}`;
   }
 
+  // Python-computed scores, populated by mergeLiveData when data.js is present.
+  // null in demo mode, which makes the scoring functions fall back to green-count.
+  let pythonComposite = null;
+  let pythonCatScores = null;
+
+  // ── Live market commentary ──────────────────────────────────────────────
+  // The headline used to be hardcoded, so it kept asserting "breadth is
+  // healthy" long after breadth had rolled over. It is now written from the
+  // actual category scores on every load.
+  const CATEGORY_PHRASES = {
+    vol:     { greed: 'volatiliteten er lav',                  neutral: 'volatiliteten er normal',            fear: 'volatiliteten er forhøjet' },
+    credit:  { greed: 'kreditspændene er stramme',             neutral: 'kreditspændene er neutrale',         fear: 'kreditspændene er udvidet' },
+    breadth: { greed: 'markedsbredden er sund',                neutral: 'markedsbredden er blandet',          fear: 'markedsbredden er svag' },
+    pos:     { greed: 'positioneringen er offensiv',           neutral: 'positioneringen er neutral',         fear: 'positioneringen er defensiv' },
+    cross:   { greed: 'cross-asset signalerne peger risk-on',  neutral: 'cross-asset signalerne er blandede', fear: 'cross-asset signalerne peger defensivt' },
+  };
+
+  function phraseFor(cat, score) {
+    const band = score >= 55 ? 'greed' : score <= 45 ? 'fear' : 'neutral';
+    return CATEGORY_PHRASES[cat] ? CATEGORY_PHRASES[cat][band] : '';
+  }
+
+  // Lookback window and indicator count come from data.js so these never drift
+  // out of sync with the model again (they were hardcoded at 3y and 25).
+  function histWindowYears() {
+    const c = window.DASHBOARD_DATA && window.DASHBOARD_DATA.composite;
+    return (c && c.window_years) || 5;
+  }
+
+  function indicatorCount() {
+    const live = window.DASHBOARD_DATA && window.DASHBOARD_DATA.indicators;
+    if (live) return Object.keys(live).length;
+    return Object.values(data).reduce((n, arr) => n + arr.length, 0);
+  }
+
+  function compositeLabel(v) {
+    if (v < 25) return 'udbredt frygt';
+    if (v < 45) return 'forsigtighed';
+    if (v < 55) return 'et blandet billede';
+    if (v < 75) return 'moderat optimisme';
+    return 'udpræget grådighed';
+  }
+
+  function updateSummaryText(composite, catScores, roc) {
+    const el = document.querySelector('.summary h2');
+    if (!el || !catScores) return;
+    const entries = Object.entries(catScores).filter(([, v]) => v != null);
+    if (entries.length < 2) return;
+    entries.sort((a, b) => b[1] - a[1]);
+    const [strongCat, strongVal] = entries[0];
+    const [weakCat,   weakVal]   = entries[entries.length - 1];
+
+    // Only frame it as a contrast when the two ends actually disagree;
+    // otherwise the sentence would claim tension that isn't in the data.
+    const contrast = strongVal - weakVal >= 12;
+    const body = contrast
+      ? `${phraseFor(strongCat, strongVal)} (${Math.round(strongVal)}), mens ${phraseFor(weakCat, weakVal)} (${Math.round(weakVal)})`
+      : `${phraseFor(strongCat, strongVal)} (${Math.round(strongVal)}) og ${phraseFor(weakCat, weakVal)} (${Math.round(weakVal)})`;
+
+    let trend = '';
+    const w1 = roc && roc['1w'];
+    if (w1 != null) {
+      if (w1 >= 3)       trend = ` Billedet er forbedret ${Math.abs(Math.round(w1))} point den seneste uge.`;
+      else if (w1 <= -3) trend = ` Billedet er forværret ${Math.abs(Math.round(w1))} point den seneste uge.`;
+      else               trend = ' Billedet er stort set uændret den seneste uge.';
+    }
+
+    el.innerHTML = `Markedet er præget af <em>${compositeLabel(composite)}</em> — ${body}.${trend}`;
+  }
+
   function mergeLiveData() {
     if (typeof window.DASHBOARD_DATA === 'undefined') {
       // No live data file - mark everything as demo
@@ -897,7 +967,11 @@
     // ── Consume Python composite (new model) ────────────────────────────────
     if (live.composite) {
       const c = live.composite;
-      // Override panel weights with regime-specific weights from Python
+      // Adopt the Python model: composite, category scores and regime weights.
+      // Without this the gauge showed a green-count number that disagreed with
+      // the sparkline plotted directly beneath it.
+      if (c.full != null)        pythonComposite = c.full;
+      if (c.category_scores)     pythonCatScores = c.category_scores;
       if (c.weights_used) {
         panelWeights = { ...panelWeights, ...c.weights_used };
       }
@@ -1182,7 +1256,7 @@
             <span class="details-stat-val ${tone}">${Math.round(ind.pos)} / 100</span>
           </div>
           <div class="details-stat">
-            <span class="details-stat-key">Z-score (3y)</span>
+            <span class="details-stat-key">Z-score (${histWindowYears()}y)</span>
             <span class="details-stat-val ${tone}">z ${zFromPos(ind.pos)}</span>
           </div>
           <div class="details-stat">
@@ -1226,7 +1300,7 @@
           </div>
           <div class="details-stat">
             <span class="details-stat-key">Normalisering</span>
-            <span class="details-stat-val">z-score, 3-årig</span>
+            <span class="details-stat-val">z-score, ${histWindowYears()}-årig</span>
           </div>
           <div class="details-stat">
             <span class="details-stat-key">Composite</span>
@@ -1236,13 +1310,13 @@
       </div>
       <div class="details-text">
         <h4>Princippet</h4>
-        <p>Dashboardet aggregerer 25 sentiment-indikatorer i fem tematiske kategorier til én samlet score (0-100). Idéen er at intet enkelt mål er pålideligt, men når mange uafhængige signaler peger samme vej, øges sandsynligheden for at billedet er reelt.</p>
+        <p>Dashboardet aggregerer ${indicatorCount()} sentiment-indikatorer i fem tematiske kategorier til én samlet score (0-100). Idéen er at intet enkelt mål er pålideligt, men når mange uafhængige signaler peger samme vej, øges sandsynligheden for at billedet er reelt.</p>
         <h4>Sådan læses panelerne</h4>
-        <p>Hver indikator har en markør på en horisontal skala fra <em>fear</em> (venstre) til <em>greed</em> (højre). Markørens position viser hvor på den 3-årige historiske range vi er nu. Z-scoren angiver hvor mange standardafvigelser fra gennemsnittet vi befinder os.</p>
+        <p>Hver indikator har en markør på en horisontal skala fra <em>fear</em> (venstre) til <em>greed</em> (højre). Markørens position viser hvor på den ${histWindowYears()}-årige historiske range vi er nu. Z-scoren angiver hvor mange standardafvigelser fra gennemsnittet vi befinder os.</p>
         <h4>Sådan beregnes composite-scoren (model v2)</h4>
         <p>Python-backend beregner en <em>vægtet gennemsnit-score</em> for hvert panel (0–100, baseret på den historiske percentil for hver indikator). Indenfor hvert panel reduceres dobbelt-tælling via en korrelationsmatrix: indikatorer med |r| &gt; 0,80 deler ét uafhængigt signal-slot.</p>
         <p>Panelvægte er regime-betingede: <em>Kredit 28% · Positionering 22% · Bredde 20% · Volatilitet 17% · Cross-Asset 13%</em> (risk-on). I risk-off-regime op-vægtes Kredit (33%) og Volatilitet (25%). Regime bestemmes af SPX vs. 200-DMA og VIX vs. 1-års median.</p>
-        <p>Der beregnes to composites: <em>Full</em> (alle 29 indikatorer) og <em>Fast</em> (kun RT + daglige indikatorer). Signal Strength er en ikke-lineær transform der viser 0 i det neutrale bånd (35–65) og ±1 ved ekstremerne.</p>
+        <p>Der beregnes to composites: <em>Full</em> (alle ${indicatorCount()} indikatorer) og <em>Fast</em> (kun RT + daglige indikatorer). Signal Strength er en ikke-lineær transform der viser 0 i det neutrale bånd (35–65) og ±1 ved ekstremerne.</p>
       </div>
     `;
   }
@@ -1321,26 +1395,33 @@
     `;
   }
 
-  // Returns 0–100: percentage of green (risk-on) indicators in the panel.
-  // Green = historical position > 65 (i.e. in the upper third of 3-year range).
-  // Example: 4 out of 5 green → 80. Used for both panel badges and composite.
+  // Panel score 0–100.
+  // With live data we use the Python category score (weighted average of each
+  // indicator's historical position, de-duplicated by correlation cluster).
+  // In demo mode there is no Python score, so we fall back to the cruder
+  // green-count: share of indicators sitting above position 65.
   function calcPanelScore(panelKey) {
+    if (pythonCatScores && pythonCatScores[panelKey] != null) {
+      return Math.round(pythonCatScores[panelKey]);
+    }
     const inds = data[panelKey];
     if (!inds || inds.length === 0) return 0;
     const greenCount = inds.filter(i => i.pos > 65).length;
     return Math.round((greenCount / inds.length) * 100);
   }
 
-  // Returns the raw green count and total for a panel (used in score tooltip)
+  // Returns the raw green count and total for a panel (shown beside the score)
   function calcPanelGreenCount(panelKey) {
     const inds = data[panelKey];
     if (!inds || inds.length === 0) return { green: 0, total: 0 };
     return { green: inds.filter(i => i.pos > 65).length, total: inds.length };
   }
 
-  // Master Score 0–100: each panel contributes (green%) × weight.
-  // All weights sum to 1.0, so maximum score = 100.
+  // Master Score 0–100. Prefers the Python composite so the gauge, the panel
+  // badges and the sparkline all describe the same model; the weighted
+  // green-count is only used when running on demo data.
   function calcComposite() {
+    if (pythonComposite != null) return Math.round(pythonComposite);
     let total = 0;
     for (const key in panelWeights) {
       total += calcPanelScore(key) * panelWeights[key];
@@ -1377,6 +1458,14 @@
     const gaugeState = document.getElementById('gaugeState');
     gaugeState.textContent = state.name;
     gaugeState.style.color = `var(--${state.tone})`;
+
+    // Rewrite the headline from whatever scores are actually in play, so it
+    // stays true in demo mode and after a refresh as well as on live data.
+    const summaryScores = pythonCatScores || Object.fromEntries(
+      Object.keys(panelWeights).map(k => [k, calcPanelScore(k)])
+    );
+    updateSummaryText(composite, summaryScores,
+                      (window.DASHBOARD_DATA && window.DASHBOARD_DATA.composite || {}).roc);
     // Update needle angle: 0 → -90deg, 100 → +90deg
     const angle = -90 + (composite * 1.8);
     document.getElementById('gaugeNeedle').style.transform = `rotate(${angle}deg)`;

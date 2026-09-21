@@ -777,15 +777,15 @@
       { name: 'VIX',               desc: 'CBOE volatilitetsindeks',           pos: 75, base: 14.2,  freq: 'rt',    fmt: v => v.toFixed(1) },
       { name: 'VVIX',              desc: 'Volatilitet på VIX',                 pos: 62, base: 88.4,  freq: 'rt',    fmt: v => v.toFixed(1) },
       { name: 'SKEW Index',        desc: 'Pris på tail-risk hedges',           pos: 38, base: 142.1, freq: 'rt',    fmt: v => v.toFixed(1) },
-      { name: 'Put/Call Ratio',    desc: 'CBOE total equity, 10-d glidende',   pos: 58, base: 0.82,  freq: 'rt',    fmt: v => v.toFixed(2) },
+      { name: 'Put/Call Ratio',    desc: 'CBOE equity, daglig',   pos: 58, base: 0.82,  freq: 'rt',    fmt: v => v.toFixed(2) },
       { name: 'VIX Term Structure',desc: 'VIX9D / VIX (contango)',             pos: 82, base: 0.91,  freq: 'rt',    fmt: v => v.toFixed(2) },
     ],
     breadth: [
       { name: '% over 50-DMA',     desc: 'S&P 500 medlemmer',                  pos: 70, base: 64,    freq: 'daily', fmt: v => Math.round(v) + '%', thermometer: true },
       { name: '% over 200-DMA',    desc: 'S&P 500 medlemmer',                  pos: 78, base: 71,    freq: 'daily', fmt: v => Math.round(v) + '%' },
-      { name: 'A/D Linje',         desc: 'NYSE kumulativ',                     pos: 72, base: 1847,  freq: 'rt',    fmt: v => '+' + Math.round(v).toLocaleString('da-DK') },
-      { name: 'McClellan Osc.',    desc: 'NYSE breadth oscillator',            pos: 60, base: 38,    freq: 'daily', fmt: v => (v >= 0 ? '+' : '') + Math.round(v) },
-      { name: 'New Highs - Lows',  desc: 'NYSE 52-uger',                       pos: 65, base: 142,   freq: 'rt',    fmt: v => (v >= 0 ? '+' : '') + Math.round(v) },
+      { name: 'A/D Linje',         desc: 'S&P 500 kumulativ',                     pos: 72, base: 1847,  freq: 'rt',    fmt: v => '+' + Math.round(v).toLocaleString('da-DK') },
+      { name: 'McClellan Osc.',    desc: 'S&P 500 breadth oscillator',            pos: 60, base: 38,    freq: 'daily', fmt: v => (v >= 0 ? '+' : '') + Math.round(v) },
+      { name: 'New Highs - Lows',  desc: 'S&P 500 52-uger',                       pos: 65, base: 142,   freq: 'rt',    fmt: v => (v >= 0 ? '+' : '') + Math.round(v) },
       { name: 'SPY / RSP ratio',   desc: 'Large-cap vs equal-weight bredde',   pos: 50, base: 3.55,  freq: 'rt',    fmt: v => v.toFixed(2) },
       { name: '50/200 DMA divergence', desc: '% over 50DMA minus % over 200DMA', pos: 50, base: 0,  freq: 'daily', fmt: v => (v >= 0 ? '+' : '') + v.toFixed(1) + 'pp' },
     ],
@@ -811,7 +811,7 @@
       { name: 'Kobber/Guld ratio', desc: 'Højere = risk-on',                   pos: 58, base: 0.0019,freq: 'rt',    fmt: v => v.toFixed(4) },
       { name: 'DXY',               desc: 'Dollar-indeks',                      pos: 55, base: 102.4, freq: 'rt',    fmt: v => v.toFixed(1) },
       { name: 'XLP / XLY ratio',   desc: 'Defensive vs cykliske',              pos: 68, base: 0.78,  freq: 'rt',    fmt: v => v.toFixed(2) },
-      { name: 'Bitcoin (BTC)',     desc: 'Risk-on proxy, 30-d',                pos: 62, base: 94200, freq: 'rt',    fmt: v => '$' + (v/1000).toFixed(1) + 'k' },
+      { name: 'Bitcoin (BTC)',     desc: 'Risk-on proxy',                pos: 62, base: 94200, freq: 'rt',    fmt: v => '$' + (v/1000).toFixed(1) + 'k' },
     ],
   };
 
@@ -870,6 +870,29 @@
     const live = window.DASHBOARD_DATA && window.DASHBOARD_DATA.indicators;
     if (live) return Object.keys(live).length;
     return Object.values(data).reduce((n, arr) => n + arr.length, 0);
+  }
+
+  // Model config as actually used by the Python backend, with the defaults from
+  // CONFIG as fallback for demo mode.
+  function modelConfig() {
+    const c = window.DASHBOARD_DATA && window.DASHBOARD_DATA.composite;
+    return Object.assign({
+      corr_threshold: 0.80,
+      neutral_lo: 35,
+      neutral_hi: 65,
+      regime_spx_ma_days: 200,
+      regime_vix_days: 252,
+      weights_risk_on:  { credit: 0.28, pos: 0.22, breadth: 0.20, vol: 0.17, cross: 0.13 },
+      weights_risk_off: { credit: 0.33, vol: 0.25, pos: 0.18, breadth: 0.14, cross: 0.10 },
+    }, (c && c.config) || {});
+  }
+
+  // "Kredit 28% · Positionering 22% · …", sorted heaviest first.
+  function formatWeights(weights) {
+    return Object.entries(weights)
+      .sort((a, b) => b[1] - a[1])
+      .map(([k, v]) => `${catNames[k] ? catNames[k].split(' ')[0] : k} ${Math.round(v * 100)}%`)
+      .join(' · ');
   }
 
   function compositeLabel(v) {
@@ -1066,7 +1089,7 @@
       why: 'SKEW kan fortælle hvad VIX ikke kan - nemlig om der er bekymring for sjældne men store fald. Klassisk divergens: lav VIX + høj SKEW = ro på overfladen, frygt i dybden.'
     },
     'Put/Call Ratio': {
-      what: 'Forholdet mellem handlede put- og call-optioner på CBOE, glidende 10-dages gennemsnit. Højere ratio = mere bearish positionering.',
+      what: 'Forholdet mellem handlede put- og call-optioner på CBOE, dagens equity-tal. Højere ratio = mere bearish positionering.',
       interpret: 'Under 0.7 er bullish ekstrem (greed). 0.7-1.0 er normal. Over 1.2 er bearish ekstrem (fear).',
       why: 'Bruges typisk kontrarisk. Ekstrem høj P/C i bunden af en korrektion betyder pessimismen har toppet - købssignal. Ekstrem lav P/C på toppe betyder eufori og advarselssignal.'
     },
@@ -1091,12 +1114,12 @@
       why: 'Negative divergenser i A/D-linjen har advaret om næsten alle større bear-markets i moderne historie 3-12 måneder før prisindekset toppede.'
     },
     'McClellan Osc.': {
-      what: 'En oscillator baseret på forskellen mellem 19-dages og 39-dages eksponentielle gennemsnit af stigende-faldende aktier på NYSE.',
+      what: 'En oscillator baseret på forskellen mellem 19-dages og 39-dages eksponentielle gennemsnit af stigende-faldende aktier i S&P 500.',
       interpret: 'Over +100 er overkøbt, under -100 oversolgt. Krydsninger gennem nul indikerer momentum-skift.',
       why: 'Tidligt timing-signal for kortsigtede vendinger. Ekstremer på -200 eller lavere har historisk markeret korte-sigt bunde med høj præcision.'
     },
     'New Highs - Lows': {
-      what: 'Antal aktier der laver 52-ugers højde minus antal der laver 52-ugers lavpunkt på NYSE.',
+      what: 'Antal S&P 500-aktier der laver 52-ugers højde minus antal der laver 52-ugers lavpunkt.',
       interpret: 'Konsistent positivt = sundt bull market. Skift til negativt territorium signalerer regime-skift. Stærkt negativt (under -200) ses i krak.',
       why: 'Når indeks stiger til all-time-highs mens new highs skrumper er det den klareste advarsel om at rally\'et bæres af færre og færre aktier - typisk megacaps.'
     },
@@ -1292,11 +1315,11 @@
         <div class="details-stats">
           <div class="details-stat">
             <span class="details-stat-key">Indikatorer</span>
-            <span class="details-stat-val">25 stk.</span>
+            <span class="details-stat-val">${indicatorCount()} stk.</span>
           </div>
           <div class="details-stat">
             <span class="details-stat-key">Kategorier</span>
-            <span class="details-stat-val">5 paneler</span>
+            <span class="details-stat-val">${Object.keys(data).length} paneler</span>
           </div>
           <div class="details-stat">
             <span class="details-stat-key">Normalisering</span>
@@ -1314,9 +1337,9 @@
         <h4>Sådan læses panelerne</h4>
         <p>Hver indikator har en markør på en horisontal skala fra <em>fear</em> (venstre) til <em>greed</em> (højre). Markørens position viser hvor på den ${histWindowYears()}-årige historiske range vi er nu. Z-scoren angiver hvor mange standardafvigelser fra gennemsnittet vi befinder os.</p>
         <h4>Sådan beregnes composite-scoren (model v2)</h4>
-        <p>Python-backend beregner en <em>vægtet gennemsnit-score</em> for hvert panel (0–100, baseret på den historiske percentil for hver indikator). Indenfor hvert panel reduceres dobbelt-tælling via en korrelationsmatrix: indikatorer med |r| &gt; 0,80 deler ét uafhængigt signal-slot.</p>
-        <p>Panelvægte er regime-betingede: <em>Kredit 28% · Positionering 22% · Bredde 20% · Volatilitet 17% · Cross-Asset 13%</em> (risk-on). I risk-off-regime op-vægtes Kredit (33%) og Volatilitet (25%). Regime bestemmes af SPX vs. 200-DMA og VIX vs. 1-års median.</p>
-        <p>Der beregnes to composites: <em>Full</em> (alle ${indicatorCount()} indikatorer) og <em>Fast</em> (kun RT + daglige indikatorer). Signal Strength er en ikke-lineær transform der viser 0 i det neutrale bånd (35–65) og ±1 ved ekstremerne.</p>
+        <p>Python-backend beregner en <em>vægtet gennemsnit-score</em> for hvert panel (0–100, baseret på den historiske percentil for hver indikator). Indenfor hvert panel reduceres dobbelt-tælling via en korrelationsmatrix: indikatorer med |r| &gt; ${modelConfig().corr_threshold.toFixed(2).replace('.', ',')} deler ét uafhængigt signal-slot.</p>
+        <p>Panelvægte er regime-betingede: <em>${formatWeights(modelConfig().weights_risk_on)}</em> (risk-on). I risk-off-regime skifter de til <em>${formatWeights(modelConfig().weights_risk_off)}</em>. Regime bestemmes af SPX vs. ${modelConfig().regime_spx_ma_days}-DMA og VIX vs. ${Math.round(modelConfig().regime_vix_days / 252)}-års median.</p>
+        <p>Der beregnes to composites: <em>Full</em> (alle ${indicatorCount()} indikatorer) og <em>Fast</em> (kun RT + daglige indikatorer). Signal Strength er en ikke-lineær transform der viser 0 i det neutrale bånd (${modelConfig().neutral_lo}–${modelConfig().neutral_hi}) og ±1 ved ekstremerne.</p>
       </div>
     `;
   }

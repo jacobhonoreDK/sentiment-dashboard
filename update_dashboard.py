@@ -1337,6 +1337,17 @@ def main():
 
     result["roc"]          = roc
     result["window_years"] = CONFIG["history_years"]
+    # Config the dashboard text quotes. Exported so the explanation panel can
+    # never drift away from the model the way the hardcoded "3y"/"25" did.
+    result["config"] = {
+        "corr_threshold":     CONFIG["corr_threshold"],
+        "neutral_lo":         CONFIG["signal_neutral_lo"],
+        "neutral_hi":         CONFIG["signal_neutral_hi"],
+        "regime_spx_ma_days": CONFIG["regime_spx_ma_days"],
+        "regime_vix_days":    CONFIG["regime_vix_lookback_days"],
+        "weights_risk_on":    CONFIG["weights_risk_on"],
+        "weights_risk_off":   CONFIG["weights_risk_off"],
+    }
     # Trailing composite history for the dashboard sparkline (last 90 days)
     spark_cutoff = (datetime.now() - timedelta(days=90)).strftime("%Y-%m-%d")
     result["history"] = [

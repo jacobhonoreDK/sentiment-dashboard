@@ -15,7 +15,7 @@ Requires FRED_API_KEY environment variable for credit/macro indicators.
 
 from __future__ import annotations
 
-import io, itertools, json, os, re, sys
+import io, itertools, json, os, re, sys, time
 from collections import defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -257,21 +257,31 @@ def fetch_fred(series_id: str, years: int = None) -> pd.Series | None:
         "file_type":        "json",
         "observation_start": start.strftime("%Y-%m-%d"),
     }
-    try:
-        r   = requests.get(url, params=params, timeout=15)
-        r.raise_for_status()
-        obs = r.json().get("observations", [])
-        rows = [
-            (pd.to_datetime(o["date"]), float(o["value"]))
-            for o in obs if o["value"] not in (".", "")
-        ]
-        if not rows:
-            return None
-        idx, vals = zip(*rows)
-        return pd.Series(vals, index=pd.DatetimeIndex(idx))
-    except Exception as e:
-        print(f"  ⚠ FRED {series_id}: {e}")
-        return None
+    # FRED read-timeouts are common enough that a single 15s attempt silently
+    # dropped indicators from the composite (credit moved 77 → 70 on one).
+    # Retry with a growing timeout before giving up.
+    last_err = None
+    for attempt, timeout in enumerate((20, 35, 50), start=1):
+        try:
+            r   = requests.get(url, params=params, timeout=timeout)
+            r.raise_for_status()
+            obs = r.json().get("observations", [])
+            rows = [
+                (pd.to_datetime(o["date"]), float(o["value"]))
+                for o in obs if o["value"] not in (".", "")
+            ]
+            if not rows:
+                return None
+            idx, vals = zip(*rows)
+            return pd.Series(vals, index=pd.DatetimeIndex(idx))
+        except Exception as e:
+            last_err = e
+            if attempt < 3:
+                print(f"  ↻ FRED {series_id}: forsøg {attempt} fejlede ({type(e).__name__}) — prøver igen")
+                time.sleep(2 * attempt)
+
+    print(f"  ⚠ FRED {series_id}: opgav efter 3 forsøg ({last_err})")
+    return None
 
 
 def fetch_sp500_breadth() -> dict | None:

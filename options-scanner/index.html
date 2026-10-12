@@ -18,7 +18,7 @@
     --text-2: #a8a195;
     --text-3: #6e6960;
     --fail: #c14545;
-    --cand: #c9a259;
+    --warn: #c9a259;
     --pass: #6b8e5a;
     --gold: #d4af37;
     --serif: 'Fraunces', Georgia, serif;
@@ -28,35 +28,42 @@
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.5; }
-  .wrap { max-width: 1120px; margin-inline: auto; padding: 40px 20px 64px; display: grid; gap: 24px; }
+  .wrap { max-width: 1180px; margin-inline: auto; padding: 40px 20px 64px; display: grid; gap: 24px; }
   a { color: var(--text-2); }
   .back { font-size: 13px; color: var(--text-3); text-decoration: none; }
   .back:hover, .back:focus-visible { color: var(--text); }
   h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(30px, 5vw, 44px); margin: 4px 0 0; text-wrap: balance; }
-  .lede { color: var(--text-2); max-width: 70ch; margin: 8px 0 0; }
+  .lede { color: var(--text-2); max-width: 72ch; margin: 8px 0 0; }
   .asof { font-family: var(--mono); font-size: 12px; color: var(--text-3); margin-top: 10px; }
+  .stale { color: var(--warn); }
   .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: 12px; }
   .tile, .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; min-width: 0; }
   .tile .lab { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); }
   .tile .num { font-family: var(--serif); font-size: 36px; margin-top: 6px; font-variant-numeric: tabular-nums; }
-  .tile.bad .num { color: var(--fail); }
-  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 12px; }
+  .tile.hit .num { color: var(--pass); }
+  .tile.miss .num { color: var(--fail); }
   h2 { font-family: var(--serif); font-weight: 500; font-size: 20px; margin: 0; }
-  .note { font-size: 13px; color: var(--text-3); margin: 6px 0 16px; }
+  .note { font-size: 13px; color: var(--text-3); margin: 6px 0 16px; max-width: 90ch; }
   .scroll { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
   th { text-align: left; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; font-weight: 500; color: var(--text-3); padding: 8px 10px; border-bottom: 1px solid var(--border-strong); white-space: nowrap; }
   td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; font-size: 14px; }
-  td.n, th.n { text-align: right; font-family: var(--mono); font-size: 13px; }
+  td.n, th.n { text-align: right; font-family: var(--mono); font-size: 13px; white-space: nowrap; }
   td.t { font-family: var(--mono); font-weight: 500; }
-  td.why { color: var(--text-2); font-size: 13px; min-width: 15rem; }
+  td.c { font-family: var(--mono); font-size: 12px; color: var(--text-2); white-space: nowrap; }
+  td.why { color: var(--text-2); font-size: 13px; min-width: 16rem; }
   .pill { display: inline-block; font-size: 12px; padding: 1px 10px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
-  .pill.Fail { color: var(--fail); } .pill.Candidate { color: var(--cand); } .pill.Qualifies { color: var(--pass); }
+  .pill.Fail { color: var(--fail); } .pill.Qualifies { color: var(--pass); }
   .empty { padding: 18px 10px; color: var(--gold); font-family: var(--serif); font-size: 17px; }
+  .breakdown { display: grid; gap: 16px; margin-top: 20px; }
+  .breakdown h3 { font-family: var(--mono); font-size: 14px; font-weight: 500; margin: 0 0 6px; }
+  .breakdown ul { margin: 0; padding-left: 18px; color: var(--text-2); font-size: 14px; display: grid; gap: 4px; }
+  .breakdown b { color: var(--text); font-weight: 500; }
   .chart svg { display: block; width: 100%; height: auto; }
   .chart text { font-family: var(--mono); font-size: 11px; }
   .src { font-size: 13px; color: var(--text-2); display: grid; gap: 6px; }
-  footer { font-size: 12px; color: var(--text-3); }
+  .src ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+  .errs { font-family: var(--mono); font-size: 12px; color: var(--text-3); }
 </style>
 </head>
 <body>
@@ -64,78 +71,94 @@
   <header>
     <a class="back" href="../">← Sentiment dashboard</a>
     <h1>Wheel Options Scanner</h1>
-    <p class="lede" id="takeaway"></p>
-    <div class="asof">Scan of Oct 12, 2026, about 09:35 ET · IV rank as of the Oct 9 close · Analysis only, no orders placed</div>
+    <p class="lede" id="takeaway">Waiting for the first scan. The scanner runs every hour.</p>
+    <div class="asof" id="asof"></div>
   </header>
 
   <section class="tiles">
-    <div class="tile"><div class="lab">Tickers scanned</div><div class="num" id="t-scanned"></div></div>
-    <div class="tile"><div class="lab">Pass IV rank &gt; 30</div><div class="num" id="t-ivr"></div></div>
-    <div class="tile"><div class="lab">Covered-call candidates</div><div class="num" id="t-cand"></div></div>
-    <div class="tile bad"><div class="lab">Qualifying trades</div><div class="num" id="t-qual"></div></div>
+    <div class="tile"><div class="lab">Tickers scanned</div><div class="num" id="t-scanned">–</div></div>
+    <div class="tile"><div class="lab">Pass IV rank</div><div class="num" id="t-ivr">–</div></div>
+    <div class="tile"><div class="lab">Pass trend &amp; ADX</div><div class="num" id="t-trend">–</div></div>
+    <div class="tile" id="qual-tile"><div class="lab">Qualifying trades</div><div class="num" id="t-qual">–</div></div>
   </section>
 
-  <section class="card">
+  <section class="card" id="dashboard">
     <h2>The dashboard</h2>
-    <p class="note">Trades that pass every rule: above the 200-day SMA, RSI near or below 35 for puts, ADX above 25, reasonable PEG, IV rank above 30, no expiry in an earnings week, 30 to 45 DTE, 0.15 to 0.30 delta, and at least 15% annualized ROC.</p>
+    <p class="note" id="rules-note"></p>
     <div class="scroll"><table>
       <thead><tr><th>Ticker</th><th>Strategy</th><th>Strike &amp; Exp (DTE)</th><th class="n">Delta</th><th class="n">IVR</th><th class="n">Ann. ROC (%)</th><th>Tech Setup (RSI/SMA)</th></tr></thead>
       <tbody id="qual-body"></tbody>
     </table></div>
+    <div class="breakdown" id="breakdown"></div>
   </section>
 
-  <div class="grid2">
-    <section class="card">
-      <h2>IV rank by ticker</h2>
-      <p class="note">The dashed line is the 30 cutoff. Names below it are out before any other check.</p>
-      <div class="chart" id="ivr-chart"></div>
-    </section>
-    <section class="card">
-      <h2>Modeled covered calls</h2>
-      <p class="note">Black-Scholes estimates, not market quotes. Capital is 100 shares at today's price. About 0.25 delta, Nov 20 expiry (39 DTE), Oct 9 ATM IV, 4% rate. Real OTM call premiums usually run lower because of skew. Every name reports earnings between Oct 28 and Nov 2, inside this expiry.</p>
-      <div class="scroll"><table>
-        <thead><tr><th>Ticker</th><th class="n">Strike</th><th class="n">Delta</th><th class="n">Premium</th><th class="n">Ann. ROC</th><th class="n">Capital</th></tr></thead>
-        <tbody id="est-body"></tbody>
-      </table></div>
-    </section>
-  </div>
+  <section class="card">
+    <h2>IV rank by ticker</h2>
+    <p class="note" id="ivr-note"></p>
+    <div class="chart" id="ivr-chart"></div>
+  </section>
 
   <section class="card">
     <h2>Screen results</h2>
-    <p class="note">Blank cells were not fetched because the name had already failed the IV rank gate. Earnings dates the source marks as estimated are shown as given.</p>
+    <p class="note">Every ticker, with the best put and call the scanner found in the DTE and delta window and every rule each one fails. A blank cell means the source returned no value, which counts as a failed check.</p>
     <div class="scroll"><table>
-      <thead><tr><th>Ticker</th><th>Result</th><th class="n">Price</th><th class="n">50d SMA</th><th class="n">200d SMA</th><th class="n">RSI</th><th class="n">PEG</th><th class="n">IVR</th><th>Next earnings</th><th>Why</th></tr></thead>
+      <thead><tr><th>Ticker</th><th>Result</th><th class="n">Price</th><th class="n">50d SMA</th><th class="n">200d SMA</th><th class="n">RSI</th><th class="n">ADX</th><th class="n">PEG</th><th class="n">IVR</th><th>Earnings</th><th>Best put</th><th>Best call</th><th>Why not</th></tr></thead>
       <tbody id="screen-body"></tbody>
     </table></div>
   </section>
 
   <section class="card src">
-    <h2>Sources and gaps</h2>
-    <div>IV rank and ATM IV: <a href="https://www.optionsanalysissuite.com/">optionsanalysissuite.com</a> (IV/HV history page per ticker).</div>
-    <div>Price, 50 and 200-day SMA, RSI, PEG and earnings dates: <a href="https://stockanalysis.com/">stockanalysis.com</a> (statistics page per ticker).</div>
-    <div>Not verifiable from free sources: per-strike option quotes (bid, ask, delta) for the Nov 13 and Nov 20 expiries, and daily ADX(14). Under the rules, a trade with an unverified required metric does not qualify.</div>
+    <h2>Sources</h2>
+    <ul>
+      <li>Price history for the moving averages, RSI and ADX, plus PEG and earnings dates: Yahoo Finance.</li>
+      <li>Option chains with bid, ask, delta and implied volatility: CBOE delayed quotes (about 15 minutes delayed). Yahoo is the fallback, with delta calculated from each quote's implied volatility.</li>
+      <li>IV rank: <a href="https://www.optionsanalysissuite.com/">optionsanalysissuite.com</a>, as of the prior close, checked once a day.</li>
+      <li>Premium is the bid/ask midpoint. Put ROC uses the strike as capital; call ROC uses the share price.</li>
+    </ul>
+    <div class="errs" id="errs"></div>
+    <div>Analysis only. No orders are placed.</div>
   </section>
-
-  <footer>Static snapshot. It does not refresh on its own; a new scan replaces this page.</footer>
 </div>
 
+<script src="data.js"></script>
 <script>
-const DATA = {"screen":[{"ticker":"NVDA","price":228.72,"sma50":null,"sma200":null,"rsi":null,"peg":null,"ivr":5.5,"earnings":"2026-11-18","result":"Fail","reason":"IV rank below 30"},{"ticker":"AMD","price":null,"sma50":null,"sma200":null,"rsi":null,"peg":null,"ivr":26.3,"earnings":null,"result":"Fail","reason":"IV rank below 30"},{"ticker":"TSLA","price":null,"sma50":null,"sma200":null,"rsi":null,"peg":null,"ivr":21.2,"earnings":null,"result":"Fail","reason":"IV rank below 30"},{"ticker":"MSTR","price":null,"sma50":null,"sma200":null,"rsi":null,"peg":null,"ivr":13.9,"earnings":null,"result":"Fail","reason":"IV rank below 30"},{"ticker":"MARA","price":null,"sma50":null,"sma200":null,"rsi":null,"peg":null,"ivr":0.0,"earnings":null,"result":"Fail","reason":"IV rank below 30"},{"ticker":"HOOD","price":null,"sma50":null,"sma200":null,"rsi":null,"peg":null,"ivr":29.2,"earnings":null,"result":"Fail","reason":"IV rank just below 30"},{"ticker":"COIN","price":179.39,"sma50":174.57,"sma200":183.78,"rsi":47.86,"peg":11.13,"ivr":40.8,"earnings":"2026-10-29","result":"Fail","reason":"Below 200-day SMA; PEG too high; RSI not oversold"},{"ticker":"CRWD","price":275.04,"sma50":228.7,"sma200":157.32,"rsi":64.86,"peg":6.65,"ivr":41.8,"earnings":"2026-12-01","result":"Fail","reason":"PEG too high for assignment risk; RSI rules out puts"},{"ticker":"MSFT","price":535.07,"sma50":500.45,"sma200":434.0,"rsi":67.47,"peg":1.72,"ivr":49.3,"earnings":"2026-10-28","result":"Candidate","reason":"Covered call: option chain and daily ADX unverified"},{"ticker":"META","price":733.83,"sma50":643.22,"sma200":630.47,"rsi":59.84,"peg":1.12,"ivr":62.0,"earnings":"2026-10-28","result":"Candidate","reason":"Covered call: option chain and daily ADX unverified"},{"ticker":"GOOGL","price":352.83,"sma50":346.19,"sma200":340.22,"rsi":57.53,"peg":1.98,"ivr":60.2,"earnings":"2026-10-28","result":"Candidate","reason":"Covered call: chain and ADX unverified; nearest its 50-day SMA"},{"ticker":"AMZN","price":262.43,"sma50":259.1,"sma200":242.15,"rsi":59.05,"peg":1.35,"ivr":59.0,"earnings":"2026-10-29","result":"Candidate","reason":"Covered call: chain and ADX unverified; close to its 50-day SMA"},{"ticker":"PLTR","price":208.26,"sma50":178.7,"sma200":152.41,"rsi":76.24,"peg":2.06,"ivr":51.0,"earnings":"2026-11-02","result":"Candidate","reason":"Covered call: chain and ADX unverified; overbought at RSI 76"}],"estimates":[{"ticker":"MSFT","strike":585,"delta":0.24,"premium":7.6,"annRoc":13.2,"capital":53900},{"ticker":"META","strike":820,"delta":0.25,"premium":14.6,"annRoc":18.6,"capital":73400},{"ticker":"GOOGL","strike":386,"delta":0.25,"premium":5.7,"annRoc":15.1,"capital":35300},{"ticker":"AMZN","strike":290,"delta":0.25,"premium":4.7,"annRoc":16.7,"capital":26200},{"ticker":"PLTR","strike":241,"delta":0.25,"premium":5.2,"annRoc":23.3,"capital":20800}]};
 (function () {
+  const D = window.SCANNER_DATA;
+  if (!D) return;
+  const R = D.rules;
   const blank = v => v === null || v === undefined || v === '';
   const fx = (v, d) => blank(v) ? '' : Number(v).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
-  const fdate = v => blank(v) ? '' : new Date(v + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
-  const s = DATA.screen;
-  const qual = s.filter(r => r.result === 'Qualifies');
-  const cand = s.filter(r => r.result === 'Candidate');
+  const usd = v => '$' + fx(v, 0);
+  const fdate = v => blank(v) ? '' : new Date(v + 'T12:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+  const pct = (a, b) => (a / b - 1) * 100;
   const set = (id, v) => { document.getElementById(id).textContent = v; };
+  const s = D.screen, T = D.trades;
+
+  // Header
+  set('takeaway', T.length
+    ? `${T.length} ${T.length === 1 ? 'setup passes' : 'setups pass'} every rule in this scan.`
+    : 'No high-probability setups found in the current data matching the strict ROC, IVR, and Technical criteria.');
+  const gen = new Date(D.generatedAt);
+  const ageH = (Date.now() - gen) / 36e5;
+  const asof = document.getElementById('asof');
+  asof.textContent = 'Last scan ' + gen.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })
+    + ' · checked every hour, and the page only changes when the data does · Analysis only, no orders placed';
+  if (ageH > 3) {
+    const w = document.createElement('div'); w.className = 'stale';
+    w.textContent = `The data is ${Math.round(ageH)} hours old. Outside market hours the quotes don't change.`;
+    asof.appendChild(w);
+  }
+
+  // Tiles
   set('t-scanned', s.length);
-  set('t-ivr', s.filter(r => Number(r.ivr) > 30).length);
-  set('t-cand', cand.length);
-  set('t-qual', qual.length);
-  set('takeaway', qual.length
-    ? qual.length + ' trades pass every rule.'
-    : 'No high-probability setups found in the current data matching the strict ROC, IVR, and Technical criteria. ' + cand.length + ' covered-call candidates pass trend, IV rank and PEG, but their option chains and daily ADX could not be verified.');
+  set('t-ivr', s.filter(r => r.ivr > R.ivr_min).length);
+  set('t-trend', s.filter(r => r.price > r.sma200 && r.adx > R.adx_min).length);
+  set('t-qual', T.length);
+  document.getElementById('qual-tile').classList.add(T.length ? 'hit' : 'miss');
+  set('rules-note', `Trades that pass every rule: price above the 200-day SMA, ADX above ${R.adx_min}, PEG between 0 and ${R.peg_max}, IV rank above ${R.ivr_min}, `
+    + `RSI at or below ${R.rsi_max_csp} for puts, ${R.dte_min} to ${R.dte_max} DTE with no expiry in an earnings week, `
+    + `${R.delta_min.toFixed(2)} to ${R.delta_max.toFixed(2)} delta, and at least ${R.roc_min}% annualized ROC.`);
+  set('ivr-note', `The dashed line is the ${R.ivr_min} cutoff. Names at or below it fail before any other check. Grey bars fail; gold bars pass.`);
 
   function row(body, cells) {
     const tr = document.createElement('tr');
@@ -147,50 +170,78 @@ const DATA = {"screen":[{"ticker":"NVDA","price":228.72,"sma50":null,"sma200":nu
     });
     body.appendChild(tr);
   }
+  const contract = (c, kind) => c ? `${fx(c.strike, c.strike % 1 ? 1 : 0)}${kind} ${fdate(c.exp)} (${c.dte}d) · Δ${fx(c.delta, 2)} · ${fx(c.roc, 1)}%` : '';
+  const setup = t => `RSI ${fx(t.rsi, 1)} · ${pct(t.price, t.sma50) >= 0 ? '+' : ''}${fx(pct(t.price, t.sma50), 1)}% vs 50d · ${pct(t.price, t.sma200) >= 0 ? '+' : ''}${fx(pct(t.price, t.sma200), 1)}% vs 200d`;
 
+  // Dashboard
   const qb = document.getElementById('qual-body');
-  if (!qual.length) {
+  if (!T.length) {
     const tr = document.createElement('tr'), td = document.createElement('td');
     td.colSpan = 7; td.className = 'empty';
     td.textContent = 'No high-probability setups found in the current data matching the strict ROC, IVR, and Technical criteria.';
     tr.appendChild(td); qb.appendChild(tr);
   }
+  T.forEach(t => row(qb, [[t.ticker, 't'], [t.strategy], [`$${fx(t.strike, t.strike % 1 ? 1 : 0)} ${fdate(t.exp)} (${t.dte} DTE)`],
+    [fx(t.delta, 2), 'n'], [fx(t.ivr, 1), 'n'], [fx(t.roc, 1), 'n'], [setup(t), 'c']]));
 
-  const order = { Qualifies: 0, Candidate: 1, Fail: 2 };
-  const sb = document.getElementById('screen-body');
-  s.slice().sort((a, b) => order[a.result] - order[b.result] || b.ivr - a.ivr).forEach(r => {
-    const p = document.createElement('span'); p.className = 'pill ' + r.result; p.textContent = r.result;
-    row(sb, [[r.ticker, 't'], [p], [fx(r.price, 2), 'n'], [fx(r.sma50, 2), 'n'], [fx(r.sma200, 2), 'n'],
-      [fx(r.rsi, 1), 'n'], [fx(r.peg, 2), 'n'], [fx(r.ivr, 1), 'n'], [fdate(r.earnings)], [r.reason, 'why']]);
+  // Per-trade breakdown
+  const bd = document.getElementById('breakdown');
+  T.forEach(t => {
+    const put = t.strategy === 'Cash-Secured Put';
+    const otm = Math.abs(pct(t.strike, t.price));
+    const box = document.createElement('div');
+    const h = document.createElement('h3'); h.textContent = `${t.ticker} · ${t.strategy} · $${fx(t.strike, t.strike % 1 ? 1 : 0)} ${fdate(t.exp)}`;
+    const ul = document.createElement('ul');
+    const li = (label, text) => { const l = document.createElement('li'); const b = document.createElement('b'); b.textContent = label + ': '; l.append(b, text); ul.appendChild(l); };
+    li('The asymmetric edge', put
+      ? `RSI ${fx(t.rsi, 1)} is oversold while price holds ${fx(pct(t.price, t.sma200), 1)}% above the 200-day SMA and ADX ${fx(t.adx, 1)} confirms the trend. The strike sits ${fx(otm, 1)}% below the share price at ${fx(t.delta, 2)} delta, so the stock can fall that far before the put is in the money.`
+      : `Price is ${fx(pct(t.price, t.sma200), 1)}% above the 200-day SMA with ADX ${fx(t.adx, 1)} confirming the trend. The strike sits ${fx(otm, 1)}% above the share price at ${fx(t.delta, 2)} delta, leaving that much upside before the shares are called away.`);
+    li('Capital management', put
+      ? `${usd(t.strike * 100)} cash secured per contract, or ${usd((t.strike - t.mid) * 100)} net of the ${usd(t.mid * 100)} premium.`
+      : `${usd(t.price * 100)} for 100 shares per contract, collecting ${usd(t.mid * 100)} in premium.`);
+    li('Defense strategy', put
+      ? `Roll out and down to the next ${R.dte_min} to ${R.dte_max} DTE expiry if the put's delta passes -0.50 or price closes below the 50-day SMA ($${fx(t.sma50, 2)}). Take assignment only at a cost basis you would hold.`
+      : `Roll up and out if the call's delta passes 0.50 or price closes above $${fx(t.strike, 2)}. Close early at 50% of the premium to redeploy.`);
+    box.append(h, ul); bd.appendChild(box);
   });
 
-  const eb = document.getElementById('est-body');
-  DATA.estimates.forEach(r => row(eb, [[r.ticker, 't'], [fx(r.strike, 0), 'n'], [fx(r.delta, 2), 'n'],
-    [fx(r.premium, 2), 'n'], [fx(r.annRoc, 1) + '%', 'n'], ['$' + fx(r.capital, 0), 'n']]));
+  // Screen table
+  const sb = document.getElementById('screen-body');
+  s.slice().sort((a, b) => (a.result === b.result ? 0 : a.result === 'Qualifies' ? -1 : 1) || (b.ivr ?? -1) - (a.ivr ?? -1)).forEach(r => {
+    const p = document.createElement('span'); p.className = 'pill ' + r.result; p.textContent = r.result;
+    const why = [...new Set([...(r.putFails || []).map(x => r.callFails?.includes(x) ? x : 'put: ' + x),
+                             ...(r.callFails || []).map(x => r.putFails?.includes(x) ? x : 'call: ' + x)])];
+    row(sb, [[r.ticker, 't'], [p], [fx(r.price, 2), 'n'], [fx(r.sma50, 2), 'n'], [fx(r.sma200, 2), 'n'], [fx(r.rsi, 1), 'n'],
+      [fx(r.adx, 1), 'n'], [fx(r.peg, 2), 'n'], [fx(r.ivr, 1), 'n'], [(r.earnings || []).map(fdate).join(' to ')],
+      [contract(r.put, 'P'), 'c'], [contract(r.call, 'C'), 'c'], [why.join('; '), 'why']]);
+  });
 
-  // IV rank bars, drawn as SVG at a fixed viewBox that scales with the card.
-  const d = s.map(r => ({ t: r.ticker, v: Number(r.ivr) })).sort((a, b) => b.v - a.v);
-  const W = 460, rh = 22, L = 54, R = 40, T = 6, B = 22, H = T + B + d.length * rh;
-  const x = v => L + (W - L - R) * v / 100;
+  // IV rank bars
+  const d = s.filter(r => !blank(r.ivr)).map(r => ({ t: r.ticker, v: Number(r.ivr) })).sort((a, b) => b.v - a.v);
+  const W = 960, rh = 22, L = 56, Rm = 44, Tp = 6, B = 22, H = Tp + B + Math.max(1, d.length) * rh;
+  const x = v => L + (W - L - Rm) * v / 100;
   const ns = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(ns, 'svg');
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.setAttribute('role', 'img');
-  svg.setAttribute('aria-label', 'IV rank by ticker with a cutoff at 30');
+  svg.setAttribute('aria-label', `IV rank by ticker with a cutoff at ${R.ivr_min}`);
   const el = (tag, attrs, text) => { const e = document.createElementNS(ns, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text !== undefined) e.textContent = text; svg.appendChild(e); return e; };
   [0, 25, 50, 75, 100].forEach(v => {
-    el('line', { x1: x(v), x2: x(v), y1: T, y2: H - B, stroke: 'rgba(240,233,218,0.08)' });
+    el('line', { x1: x(v), x2: x(v), y1: Tp, y2: H - B, stroke: 'rgba(240,233,218,0.08)' });
     el('text', { x: x(v), y: H - 6, 'text-anchor': 'middle', fill: '#6e6960' }, v);
   });
   d.forEach((r, i) => {
-    const y = T + i * rh + 4, h = rh - 8;
+    const y = Tp + i * rh + 4, h = rh - 8, pass = r.v > R.ivr_min;
     el('text', { x: L - 8, y: y + h / 2, dy: '0.35em', 'text-anchor': 'end', fill: '#f0e9da' }, r.t);
-    el('rect', { x: x(0), y, width: Math.max(2, x(r.v) - x(0)), height: h, rx: 3, fill: r.v > 30 ? '#c9a259' : '#3a3630' })
-      .appendChild(document.createElementNS(ns, 'title')).textContent = r.t + ': IV rank ' + r.v.toFixed(1);
-    el('text', { x: Math.max(x(r.v), r.v < 30 ? x(30) : 0) + 6, y: y + h / 2, dy: '0.35em', fill: '#a8a195' }, r.v.toFixed(1));
+    el('rect', { x: x(0), y, width: Math.max(2, x(r.v) - x(0)), height: h, rx: 3, fill: pass ? '#c9a259' : '#3a3630' })
+      .appendChild(document.createElementNS(ns, 'title')).textContent = `${r.t}: IV rank ${r.v.toFixed(1)}`;
+    el('text', { x: Math.max(x(r.v), pass ? 0 : x(R.ivr_min)) + 6, y: y + h / 2, dy: '0.35em', fill: '#a8a195' }, r.v.toFixed(1));
   });
-  el('line', { x1: x(30), x2: x(30), y1: T, y2: H - B, stroke: '#d4af37', 'stroke-width': 1.5, 'stroke-dasharray': '4 3' });
+  el('line', { x1: x(R.ivr_min), x2: x(R.ivr_min), y1: Tp, y2: H - B, stroke: '#d4af37', 'stroke-width': 1.5, 'stroke-dasharray': '4 3' });
   document.getElementById('ivr-chart').appendChild(svg);
+
+  // Fetch problems in this scan
+  if (D.errors && D.errors.length) set('errs', 'Not fetched this scan: ' + D.errors.join(' · '));
 })();
 </script>
 </body>

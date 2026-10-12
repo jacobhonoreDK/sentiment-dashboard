@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-10-12T14:10:07Z",
+ "generatedAt": "2026-10-12T22:09:18Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -31,10 +31,10 @@ window.SCANNER_DATA = {
  "screen": [
   {
    "ticker": "NVDA",
-   "price": 225.73,
-   "sma50": 222.58,
+   "price": 226.32,
+   "sma50": 222.59,
    "sma200": 202.34,
-   "rsi": 48.7,
+   "rsi": 49.4,
    "adx": 17.0,
    "bar": "2026-10-12",
    "peg": 0.48,
@@ -42,31 +42,31 @@ window.SCANNER_DATA = {
     "2026-11-17"
    ],
    "chainSource": "CBOE",
-   "iv30": 29.75,
+   "iv30": 30.26,
    "ivr": 5.5,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-09",
    "put": {
     "strike": 215.0,
     "exp": "2026-11-13",
     "dte": 32,
-    "delta": -0.25,
-    "mid": 3.3,
-    "roc": 17.5,
+    "delta": -0.26,
+    "mid": 3.55,
+    "roc": 18.8,
     "capital": 21500
    },
    "putFails": [
     "ADX 17.0 not above 25",
     "IV rank 5.5 not above 30",
-    "RSI 48.7 too high for a put"
+    "RSI 49.4 too high for a put"
    ],
    "call": {
     "strike": 240.0,
     "exp": "2026-11-13",
     "dte": 32,
-    "delta": 0.29,
-    "mid": 3.45,
-    "roc": 17.4,
-    "capital": 22573
+    "delta": 0.28,
+    "mid": 3.25,
+    "roc": 16.4,
+    "capital": 22632
    },
    "callFails": [
     "ADX 17.0 not above 25",
@@ -76,18 +76,18 @@ window.SCANNER_DATA = {
   },
   {
    "ticker": "AMD",
-   "price": 591.97,
-   "sma50": 531.24,
-   "sma200": 387.2,
-   "rsi": 52.4,
-   "adx": 25.4,
+   "price": 594.24,
+   "sma50": 531.28,
+   "sma200": 387.22,
+   "rsi": 53.0,
+   "adx": 25.2,
    "bar": "2026-10-12",
    "peg": 0.63,
    "earnings": [
     "2026-11-03"
    ],
    "chainSource": "CBOE",
-   "iv30": 53.54,
+   "iv30": 52.99,
    "ivr": 26.3,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-09",
    "put": {
@@ -95,22 +95,22 @@ window.SCANNER_DATA = {
     "exp": "2026-11-13",
     "dte": 32,
     "delta": -0.16,
-    "mid": 8.62,
-    "roc": 19.1,
+    "mid": 8.6,
+    "roc": 19.0,
     "capital": 51500
    },
    "putFails": [
     "IV rank 26.3 not above 30",
-    "RSI 52.4 too high for a put"
+    "RSI 53.0 too high for a put"
    ],
    "call": {
-    "strike": 705.0,
+    "strike": 700.0,
     "exp": "2026-11-13",
     "dte": 32,
-    "delta": 0.17,
-    "mid": 8.28,
-    "roc": 15.9,
-    "capital": 59197
+    "delta": 0.18,
+    "mid": 8.35,
+    "roc": 16.0,
+    "capital": 59424
    },
    "callFails": [
     "IV rank 26.3 not above 30"
@@ -119,58 +119,58 @@ window.SCANNER_DATA = {
   },
   {
    "ticker": "MSFT",
-   "price": 538.65,
-   "sma50": 501.93,
-   "sma200": 434.26,
-   "rsi": 68.9,
-   "adx": 40.0,
+   "price": 541.15,
+   "sma50": 501.98,
+   "sma200": 434.28,
+   "rsi": 69.9,
+   "adx": 40.1,
    "bar": "2026-10-12",
    "peg": 1.62,
    "earnings": [
     "2026-10-28"
    ],
    "chainSource": "CBOE",
-   "iv30": 31.37,
+   "iv30": 30.77,
    "ivr": 49.3,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-09",
    "put": {
-    "strike": 505.0,
+    "strike": 510.0,
     "exp": "2026-11-13",
     "dte": 32,
-    "delta": -0.23,
-    "mid": 7.07,
-    "roc": 16.0,
-    "capital": 50500
+    "delta": -0.24,
+    "mid": 7.47,
+    "roc": 16.7,
+    "capital": 51000
    },
    "putFails": [
-    "RSI 68.9 too high for a put"
+    "RSI 69.9 too high for a put"
    ],
    "call": {
     "strike": 575.0,
     "exp": "2026-11-13",
     "dte": 32,
-    "delta": 0.27,
-    "mid": 7.8,
-    "roc": 16.5,
-    "capital": 53865
+    "delta": 0.28,
+    "mid": 7.6,
+    "roc": 16.0,
+    "capital": 54115
    },
    "callFails": [],
    "result": "Qualifies"
   },
   {
    "ticker": "META",
-   "price": 742.78,
-   "sma50": 643.45,
+   "price": 742.96,
+   "sma50": 643.46,
    "sma200": 630.52,
-   "rsi": 62.2,
-   "adx": 36.1,
+   "rsi": 62.3,
+   "adx": 36.3,
    "bar": "2026-10-12",
    "peg": 0.98,
    "earnings": [
     "2026-10-28"
    ],
    "chainSource": "CBOE",
-   "iv30": 45.08,
+   "iv30": 44.38,
    "ivr": 62.0,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-09",
    "put": {
@@ -178,31 +178,31 @@ window.SCANNER_DATA = {
     "exp": "2026-11-13",
     "dte": 32,
     "delta": -0.16,
-    "mid": 8.9,
-    "roc": 15.4,
+    "mid": 9.18,
+    "roc": 15.9,
     "capital": 66000
    },
    "putFails": [
-    "RSI 62.2 too high for a put"
+    "RSI 62.3 too high for a put"
    ],
    "call": {
-    "strike": 850.0,
+    "strike": 840.0,
     "exp": "2026-11-13",
     "dte": 32,
-    "delta": 0.19,
-    "mid": 9.82,
-    "roc": 15.1,
-    "capital": 74278
+    "delta": 0.2,
+    "mid": 10.43,
+    "roc": 16.0,
+    "capital": 74296
    },
    "callFails": [],
    "result": "Qualifies"
   },
   {
    "ticker": "GOOGL",
-   "price": 353.3,
-   "sma50": 346.19,
+   "price": 352.72,
+   "sma50": 346.18,
    "sma200": 340.22,
-   "rsi": 57.7,
+   "rsi": 57.2,
    "adx": 17.3,
    "bar": "2026-10-12",
    "peg": 1.25,
@@ -210,7 +210,7 @@ window.SCANNER_DATA = {
     "2026-10-28"
    ],
    "chainSource": "CBOE",
-   "iv30": 36.65,
+   "iv30": 36.29,
    "ivr": 60.2,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-09",
    "put": {
@@ -218,22 +218,22 @@ window.SCANNER_DATA = {
     "exp": "2026-11-13",
     "dte": 32,
     "delta": -0.2,
-    "mid": 4.4,
-    "roc": 15.4,
+    "mid": 4.43,
+    "roc": 15.5,
     "capital": 32500
    },
    "putFails": [
     "ADX 17.3 not above 25",
-    "RSI 57.7 too high for a put"
+    "RSI 57.2 too high for a put"
    ],
    "call": {
     "strike": 385.0,
     "exp": "2026-11-13",
     "dte": 32,
     "delta": 0.24,
-    "mid": 5.17,
-    "roc": 16.7,
-    "capital": 35330
+    "mid": 4.68,
+    "roc": 15.1,
+    "capital": 35272
    },
    "callFails": [
     "ADX 17.3 not above 25"
@@ -242,10 +242,10 @@ window.SCANNER_DATA = {
   },
   {
    "ticker": "AMZN",
-   "price": 260.48,
-   "sma50": 258.87,
+   "price": 259.53,
+   "sma50": 258.85,
    "sma200": 242.29,
-   "rsi": 56.7,
+   "rsi": 55.6,
    "adx": 14.0,
    "bar": "2026-10-12",
    "peg": 1.48,
@@ -253,30 +253,30 @@ window.SCANNER_DATA = {
     "2026-10-29"
    ],
    "chainSource": "CBOE",
-   "iv30": 39.27,
+   "iv30": 38.92,
    "ivr": 59.0,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-09",
    "put": {
     "strike": 240.0,
     "exp": "2026-11-13",
     "dte": 32,
-    "delta": -0.21,
-    "mid": 3.9,
-    "roc": 18.5,
+    "delta": -0.22,
+    "mid": 4.08,
+    "roc": 19.4,
     "capital": 24000
    },
    "putFails": [
     "ADX 14.0 not above 25",
-    "RSI 56.7 too high for a put"
+    "RSI 55.6 too high for a put"
    ],
    "call": {
     "strike": 285.0,
     "exp": "2026-11-13",
     "dte": 32,
-    "delta": 0.25,
-    "mid": 4.28,
-    "roc": 18.7,
-    "capital": 26048
+    "delta": 0.24,
+    "mid": 3.88,
+    "roc": 17.0,
+    "capital": 25953
    },
    "callFails": [
     "ADX 14.0 not above 25"
@@ -285,48 +285,48 @@ window.SCANNER_DATA = {
   },
   {
    "ticker": "TSLA",
-   "price": 379.33,
-   "sma50": 356.11,
+   "price": 378.03,
+   "sma50": 356.08,
    "sma200": 390.07,
-   "rsi": 57.3,
-   "adx": 17.1,
+   "rsi": 56.4,
+   "adx": 17.0,
    "bar": "2026-10-12",
    "peg": 4.54,
    "earnings": [
     "2026-10-21"
    ],
    "chainSource": "CBOE",
-   "iv30": 42.82,
+   "iv30": 42.31,
    "ivr": 21.2,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-09",
    "put": {
     "strike": 340.0,
     "exp": "2026-11-13",
     "dte": 32,
-    "delta": -0.17,
-    "mid": 4.58,
-    "roc": 15.3,
+    "delta": -0.18,
+    "mid": 4.83,
+    "roc": 16.2,
     "capital": 34000
    },
    "putFails": [
     "below 200-day SMA",
-    "ADX 17.1 not above 25",
+    "ADX 17.0 not above 25",
     "PEG 4.54 outside 0 to 2.5",
     "IV rank 21.2 not above 30",
-    "RSI 57.3 too high for a put"
+    "RSI 56.4 too high for a put"
    ],
    "call": {
-    "strike": 430.0,
+    "strike": 425.0,
     "exp": "2026-11-13",
     "dte": 32,
     "delta": 0.2,
-    "mid": 5.0,
+    "mid": 4.97,
     "roc": 15.0,
-    "capital": 37933
+    "capital": 37803
    },
    "callFails": [
     "below 200-day SMA",
-    "ADX 17.1 not above 25",
+    "ADX 17.0 not above 25",
     "PEG 4.54 outside 0 to 2.5",
     "IV rank 21.2 not above 30"
    ],
@@ -334,10 +334,10 @@ window.SCANNER_DATA = {
   },
   {
    "ticker": "PLTR",
-   "price": 207.1,
-   "sma50": 178.66,
-   "sma200": 152.4,
-   "rsi": 73.1,
+   "price": 209.0,
+   "sma50": 178.7,
+   "sma200": 152.41,
+   "rsi": 76.2,
    "adx": 35.1,
    "bar": "2026-10-12",
    "peg": 1.85,
@@ -345,7 +345,7 @@ window.SCANNER_DATA = {
     "2026-11-02"
    ],
    "chainSource": "CBOE",
-   "iv30": 56.5,
+   "iv30": 56.03,
    "ivr": 51.0,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-09",
    "put": {
@@ -353,31 +353,31 @@ window.SCANNER_DATA = {
     "exp": "2026-11-13",
     "dte": 32,
     "delta": -0.17,
-    "mid": 3.5,
-    "roc": 22.2,
+    "mid": 3.42,
+    "roc": 21.7,
     "capital": 18000
    },
    "putFails": [
-    "RSI 73.1 too high for a put"
+    "RSI 76.2 too high for a put"
    ],
    "call": {
     "strike": 250.0,
-    "exp": "2026-11-13",
-    "dte": 32,
-    "delta": 0.17,
-    "mid": 2.83,
-    "roc": 15.6,
-    "capital": 20710
+    "exp": "2026-11-20",
+    "dte": 39,
+    "delta": 0.18,
+    "mid": 3.35,
+    "roc": 15.0,
+    "capital": 20900
    },
    "callFails": [],
    "result": "Qualifies"
   },
   {
    "ticker": "CRWD",
-   "price": 266.6,
-   "sma50": 230.22,
-   "sma200": 158.05,
-   "rsi": 59.0,
+   "price": 263.01,
+   "sma50": 230.15,
+   "sma200": 158.03,
+   "rsi": 56.9,
    "adx": 24.9,
    "bar": "2026-10-12",
    "peg": 8.4,
@@ -385,31 +385,31 @@ window.SCANNER_DATA = {
     "2026-12-01"
    ],
    "chainSource": "CBOE",
-   "iv30": 50.43,
+   "iv30": 50.15,
    "ivr": 41.8,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-09",
    "put": {
-    "strike": 230.0,
+    "strike": 225.0,
     "exp": "2026-11-20",
     "dte": 39,
-    "delta": -0.16,
-    "mid": 4.1,
-    "roc": 16.7,
-    "capital": 23000
+    "delta": -0.15,
+    "mid": 3.88,
+    "roc": 16.1,
+    "capital": 22500
    },
    "putFails": [
     "ADX 24.9 not above 25",
     "PEG 8.40 outside 0 to 2.5",
-    "RSI 59.0 too high for a put"
+    "RSI 56.9 too high for a put"
    ],
    "call": {
     "strike": 310.0,
     "exp": "2026-11-20",
     "dte": 39,
-    "delta": 0.23,
-    "mid": 5.5,
-    "roc": 19.3,
-    "capital": 26660
+    "delta": 0.2,
+    "mid": 4.28,
+    "roc": 15.2,
+    "capital": 26301
    },
    "callFails": [
     "ADX 24.9 not above 25",
@@ -419,55 +419,55 @@ window.SCANNER_DATA = {
   },
   {
    "ticker": "COIN",
-   "price": 183.49,
-   "sma50": 175.31,
-   "sma200": 183.49,
-   "rsi": 50.4,
-   "adx": 19.3,
+   "price": 180.39,
+   "sma50": 175.25,
+   "sma200": 183.47,
+   "rsi": 48.5,
+   "adx": 19.4,
    "bar": "2026-10-12",
    "peg": 2.37,
    "earnings": [
     "2026-10-29"
    ],
    "chainSource": "CBOE",
-   "iv30": 66.34,
+   "iv30": 65.01,
    "ivr": 40.8,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-09",
    "put": {
-    "strike": 155.0,
+    "strike": 150.0,
     "exp": "2026-11-20",
     "dte": 39,
-    "delta": -0.19,
-    "mid": 4.43,
-    "roc": 26.7,
-    "capital": 15500
+    "delta": -0.16,
+    "mid": 3.45,
+    "roc": 21.5,
+    "capital": 15000
    },
    "putFails": [
     "below 200-day SMA",
-    "ADX 19.3 not above 25",
-    "RSI 50.4 too high for a put"
+    "ADX 19.4 not above 25",
+    "RSI 48.5 too high for a put"
    ],
    "call": {
     "strike": 230.0,
     "exp": "2026-11-20",
     "dte": 39,
-    "delta": 0.19,
-    "mid": 3.8,
-    "roc": 19.4,
-    "capital": 18349
+    "delta": 0.17,
+    "mid": 3.15,
+    "roc": 16.3,
+    "capital": 18039
    },
    "callFails": [
     "below 200-day SMA",
-    "ADX 19.3 not above 25"
+    "ADX 19.4 not above 25"
    ],
    "result": "Fail"
   },
   {
    "ticker": "MSTR",
-   "price": 157.75,
-   "sma50": 131.11,
-   "sma200": 135.86,
-   "rsi": 57.7,
+   "price": 152.68,
+   "sma50": 131.01,
+   "sma200": 135.83,
+   "rsi": 53.9,
    "adx": 33.4,
    "bar": "2026-10-12",
    "peg": 2.85,
@@ -475,31 +475,31 @@ window.SCANNER_DATA = {
     "2026-10-29"
    ],
    "chainSource": "CBOE",
-   "iv30": 65.25,
+   "iv30": 64.38,
    "ivr": 13.9,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-09",
    "put": {
     "strike": 130.0,
-    "exp": "2026-11-20",
-    "dte": 39,
-    "delta": -0.16,
-    "mid": 3.22,
-    "roc": 23.2,
+    "exp": "2026-11-13",
+    "dte": 32,
+    "delta": -0.17,
+    "mid": 3.08,
+    "roc": 27.0,
     "capital": 13000
    },
    "putFails": [
     "PEG 2.85 outside 0 to 2.5",
     "IV rank 13.9 not above 30",
-    "RSI 57.7 too high for a put"
+    "RSI 53.9 too high for a put"
    ],
    "call": {
-    "strike": 200.0,
+    "strike": 190.0,
     "exp": "2026-11-13",
     "dte": 32,
-    "delta": 0.15,
-    "mid": 2.37,
-    "roc": 17.1,
-    "capital": 15775
+    "delta": 0.17,
+    "mid": 2.61,
+    "roc": 19.5,
+    "capital": 15268
    },
    "callFails": [
     "PEG 2.85 outside 0 to 2.5",
@@ -509,18 +509,18 @@ window.SCANNER_DATA = {
   },
   {
    "ticker": "MARA",
-   "price": 9.62,
-   "sma50": 11.12,
+   "price": 9.44,
+   "sma50": 11.11,
    "sma200": 10.98,
-   "rsi": 32.9,
-   "adx": 17.3,
+   "rsi": 31.8,
+   "adx": 17.4,
    "bar": "2026-10-12",
    "peg": 0.1,
    "earnings": [
     "2026-11-04"
    ],
    "chainSource": "CBOE",
-   "iv30": 75.8,
+   "iv30": 74.75,
    "ivr": 0.0,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-09",
    "put": {
@@ -528,37 +528,37 @@ window.SCANNER_DATA = {
     "exp": "2026-11-13",
     "dte": 32,
     "delta": -0.19,
-    "mid": 0.25,
-    "roc": 35.6,
+    "mid": 0.26,
+    "roc": 36.4,
     "capital": 800
    },
    "putFails": [
     "below 200-day SMA",
-    "ADX 17.3 not above 25",
+    "ADX 17.4 not above 25",
     "IV rank 0.0 not above 30"
    ],
    "call": {
     "strike": 12.5,
     "exp": "2026-11-13",
     "dte": 32,
-    "delta": 0.17,
-    "mid": 0.18,
-    "roc": 21.9,
-    "capital": 962
+    "delta": 0.16,
+    "mid": 0.16,
+    "roc": 19.3,
+    "capital": 944
    },
    "callFails": [
     "below 200-day SMA",
-    "ADX 17.3 not above 25",
+    "ADX 17.4 not above 25",
     "IV rank 0.0 not above 30"
    ],
    "result": "Fail"
   },
   {
    "ticker": "HOOD",
-   "price": 109.48,
+   "price": 109.22,
    "sma50": 107.69,
    "sma200": 94.05,
-   "rsi": 46.5,
+   "rsi": 46.1,
    "adx": 13.2,
    "bar": "2026-10-12",
    "peg": 2.14,
@@ -566,7 +566,7 @@ window.SCANNER_DATA = {
     "2026-10-27"
    ],
    "chainSource": "CBOE",
-   "iv30": 63.06,
+   "iv30": 63.54,
    "ivr": 29.2,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-09",
    "put": {
@@ -574,23 +574,23 @@ window.SCANNER_DATA = {
     "exp": "2026-11-13",
     "dte": 32,
     "delta": -0.2,
-    "mid": 2.55,
-    "roc": 30.7,
+    "mid": 2.49,
+    "roc": 29.9,
     "capital": 9500
    },
    "putFails": [
     "ADX 13.2 not above 25",
     "IV rank 29.2 not above 30",
-    "RSI 46.5 too high for a put"
+    "RSI 46.1 too high for a put"
    ],
    "call": {
     "strike": 135.0,
     "exp": "2026-11-13",
     "dte": 32,
-    "delta": 0.16,
-    "mid": 1.64,
-    "roc": 17.0,
-    "capital": 10948
+    "delta": 0.17,
+    "mid": 1.71,
+    "roc": 17.8,
+    "capital": 10922
    },
    "callFails": [
     "ADX 13.2 not above 25",
@@ -606,50 +606,50 @@ window.SCANNER_DATA = {
    "strike": 575.0,
    "exp": "2026-11-13",
    "dte": 32,
-   "delta": 0.27,
-   "mid": 7.8,
-   "roc": 16.5,
-   "capital": 53865,
+   "delta": 0.28,
+   "mid": 7.6,
+   "roc": 16.0,
+   "capital": 54115,
    "ivr": 49.3,
-   "rsi": 68.9,
-   "adx": 40.0,
-   "price": 538.65,
-   "sma50": 501.93,
-   "sma200": 434.26
+   "rsi": 69.9,
+   "adx": 40.1,
+   "price": 541.15,
+   "sma50": 501.98,
+   "sma200": 434.28
+  },
+  {
+   "ticker": "META",
+   "strategy": "Covered Call",
+   "strike": 840.0,
+   "exp": "2026-11-13",
+   "dte": 32,
+   "delta": 0.2,
+   "mid": 10.43,
+   "roc": 16.0,
+   "capital": 74296,
+   "ivr": 62.0,
+   "rsi": 62.3,
+   "adx": 36.3,
+   "price": 742.96,
+   "sma50": 643.46,
+   "sma200": 630.52
   },
   {
    "ticker": "PLTR",
    "strategy": "Covered Call",
    "strike": 250.0,
-   "exp": "2026-11-13",
-   "dte": 32,
-   "delta": 0.17,
-   "mid": 2.83,
-   "roc": 15.6,
-   "capital": 20710,
+   "exp": "2026-11-20",
+   "dte": 39,
+   "delta": 0.18,
+   "mid": 3.35,
+   "roc": 15.0,
+   "capital": 20900,
    "ivr": 51.0,
-   "rsi": 73.1,
+   "rsi": 76.2,
    "adx": 35.1,
-   "price": 207.1,
-   "sma50": 178.66,
-   "sma200": 152.4
-  },
-  {
-   "ticker": "META",
-   "strategy": "Covered Call",
-   "strike": 850.0,
-   "exp": "2026-11-13",
-   "dte": 32,
-   "delta": 0.19,
-   "mid": 9.82,
-   "roc": 15.1,
-   "capital": 74278,
-   "ivr": 62.0,
-   "rsi": 62.2,
-   "adx": 36.1,
-   "price": 742.78,
-   "sma50": 643.45,
-   "sma200": 630.52
+   "price": 209.0,
+   "sma50": 178.7,
+   "sma200": 152.41
   }
  ],
  "errors": []

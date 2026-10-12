@@ -112,7 +112,7 @@
     <ul>
       <li>Price history for the moving averages, RSI and ADX, plus PEG and earnings dates: Yahoo Finance.</li>
       <li>Option chains with bid, ask, delta and implied volatility: CBOE delayed quotes (about 15 minutes delayed). Yahoo is the fallback, with delta calculated from each quote's implied volatility.</li>
-      <li>IV rank: <a href="https://www.optionsanalysissuite.com/">optionsanalysissuite.com</a>, as of the prior close, checked once a day.</li>
+      <li>IV rank: <a href="https://www.optionsanalysissuite.com/">optionsanalysissuite.com</a>, as of the prior close, refreshed once a day. <span id="ivr-src"></span></li>
       <li>Premium is the bid/ask midpoint. Put ROC uses the strike as capital; call ROC uses the share price.</li>
     </ul>
     <div class="errs" id="errs"></div>
@@ -239,6 +239,9 @@
   });
   el('line', { x1: x(R.ivr_min), x2: x(R.ivr_min), y1: Tp, y2: H - B, stroke: '#d4af37', 'stroke-width': 1.5, 'stroke-dasharray': '4 3' });
   document.getElementById('ivr-chart').appendChild(svg);
+
+  const srcs = [...new Set(s.map(r => r.ivrSource).filter(Boolean))];
+  set('ivr-src', srcs.length ? 'This scan used: ' + srcs.join('; ') + '.' : 'No IV rank was available for this scan.');
 
   // Fetch problems in this scan
   if (D.errors && D.errors.length) set('errs', 'Not fetched this scan: ' + D.errors.join(' · '));

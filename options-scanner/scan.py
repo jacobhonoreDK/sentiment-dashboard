@@ -9,7 +9,11 @@ and writes options-scanner/data.js for options-scanner/index.html.
 Sources:
   - Yahoo Finance (yfinance): daily OHLC (SMA, RSI, ADX), PEG, earnings date
   - CBOE delayed quotes: option chains with bid, ask, delta, IV
-  - optionsanalysissuite.com: IV rank (prior close), cached once a day
+  - IV rank: options-scanner/ivr.json (prior-close values from
+    optionsanalysissuite.com, refreshed once a day outside this workflow,
+    since that site refuses requests from GitHub's runners). Once a year of
+    CBOE iv30 readings has been logged in cache.json, the scanner computes
+    IV rank itself when ivr.json is stale.
 
 A required metric that can't be fetched counts as a failed check: no
 trade qualifies on missing data.
@@ -20,7 +24,7 @@ Run:
 
 from __future__ import annotations
 
-import html, json, math, re, sys, time
+import json, math, re, sys, time
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -61,6 +65,8 @@ RULES = {
 HERE       = Path(__file__).resolve().parent
 DATA_JS    = HERE / "data.js"
 CACHE_JSON = HERE / "cache.json"
+IVR_JSON   = HERE / "ivr.json"
+IVR_MAX_AGE_DAYS = 5      # ivr.json older than this is ignored
 ET         = ZoneInfo("America/New_York")
 UA         = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
 
@@ -164,20 +170,27 @@ def fetch_earnings(tk: yf.Ticker, today: date) -> list[str]:
     return sorted(set(out))
 
 
-def fetch_ivr(ticker: str):
-    """IV rank (%) from optionsanalysissuite's IV/HV history page."""
-    url = f"https://www.optionsanalysissuite.com/stocks/{ticker.lower()}/iv-hv-history"
-    r = requests.get(url, headers=UA, timeout=25)
-    r.raise_for_status()
-    text = html.unescape(re.sub(r"<[^>]+>", " ", r.text))
-    text = re.sub(r"\s+", " ", text)
-    for pat in (r"IV Rank\s*:?\s*([0-9]+(?:\.[0-9]+)?)\s*%", r"IV rank at\s*([0-9]+(?:\.[0-9]+)?)\s*%"):
-        m = re.search(pat, text)
-        if m:
-            v = float(m.group(1))
-            if 0 <= v <= 100:
-                return v
-    return None
+def load_ivr(today: date) -> tuple[dict, str | None]:
+    """IV ranks from ivr.json if it is recent enough, else empty."""
+    js = load_json(IVR_JSON, {})
+    try:
+        as_of = date.fromisoformat(js.get("asOf", ""))
+    except ValueError:
+        return {}, None
+    if (today - as_of).days > IVR_MAX_AGE_DAYS:
+        return {}, None
+    vals = {k: num(v, 1) for k, v in (js.get("values") or {}).items()}
+    vals = {k: v for k, v in vals.items() if v is not None and 0 <= v <= 100}
+    return vals, f"{js.get('source', 'ivr.json')}, as of {as_of.isoformat()}"
+
+
+def own_ivr(history: dict, current) -> float | None:
+    """IV rank from our own daily iv30 log, once it covers about a year."""
+    vals = list(history.values())[-252:]
+    if current is None or len(vals) < 252:
+        return None
+    lo, hi = min(vals), max(vals)
+    return round((current - lo) / (hi - lo) * 100, 1) if hi > lo else None
 
 
 OPT_RE = re.compile(r"^([A-Z]+)(\d{6})([CP])(\d{8})$")
@@ -345,6 +358,9 @@ def main() -> int:
     cache = load_json(CACHE_JSON, {})
     daily = cache.setdefault("daily", {})
     ivh   = cache.setdefault("iv30_history", {})
+    ivr_vals, ivr_src = load_ivr(today)
+    if not ivr_vals:
+        print("  ⚠ ivr.json missing or stale; IV rank falls back to the scanner's own log")
 
     screen, trades, errors = [], [], []
     for t in TICKERS:
@@ -356,21 +372,20 @@ def main() -> int:
         except Exception as e:
             errors.append(f"{t}: price history ({e})")
 
-        # Daily-cached fundamentals and IV rank (they change at most once a day)
+        # Daily-cached fundamentals (they change at most once a day)
         d = daily.get(t, {})
         if d.get("date") != today.isoformat():
             d = {"date": today.isoformat()}
             for key, fn in (("peg", lambda: fetch_peg(tk)),
-                            ("earnings", lambda: fetch_earnings(tk, today)),
-                            ("ivr", lambda: fetch_ivr(t))):
+                            ("earnings", lambda: fetch_earnings(tk, today))):
                 try:
                     d[key] = fn()
                 except Exception as e:
                     d[key] = None
                     errors.append(f"{t}: {key} ({e})")
-            if all(d.get(k) is not None for k in ("peg", "ivr")) and d.get("earnings"):
+            if d.get("peg") is not None and d.get("earnings"):
                 daily[t] = d          # only cache a complete set; retry next hour otherwise
-        row["peg"], row["ivr"], row["earnings"] = d.get("peg"), d.get("ivr"), d.get("earnings") or []
+        row["peg"], row["earnings"] = d.get("peg"), d.get("earnings") or []
 
         chain = None
         try:
@@ -388,9 +403,18 @@ def main() -> int:
             row["iv30"] = chain["iv30"]
             ivh.setdefault(t, {})[today.isoformat()] = chain["iv30"]
             ivh[t] = dict(sorted(ivh[t].items())[-400:])
+        if t in ivr_vals:
+            row["ivr"], row["ivrSource"] = ivr_vals[t], ivr_src
+        else:
+            row["ivr"] = own_ivr(ivh.get(t, {}), row.get("iv30"))
+            row["ivrSource"] = "own iv30 log" if row["ivr"] is not None else None
 
         row, tr = screen_ticker(t, row, chain, today)
         screen.append(row)
+        roc = lambda c: f"{c['roc']:.1f}%" if c else "-"
+        print(f"  {t:5} {row['result']:9} px={row.get('price')} rsi={row.get('rsi')} adx={row.get('adx')} "
+              f"peg={row.get('peg')} ivr={row.get('ivr')} earn={row.get('earnings')} "
+              f"put={roc(row.get('put'))} call={roc(row.get('call'))} chain={row.get('chainSource')}")
         trades.extend(tr)
         time.sleep(0.5)
 

@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-10-21T10:11:04Z",
+ "generatedAt": "2026-10-21T12:52:11Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -42,33 +42,19 @@ window.SCANNER_DATA = {
     "2026-11-17"
    ],
    "chainSource": "CBOE",
-   "iv30": 39.77,
-   "ivr": 35.5,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-10-19",
-   "put": {
-    "strike": 195.0,
-    "exp": "2026-11-27",
-    "dte": 37,
-    "delta": -0.19,
-    "mid": 3.28,
-    "roc": 16.6,
-    "capital": 19500
-   },
+   "iv30": 39.3,
+   "ivr": 41.2,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-10-20",
+   "put": null,
    "putFails": [
     "ADX 18.0 not above 25",
-    "RSI 40.9 too high for a put"
+    "RSI 40.9 too high for a put",
+    "no liquid contract in the delta and DTE window"
    ],
-   "call": {
-    "strike": 235.0,
-    "exp": "2026-11-27",
-    "dte": 37,
-    "delta": 0.27,
-    "mid": 3.95,
-    "roc": 18.0,
-    "capital": 21647
-   },
+   "call": null,
    "callFails": [
-    "ADX 18.0 not above 25"
+    "ADX 18.0 not above 25",
+    "no liquid contract in the delta and DTE window"
    ],
    "result": "Fail"
   },
@@ -85,33 +71,19 @@ window.SCANNER_DATA = {
     "2026-11-03"
    ],
    "chainSource": "CBOE",
-   "iv30": 60.03,
-   "ivr": 35.6,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-10-19",
-   "put": {
-    "strike": 450.0,
-    "exp": "2026-11-27",
-    "dte": 37,
-    "delta": -0.16,
-    "mid": 8.88,
-    "roc": 19.5,
-    "capital": 45000
-   },
+   "iv30": 60.27,
+   "ivr": 39.1,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-10-20",
+   "put": null,
    "putFails": [
     "ADX 22.3 not above 25",
-    "RSI 39.8 too high for a put"
+    "RSI 39.8 too high for a put",
+    "no liquid contract in the delta and DTE window"
    ],
-   "call": {
-    "strike": 650.0,
-    "exp": "2026-11-20",
-    "dte": 30,
-    "delta": 0.16,
-    "mid": 6.95,
-    "roc": 15.8,
-    "capital": 53474
-   },
+   "call": null,
    "callFails": [
-    "ADX 22.3 not above 25"
+    "ADX 22.3 not above 25",
+    "no liquid contract in the delta and DTE window"
    ],
    "result": "Fail"
   },
@@ -128,32 +100,19 @@ window.SCANNER_DATA = {
     "2026-10-28"
    ],
    "chainSource": "CBOE",
-   "iv30": 31.51,
-   "ivr": 48.7,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-10-19",
-   "put": {
-    "strike": 495.0,
-    "exp": "2026-11-20",
-    "dte": 30,
-    "delta": -0.21,
-    "mid": 6.43,
-    "roc": 15.8,
-    "capital": 49500
-   },
+   "iv30": 31.93,
+   "ivr": 50.2,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-10-20",
+   "put": null,
    "putFails": [
-    "RSI 58.3 too high for a put"
+    "RSI 58.3 too high for a put",
+    "no liquid contract in the delta and DTE window"
    ],
-   "call": {
-    "strike": 565.0,
-    "exp": "2026-11-20",
-    "dte": 30,
-    "delta": 0.27,
-    "mid": 7.43,
-    "roc": 17.0,
-    "capital": 53187
-   },
-   "callFails": [],
-   "result": "Qualifies"
+   "call": null,
+   "callFails": [
+    "no liquid contract in the delta and DTE window"
+   ],
+   "result": "Fail"
   },
   {
    "ticker": "META",
@@ -168,32 +127,19 @@ window.SCANNER_DATA = {
     "2026-10-21"
    ],
    "chainSource": "CBOE",
-   "iv30": 45.33,
-   "ivr": 64.8,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-10-19",
-   "put": {
-    "strike": 610.0,
-    "exp": "2026-11-20",
-    "dte": 30,
-    "delta": -0.15,
-    "mid": 7.85,
-    "roc": 15.7,
-    "capital": 61000
-   },
+   "iv30": 44.52,
+   "ivr": 67.5,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-10-20",
+   "put": null,
    "putFails": [
-    "RSI 46.4 too high for a put"
+    "RSI 46.4 too high for a put",
+    "no liquid contract in the delta and DTE window"
    ],
-   "call": {
-    "strike": 785.0,
-    "exp": "2026-11-20",
-    "dte": 30,
-    "delta": 0.2,
-    "mid": 8.95,
-    "roc": 15.7,
-    "capital": 69425
-   },
-   "callFails": [],
-   "result": "Qualifies"
+   "call": null,
+   "callFails": [
+    "no liquid contract in the delta and DTE window"
+   ],
+   "result": "Fail"
   },
   {
    "ticker": "GOOGL",
@@ -208,35 +154,21 @@ window.SCANNER_DATA = {
     "2026-10-28"
    ],
    "chainSource": "CBOE",
-   "iv30": 36.61,
-   "ivr": 66.0,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-10-19",
-   "put": {
-    "strike": 310.0,
-    "exp": "2026-11-20",
-    "dte": 30,
-    "delta": -0.18,
-    "mid": 3.88,
-    "roc": 15.2,
-    "capital": 31000
-   },
+   "iv30": 36.82,
+   "ivr": 72.0,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-10-20",
+   "put": null,
    "putFails": [
     "below 200-day SMA",
     "ADX 15.0 not above 25",
-    "RSI 44.7 too high for a put"
+    "RSI 44.7 too high for a put",
+    "no liquid contract in the delta and DTE window"
    ],
-   "call": {
-    "strike": 370.0,
-    "exp": "2026-11-20",
-    "dte": 30,
-    "delta": 0.24,
-    "mid": 4.7,
-    "roc": 16.8,
-    "capital": 34028
-   },
+   "call": null,
    "callFails": [
     "below 200-day SMA",
-    "ADX 15.0 not above 25"
+    "ADX 15.0 not above 25",
+    "no liquid contract in the delta and DTE window"
    ],
    "result": "Fail"
   },
@@ -253,33 +185,19 @@ window.SCANNER_DATA = {
     "2026-10-29"
    ],
    "chainSource": "CBOE",
-   "iv30": 40.0,
-   "ivr": 62.4,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-10-19",
-   "put": {
-    "strike": 235.0,
-    "exp": "2026-11-20",
-    "dte": 30,
-    "delta": -0.16,
-    "mid": 2.94,
-    "roc": 15.2,
-    "capital": 23500
-   },
+   "iv30": 40.67,
+   "ivr": 62.9,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-10-20",
+   "put": null,
    "putFails": [
     "ADX 14.0 not above 25",
-    "RSI 57.4 too high for a put"
+    "RSI 57.4 too high for a put",
+    "no liquid contract in the delta and DTE window"
    ],
-   "call": {
-    "strike": 290.0,
-    "exp": "2026-11-20",
-    "dte": 30,
-    "delta": 0.22,
-    "mid": 3.45,
-    "roc": 16.0,
-    "capital": 26263
-   },
+   "call": null,
    "callFails": [
-    "ADX 14.0 not above 25"
+    "ADX 14.0 not above 25",
+    "no liquid contract in the delta and DTE window"
    ],
    "result": "Fail"
   },
@@ -296,37 +214,23 @@ window.SCANNER_DATA = {
     "2026-10-21"
    ],
    "chainSource": "CBOE",
-   "iv30": 45.75,
-   "ivr": 32.8,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-10-19",
-   "put": {
-    "strike": 330.0,
-    "exp": "2026-11-20",
-    "dte": 30,
-    "delta": -0.16,
-    "mid": 4.67,
-    "roc": 17.2,
-    "capital": 33000
-   },
+   "iv30": 46.37,
+   "ivr": 36.8,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-10-20",
+   "put": null,
    "putFails": [
     "below 200-day SMA",
     "ADX 12.8 not above 25",
     "PEG 4.54 outside 0 to 2.5",
-    "RSI 53.7 too high for a put"
+    "RSI 53.7 too high for a put",
+    "no liquid contract in the delta and DTE window"
    ],
-   "call": {
-    "strike": 425.0,
-    "exp": "2026-11-20",
-    "dte": 30,
-    "delta": 0.19,
-    "mid": 4.7,
-    "roc": 15.3,
-    "capital": 37371
-   },
+   "call": null,
    "callFails": [
     "below 200-day SMA",
     "ADX 12.8 not above 25",
-    "PEG 4.54 outside 0 to 2.5"
+    "PEG 4.54 outside 0 to 2.5",
+    "no liquid contract in the delta and DTE window"
    ],
    "result": "Fail"
   },
@@ -343,9 +247,9 @@ window.SCANNER_DATA = {
     "2026-11-02"
    ],
    "chainSource": "CBOE",
-   "iv30": 63.24,
-   "ivr": 70.2,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-10-19",
+   "iv30": 63.23,
+   "ivr": 72.3,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-10-20",
    "put": {
     "strike": 160.0,
     "exp": "2026-11-27",
@@ -384,8 +288,8 @@ window.SCANNER_DATA = {
    ],
    "chainSource": "CBOE",
    "iv30": 53.81,
-   "ivr": 53.2,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-10-19",
+   "ivr": 52.3,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-10-20",
    "put": {
     "strike": 195.0,
     "exp": "2026-11-20",
@@ -429,8 +333,8 @@ window.SCANNER_DATA = {
    ],
    "chainSource": "CBOE",
    "iv30": 68.3,
-   "ivr": 49.6,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-10-19",
+   "ivr": 48.8,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-10-20",
    "put": {
     "strike": 140.0,
     "exp": "2026-11-27",
@@ -473,9 +377,9 @@ window.SCANNER_DATA = {
     "2026-10-29"
    ],
    "chainSource": "CBOE",
-   "iv30": 68.94,
-   "ivr": 21.6,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-10-19",
+   "iv30": 68.95,
+   "ivr": 21.4,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-10-20",
    "put": {
     "strike": 120.0,
     "exp": "2026-11-20",
@@ -488,7 +392,7 @@ window.SCANNER_DATA = {
    "putFails": [
     "ADX 24.8 not above 25",
     "PEG 2.85 outside 0 to 2.5",
-    "IV rank 21.6 not above 30",
+    "IV rank 21.4 not above 30",
     "RSI 47.4 too high for a put"
    ],
    "call": {
@@ -503,7 +407,7 @@ window.SCANNER_DATA = {
    "callFails": [
     "ADX 24.8 not above 25",
     "PEG 2.85 outside 0 to 2.5",
-    "IV rank 21.6 not above 30"
+    "IV rank 21.4 not above 30"
    ],
    "result": "Fail"
   },
@@ -520,9 +424,9 @@ window.SCANNER_DATA = {
     "2026-11-04"
    ],
    "chainSource": "CBOE",
-   "iv30": 92.93,
-   "ivr": 34.0,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-10-19",
+   "iv30": 92.9,
+   "ivr": 36.2,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-10-20",
    "put": {
     "strike": 6.0,
     "exp": "2026-11-20",
@@ -562,54 +466,23 @@ window.SCANNER_DATA = {
     "2026-10-27"
    ],
    "chainSource": "CBOE",
-   "iv30": 65.91,
-   "ivr": 41.6,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-10-19",
-   "put": {
-    "strike": 85.0,
-    "exp": "2026-11-20",
-    "dte": 30,
-    "delta": -0.2,
-    "mid": 2.36,
-    "roc": 33.8,
-    "capital": 8500
-   },
+   "iv30": 65.89,
+   "ivr": 40.2,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-10-20",
+   "put": null,
    "putFails": [
-    "ADX 17.1 not above 25"
+    "ADX 17.1 not above 25",
+    "no liquid contract in the delta and DTE window"
    ],
-   "call": {
-    "strike": 123.0,
-    "exp": "2026-11-27",
-    "dte": 37,
-    "delta": 0.17,
-    "mid": 1.63,
-    "roc": 16.4,
-    "capital": 9821
-   },
+   "call": null,
    "callFails": [
-    "ADX 17.1 not above 25"
+    "ADX 17.1 not above 25",
+    "no liquid contract in the delta and DTE window"
    ],
    "result": "Fail"
   }
  ],
  "trades": [
-  {
-   "ticker": "MSFT",
-   "strategy": "Covered Call",
-   "strike": 565.0,
-   "exp": "2026-11-20",
-   "dte": 30,
-   "delta": 0.27,
-   "mid": 7.43,
-   "roc": 17.0,
-   "capital": 53187,
-   "ivr": 48.7,
-   "rsi": 58.3,
-   "adx": 34.6,
-   "price": 531.87,
-   "sma50": 506.72,
-   "sma200": 435.8
-  },
   {
    "ticker": "PLTR",
    "strategy": "Covered Call",
@@ -620,29 +493,12 @@ window.SCANNER_DATA = {
    "mid": 2.53,
    "roc": 16.0,
    "capital": 19260,
-   "ivr": 70.2,
+   "ivr": 72.3,
    "rsi": 52.1,
    "adx": 28.7,
    "price": 192.6,
    "sma50": 183.36,
    "sma200": 152.85
-  },
-  {
-   "ticker": "META",
-   "strategy": "Covered Call",
-   "strike": 785.0,
-   "exp": "2026-11-20",
-   "dte": 30,
-   "delta": 0.2,
-   "mid": 8.95,
-   "roc": 15.7,
-   "capital": 69425,
-   "ivr": 64.8,
-   "rsi": 46.4,
-   "adx": 30.4,
-   "price": 694.25,
-   "sma50": 659.49,
-   "sma200": 632.42
   }
  ],
  "errors": []

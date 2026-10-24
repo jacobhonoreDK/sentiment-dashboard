@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-10-24T07:18:46Z",
+ "generatedAt": "2026-10-24T19:29:51Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -163,7 +163,7 @@ window.SCANNER_DATA = {
    "rsi": 35.7,
    "adx": 27.7,
    "bar": "2026-10-23",
-   "peg": 0.86,
+   "peg": 0.85,
    "earnings": [],
    "chainSource": "CBOE",
    "iv30": 37.03,

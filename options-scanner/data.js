@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-10-23T22:20:41Z",
+ "generatedAt": "2026-10-24T01:36:16Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -42,7 +42,7 @@ window.SCANNER_DATA = {
     "2026-11-17"
    ],
    "chainSource": "CBOE",
-   "iv30": 42.77,
+   "iv30": 42.75,
    "ivr": 55.1,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-22",
    "put": {
@@ -85,7 +85,7 @@ window.SCANNER_DATA = {
     "2026-11-03"
    ],
    "chainSource": "CBOE",
-   "iv30": 60.57,
+   "iv30": 60.54,
    "ivr": 45.9,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-22",
    "put": {
@@ -128,7 +128,7 @@ window.SCANNER_DATA = {
     "2026-10-28"
    ],
    "chainSource": "CBOE",
-   "iv30": 32.13,
+   "iv30": 32.2,
    "ivr": 54.7,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-22",
    "put": {
@@ -163,10 +163,10 @@ window.SCANNER_DATA = {
    "rsi": 35.7,
    "adx": 27.7,
    "bar": "2026-10-23",
-   "peg": 0.92,
+   "peg": 0.86,
    "earnings": [],
    "chainSource": "CBOE",
-   "iv30": 37.12,
+   "iv30": 37.03,
    "ivr": 44.9,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-22",
    "put": {
@@ -208,7 +208,7 @@ window.SCANNER_DATA = {
     "2026-10-28"
    ],
    "chainSource": "CBOE",
-   "iv30": 36.88,
+   "iv30": 36.92,
    "ivr": 78.6,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-22",
    "put": {
@@ -252,7 +252,7 @@ window.SCANNER_DATA = {
     "2026-10-29"
    ],
    "chainSource": "CBOE",
-   "iv30": 43.79,
+   "iv30": 43.67,
    "ivr": 72.0,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-22",
    "put": {
@@ -344,7 +344,7 @@ window.SCANNER_DATA = {
     "2026-11-02"
    ],
    "chainSource": "CBOE",
-   "iv30": 64.61,
+   "iv30": 64.66,
    "ivr": 76.5,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-22",
    "put": {
@@ -559,14 +559,14 @@ window.SCANNER_DATA = {
     "2026-10-27"
    ],
    "chainSource": "CBOE",
-   "iv30": 68.21,
+   "iv30": 68.25,
    "ivr": 46.2,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-22",
    "put": {
     "strike": 80.0,
     "exp": "2026-11-27",
     "dte": 35,
-    "delta": -0.18,
+    "delta": -0.17,
     "mid": 2.1,
     "roc": 27.4,
     "capital": 8000

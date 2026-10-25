@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-10-25T01:11:39Z",
+ "generatedAt": "2026-10-25T06:11:20Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -48,10 +48,10 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 185.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": -0.16,
     "mid": 2.73,
-    "roc": 15.8,
+    "roc": 16.3,
     "capital": 18500
    },
    "putFails": [
@@ -61,10 +61,10 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 230.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": 0.27,
     "mid": 3.95,
-    "roc": 20.1,
+    "roc": 20.7,
     "capital": 21096
    },
    "callFails": [
@@ -91,10 +91,10 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 435.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": -0.16,
     "mid": 8.8,
-    "roc": 21.7,
+    "roc": 22.4,
     "capital": 43500
    },
    "putFails": [
@@ -104,10 +104,10 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 625.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": 0.17,
     "mid": 7.28,
-    "roc": 15.1,
+    "roc": 15.6,
     "capital": 51679
    },
    "callFails": [
@@ -134,10 +134,10 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 485.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": -0.2,
     "mid": 6.83,
-    "roc": 15.1,
+    "roc": 15.6,
     "capital": 48500
    },
    "putFails": [
@@ -146,10 +146,10 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 555.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": 0.3,
     "mid": 8.02,
-    "roc": 16.4,
+    "roc": 16.9,
     "capital": 52451
    },
    "callFails": [],
@@ -172,10 +172,10 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 585.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": -0.19,
     "mid": 8.22,
-    "roc": 15.1,
+    "roc": 15.6,
     "capital": 58500
    },
    "putFails": [
@@ -184,10 +184,10 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 705.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": 0.23,
     "mid": 9.22,
-    "roc": 15.4,
+    "roc": 15.9,
     "capital": 64262
    },
    "callFails": [
@@ -214,10 +214,10 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 295.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": -0.21,
     "mid": 4.55,
-    "roc": 16.6,
+    "roc": 17.1,
     "capital": 29500
    },
    "putFails": [
@@ -225,12 +225,12 @@ window.SCANNER_DATA = {
     "ADX 17.7 not above 25"
    ],
    "call": {
-    "strike": 345.0,
+    "strike": 350.0,
     "exp": "2026-11-27",
-    "dte": 34,
-    "delta": 0.28,
-    "mid": 5.6,
-    "roc": 18.8,
+    "dte": 33,
+    "delta": 0.23,
+    "mid": 4.45,
+    "roc": 15.4,
     "capital": 32021
    },
    "callFails": [
@@ -258,10 +258,10 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 220.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": -0.17,
     "mid": 3.16,
-    "roc": 15.4,
+    "roc": 15.9,
     "capital": 22000
    },
    "putFails": [
@@ -271,10 +271,10 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 275.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": 0.24,
     "mid": 3.85,
-    "roc": 16.7,
+    "roc": 17.2,
     "capital": 24800
    },
    "callFails": [
@@ -299,10 +299,10 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 335.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": -0.18,
     "mid": 4.83,
-    "roc": 15.5,
+    "roc": 15.9,
     "capital": 33500
    },
    "putFails": [
@@ -316,10 +316,10 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 410.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": 0.23,
     "mid": 5.53,
-    "roc": 15.9,
+    "roc": 16.4,
     "capital": 37222
    },
    "callFails": [
@@ -350,10 +350,10 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 165.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": -0.17,
     "mid": 3.88,
-    "roc": 25.2,
+    "roc": 26.0,
     "capital": 16500
    },
    "putFails": [
@@ -363,10 +363,10 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 240.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": 0.17,
     "mid": 2.96,
-    "roc": 16.2,
+    "roc": 16.6,
     "capital": 19675
    },
    "callFails": [
@@ -400,10 +400,10 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 300.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": 0.23,
     "mid": 5.55,
-    "roc": 23.1,
+    "roc": 23.8,
     "capital": 25757
    },
    "callFails": [
@@ -420,7 +420,7 @@ window.SCANNER_DATA = {
    "rsi": 41.5,
    "adx": 17.0,
    "bar": "2026-10-23",
-   "peg": 2.47,
+   "peg": 2.4,
    "earnings": [
     "2026-10-29"
    ],
@@ -431,10 +431,10 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 140.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": -0.19,
     "mid": 4.42,
-    "roc": 33.9,
+    "roc": 35.0,
     "capital": 14000
    },
    "putFails": [
@@ -445,10 +445,10 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 190.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": 0.29,
     "mid": 5.72,
-    "roc": 37.4,
+    "roc": 38.5,
     "capital": 16445
    },
    "callFails": [
@@ -476,10 +476,10 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 120.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": -0.16,
     "mid": 3.27,
-    "roc": 29.3,
+    "roc": 30.2,
     "capital": 12000
    },
    "putFails": [
@@ -491,10 +491,10 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 185.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": 0.18,
     "mid": 2.5,
-    "roc": 18.4,
+    "roc": 19.0,
     "capital": 14601
    },
    "callFails": [
@@ -523,10 +523,10 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 5.5,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": -0.17,
     "mid": 0.21,
-    "roc": 41.0,
+    "roc": 42.2,
     "capital": 550
    },
    "putFails": [
@@ -535,10 +535,10 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 10.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": 0.15,
     "mid": 0.14,
-    "roc": 20.6,
+    "roc": 21.3,
     "capital": 702
    },
    "callFails": [
@@ -565,10 +565,10 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 80.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": -0.17,
     "mid": 2.1,
-    "roc": 28.2,
+    "roc": 29.0,
     "capital": 8000
    },
    "putFails": [
@@ -577,10 +577,10 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 120.0,
     "exp": "2026-11-27",
-    "dte": 34,
+    "dte": 33,
     "delta": 0.16,
     "mid": 1.44,
-    "roc": 16.3,
+    "roc": 16.8,
     "capital": 9507
    },
    "callFails": [
@@ -595,10 +595,10 @@ window.SCANNER_DATA = {
    "strategy": "Covered Call",
    "strike": 555.0,
    "exp": "2026-11-27",
-   "dte": 34,
+   "dte": 33,
    "delta": 0.3,
    "mid": 8.02,
-   "roc": 16.4,
+   "roc": 16.9,
    "capital": 52451,
    "ivr": 54.7,
    "rsi": 52.6,

@@ -783,7 +783,7 @@
     breadth: [
       { name: '% over 50-DMA',     desc: 'S&P 500 medlemmer',                  pos: 70, base: 64,    freq: 'daily', fmt: v => Math.round(v) + '%', thermometer: true },
       { name: '% over 200-DMA',    desc: 'S&P 500 medlemmer',                  pos: 78, base: 71,    freq: 'daily', fmt: v => Math.round(v) + '%' },
-      { name: 'A/D Linje',         desc: 'S&P 500 kumulativ',                     pos: 72, base: 1847,  freq: 'rt',    fmt: v => '+' + Math.round(v).toLocaleString('da-DK') },
+      { name: 'A/D Linje',         desc: 'S&P 500, 20-dages hældning',            pos: 72, base: 1847,  freq: 'daily', fmt: v => (v >= 0 ? '+' : '') + Math.round(v).toLocaleString('da-DK') },
       { name: 'McClellan Osc.',    desc: 'S&P 500 breadth oscillator',            pos: 60, base: 38,    freq: 'daily', fmt: v => (v >= 0 ? '+' : '') + Math.round(v) },
       { name: 'New Highs - Lows',  desc: 'S&P 500 52-uger',                       pos: 65, base: 142,   freq: 'rt',    fmt: v => (v >= 0 ? '+' : '') + Math.round(v) },
       { name: 'SPY / RSP ratio',   desc: 'Large-cap vs equal-weight bredde',   pos: 50, base: 3.55,  freq: 'rt',    fmt: v => v.toFixed(2) },
@@ -1109,8 +1109,8 @@
       why: 'Skifter fra over til under 50% har historisk været et godt signal for skift mellem bull og bear regimer. Stærk persistens - markeder bliver oppe eller nede i lang tid.'
     },
     'A/D Linje': {
-      what: 'Kumulativ optælling af antallet af aktier der stiger minus antallet der falder hver dag. Glat indikator der viser den underliggende styrke i markedet.',
-      interpret: 'Stigende A/D-linje bekræfter pris-rallies. Faldende A/D-linje samtidig med stigende indeks er en klassisk negativ divergens.',
+      what: 'Hældningen på advance/decline-linjen over 20 dage — altså hvor hurtigt den kumulative optælling af stigende minus faldende aktier bevæger sig. Selve niveauet bruges ikke, da det blot afspejler hvor måleperioden begynder.',
+      interpret: 'Positiv hældning betyder at flere aktier stiger end falder — bred deltagelse, der bekræfter et rally. Negativ hældning samtidig med stigende indeks er en klassisk negativ divergens. Nul er neutralt.',
       why: 'Negative divergenser i A/D-linjen har advaret om næsten alle større bear-markets i moderne historie 3-12 måneder før prisindekset toppede.'
     },
     'McClellan Osc.': {

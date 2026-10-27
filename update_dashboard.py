@@ -40,9 +40,26 @@ except ImportError as e:
 CONFIG = {
     # ── Lookback windows ─────────────────────────────────────────────────────
     # Default years of history for z-score / percentile computation.
-    # Breadth is kept at 1y because downloading 5y for 500 tickers is expensive.
+    # Breadth was 1y, which compressed the range so badly that a middling
+    # 57% above-200DMA scored at the 93rd percentile. 3y is a compromise
+    # between a usable distribution and the cost of 500 tickers.
     "history_years":         5,
-    "history_years_breadth": 1,
+    "history_years_breadth": 3,
+
+    # ── Zero-centred indicators ──────────────────────────────────────────────
+    # Oscillators that swing around zero, where zero is meaningful (balance)
+    # rather than just "the middle of what happened lately". Percentile-of-
+    # history mis-scores these: a net-zero high/low reading landed at pos 99
+    # purely because the window happened to be mostly negative. These are
+    # scored on a symmetric scale around zero instead — see scoring below.
+    "zero_centered": {
+        "New Highs - Lows",
+        "McClellan Osc.",
+        "50/200 DMA divergence",
+        "A/D Linje",
+    },
+    # Robust half-scale: the percentile of |x| that maps to a full ±50 swing.
+    "zero_centered_scale_pct": 90,
 
     # ── Category weights — RISK-ON regime ────────────────────────────────────
     # Must sum to 1.0; script normalizes automatically.
@@ -214,7 +231,8 @@ INDICATORS = [
     ("% over 50-DMA",      "breadth", "pct_above_50",     1, "breadth", "daily"),
     ("% over 200-DMA",     "breadth", "pct_above_200",    1, "breadth", "daily"),
     ("New Highs - Lows",   "breadth", "hl_net",           1, "breadth", "daily"),
-    ("A/D Linje",          "breadth", "ad_cumulative",    1, "breadth", "daily"),
+    # 20-day slope of the cumulative A/D line, not its level (see fetch_sp500_breadth)
+    ("A/D Linje",          "breadth", "ad_momentum",      1, "breadth", "daily"),
     ("McClellan Osc.",     "breadth", "mcclellan",        1, "breadth", "daily"),
     # Cap-weight vs equal-weight divergence: falling = leadership narrowing = fear
     ("SPY / RSP ratio",    "derived", "spy_rsp",         -1, "breadth", "rt"),
@@ -345,6 +363,11 @@ def fetch_sp500_breadth() -> dict | None:
 
     net_ad       = ((daily_ret > 0).sum(axis=1) - (daily_ret < 0).sum(axis=1)).astype(float)
     ad_cumulative = net_ad.cumsum()
+    # The cumulative line's level is an artefact of where the window starts:
+    # it climbs with the market, so the latest value always sits near the top
+    # of its own range (pos 91 on a 3y window). Its 20-day slope is what
+    # actually carries breadth information, and it oscillates around zero.
+    ad_momentum = ad_cumulative.diff(20)
     mcclellan    = (
         net_ad.ewm(span=19, adjust=False).mean()
         - net_ad.ewm(span=39, adjust=False).mean()
@@ -359,7 +382,7 @@ def fetch_sp500_breadth() -> dict | None:
         "pct_above_50":   pct_above_50.dropna(),
         "pct_above_200":  pct_above_200.dropna(),
         "hl_net":         hl_net.dropna(),
-        "ad_cumulative":  ad_cumulative.dropna(),
+        "ad_momentum":    ad_momentum.dropna(),
         "mcclellan":      mcclellan.dropna(),
         "dma_divergence": dma_divergence.dropna(),
     }
@@ -657,7 +680,18 @@ def fetch_cboe_pcr():
 # SCORING PRIMITIVES
 # ════════════════════════════════════════════════════════════════════════════
 
-def calc_position_and_zscore(value, history, direction):
+def calc_position_and_zscore(value, history, direction, zero_centered=False):
+    """
+    Maps a reading onto a 0-100 greed scale plus a z-score.
+
+    Default: empirical percentile within the lookback window.
+
+    zero_centered=True: for oscillators where zero means balance, the
+    percentile is the wrong frame — a net-zero high/low count scored 99
+    simply because the window was mostly negative. These are mapped onto a
+    symmetric scale instead, so zero is always 50 and the full ±50 swing is
+    reached at a robust high-water mark of |x| in the window.
+    """
     if history is None or len(history) < 30:
         return None, None
     history = history.dropna()
@@ -665,6 +699,17 @@ def calc_position_and_zscore(value, history, direction):
         return None, None
     mean = float(history.mean())
     std  = float(history.std())
+
+    if zero_centered:
+        scale = float(np.percentile(np.abs(history.values), CONFIG["zero_centered_scale_pct"]))
+        if scale <= 0:
+            return 50.0, 0.0
+        ratio = max(-1.0, min(1.0, value / scale))
+        pos   = 50.0 + 50.0 * ratio * direction
+        pos   = max(1.0, min(99.0, pos))
+        # z measured from zero rather than the window mean, so pos and z agree
+        z = 0.0 if std < 1e-6 else max(-4.0, min(4.0, value / std)) * direction
+        return float(pos), float(z)
 
     percentile = float((history <= value).sum()) / len(history) * 100
     pos        = percentile if direction == 1 else 100 - percentile
@@ -1174,7 +1219,7 @@ def main():
         "Short Interest": "low short interest", "Insider Buy/Sell": "net buying",
         "X / Twitter Bull": "social bullishness", "CNN Fear & Greed": "index high",
         "% over 50-DMA": "high %", "% over 200-DMA": "high %",
-        "New Highs - Lows": "positive net", "A/D Linje": "rising cumulative",
+        "New Highs - Lows": "positive net", "A/D Linje": "positive 20d slope",
         "McClellan Osc.": "positive", "SPY / RSP ratio": "RSP leads (broad breadth)",
         "50/200 DMA divergence": "50DMA breadth ≥ 200DMA",
     }
@@ -1259,7 +1304,10 @@ def main():
                     value, history = float(s.iloc[-1]), s
 
         if value is not None and history is not None:
-            pos, z = calc_position_and_zscore(value, history, direction)
+            pos, z = calc_position_and_zscore(
+                value, history, direction,
+                zero_centered=name in CONFIG["zero_centered"],
+            )
             if pos is not None:
                 # Date of the latest observation (for display in dashboard)
                 try:
@@ -1460,7 +1508,13 @@ def main():
 
     # ── Build output — strip history from indicators_raw before serializing ───
     indicators_out = {
-        nm: {"base": d["base"], "pos": d["pos"], "z": d["z"], "freq": d["freq"], "date": d.get("date")}
+        nm: {
+            "base": d["base"], "pos": d["pos"], "z": d["z"],
+            "freq": d["freq"], "date": d.get("date"),
+            # How pos was derived, so the dashboard can say so rather than
+            # claiming every marker is a percentile of the lookback window.
+            "scale": "zero" if nm in CONFIG["zero_centered"] else "percentile",
+        }
         for nm, d in indicators_raw.items()
     }
 

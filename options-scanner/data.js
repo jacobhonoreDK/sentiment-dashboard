@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-10-28T21:39:41Z",
+ "generatedAt": "2026-10-29T01:48:58Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -213,7 +213,7 @@ window.SCANNER_DATA = {
     "2026-10-28"
    ],
    "chainSource": "CBOE",
-   "iv30": 38.64,
+   "iv30": 38.73,
    "ivr": 75.3,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-27",
    "put": {
@@ -221,8 +221,8 @@ window.SCANNER_DATA = {
     "exp": "2026-11-27",
     "dte": 30,
     "delta": -0.2,
-    "mid": 4.33,
-    "roc": 17.5,
+    "mid": 4.42,
+    "roc": 17.9,
     "capital": 30000
    },
    "putFails": [
@@ -299,7 +299,7 @@ window.SCANNER_DATA = {
    "peg": 4.75,
    "earnings": [],
    "chainSource": "CBOE",
-   "iv30": 36.96,
+   "iv30": 36.93,
    "ivr": 4.6,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-27",
    "put": {
@@ -391,7 +391,7 @@ window.SCANNER_DATA = {
     "2026-12-01"
    ],
    "chainSource": "CBOE",
-   "iv30": 58.54,
+   "iv30": 58.58,
    "ivr": 63.8,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-27",
    "put": {
@@ -412,7 +412,7 @@ window.SCANNER_DATA = {
     "strike": 300.0,
     "exp": "2026-11-27",
     "dte": 30,
-    "delta": 0.28,
+    "delta": 0.27,
     "mid": 7.05,
     "roc": 32.2,
     "capital": 26666
@@ -481,7 +481,7 @@ window.SCANNER_DATA = {
     "2026-10-29"
    ],
    "chainSource": "CBOE",
-   "iv30": 70.22,
+   "iv30": 70.26,
    "ivr": 24.0,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-27",
    "put": {
@@ -500,12 +500,12 @@ window.SCANNER_DATA = {
     "RSI 49.5 too high for a put"
    ],
    "call": {
-    "strike": 180.0,
-    "exp": "2026-11-27",
-    "dte": 30,
-    "delta": 0.18,
-    "mid": 2.55,
-    "roc": 21.4,
+    "strike": 190.0,
+    "exp": "2026-12-04",
+    "dte": 37,
+    "delta": 0.15,
+    "mid": 2.25,
+    "roc": 15.3,
     "capital": 14516
    },
    "callFails": [
@@ -528,7 +528,7 @@ window.SCANNER_DATA = {
     "2026-11-04"
    ],
    "chainSource": "CBOE",
-   "iv30": 97.65,
+   "iv30": 97.56,
    "ivr": 38.7,
    "ivrSource": "optionsanalysissuite.com, as of 2026-10-27",
    "put": {
@@ -544,12 +544,12 @@ window.SCANNER_DATA = {
     "below 200-day SMA"
    ],
    "call": {
-    "strike": 10.5,
-    "exp": "2026-12-04",
-    "dte": 37,
+    "strike": 10.0,
+    "exp": "2026-11-27",
+    "dte": 30,
     "delta": 0.18,
-    "mid": 0.19,
-    "roc": 25.5,
+    "mid": 0.18,
+    "roc": 30.6,
     "capital": 735
    },
    "callFails": [

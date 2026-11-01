@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-10-31T21:36:52Z",
+ "generatedAt": "2026-11-01T01:12:08Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -169,7 +169,9 @@ window.SCANNER_DATA = {
    "adx": 27.5,
    "bar": "2026-10-30",
    "peg": 0.8,
-   "earnings": [],
+   "earnings": [
+    "2027-01-27"
+   ],
    "chainSource": "CBOE",
    "iv30": 38.5,
    "ivr": 42.3,
@@ -184,8 +186,7 @@ window.SCANNER_DATA = {
     "capital": 55500
    },
    "putFails": [
-    "below 200-day SMA",
-    "next earnings date unavailable"
+    "below 200-day SMA"
    ],
    "call": {
     "strike": 680.0,
@@ -197,8 +198,7 @@ window.SCANNER_DATA = {
     "capital": 61499
    },
    "callFails": [
-    "below 200-day SMA",
-    "next earnings date unavailable"
+    "below 200-day SMA"
    ],
    "result": "Fail"
   },
@@ -299,7 +299,9 @@ window.SCANNER_DATA = {
    "adx": 15.3,
    "bar": "2026-10-30",
    "peg": 4.66,
-   "earnings": [],
+   "earnings": [
+    "2027-01-27"
+   ],
    "chainSource": "CBOE",
    "iv30": 41.35,
    "ivr": 0.0,
@@ -317,7 +319,6 @@ window.SCANNER_DATA = {
     "ADX 15.3 not above 25",
     "PEG 4.66 outside 0 to 2.5",
     "IV rank 0.0 not above 30",
-    "next earnings date unavailable",
     "RSI 60.9 too high for a put"
    ],
    "call": {
@@ -332,8 +333,7 @@ window.SCANNER_DATA = {
    "callFails": [
     "ADX 15.3 not above 25",
     "PEG 4.66 outside 0 to 2.5",
-    "IV rank 0.0 not above 30",
-    "next earnings date unavailable"
+    "IV rank 0.0 not above 30"
    ],
    "result": "Fail"
   },

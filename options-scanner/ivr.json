@@ -1,8 +1,8 @@
 {
- "asOf": "2026-10-30",
+ "asOf": "2026-11-02",
  "source": "optionsanalysissuite.com",
  "values": {
-  "NVDA": 64.1, "AMD": 48.7, "MSFT": 35.6, "META": 47.5, "GOOGL": 40.3, "AMZN": 34.8, "TSLA": 24.2,
-  "PLTR": 93.4, "CRWD": 81.7, "COIN": 46.3, "MSTR": 28.1, "MARA": 55.9, "HOOD": 25.4
+  "NVDA": 76.0, "AMD": 57.6, "MSFT": 42.9, "META": 52.0, "GOOGL": 44.3, "AMZN": 37.2, "TSLA": 39.6,
+  "PLTR": 94.5, "CRWD": 94.4, "COIN": 54.0, "MSTR": 30.2, "MARA": 60.9, "HOOD": 34.5
  }
 }

@@ -700,8 +700,8 @@
     "regime": "risk_on"
   },
   "2026-11-05": {
-    "fast": 56.3,
-    "full": 56.5,
-    "regime": "risk_on"
+    "fast": 44.5,
+    "full": 49.3,
+    "regime": "risk_off"
   }
 }

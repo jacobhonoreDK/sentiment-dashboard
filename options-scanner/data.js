@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-11-06T02:28:32Z",
+ "generatedAt": "2026-11-06T10:55:00Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -37,7 +37,7 @@ window.SCANNER_DATA = {
    "rsi": 25.4,
    "adx": 26.4,
    "bar": "2026-11-05",
-   "peg": 0.25,
+   "peg": 0.24,
    "earnings": [
     "2026-11-17"
    ],
@@ -48,10 +48,10 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 148.0,
     "exp": "2026-12-18",
-    "dte": 43,
+    "dte": 42,
     "delta": -0.15,
     "mid": 3.75,
-    "roc": 21.5,
+    "roc": 22.0,
     "capital": 14800
    },
    "putFails": [
@@ -60,10 +60,10 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 215.0,
     "exp": "2026-12-11",
-    "dte": 36,
+    "dte": 35,
     "delta": 0.19,
     "mid": 2.92,
-    "roc": 16.3,
+    "roc": 16.8,
     "capital": 18160
    },
    "callFails": [
@@ -79,7 +79,7 @@ window.SCANNER_DATA = {
    "rsi": 29.7,
    "adx": 24.0,
    "bar": "2026-11-05",
-   "peg": 0.48,
+   "peg": 0.4,
    "earnings": [
     "2027-02-02"
    ],
@@ -90,10 +90,10 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 320.0,
     "exp": "2026-12-18",
-    "dte": 43,
+    "dte": 42,
     "delta": -0.16,
     "mid": 10.97,
-    "roc": 29.1,
+    "roc": 29.8,
     "capital": 32000
    },
    "putFails": [
@@ -103,10 +103,10 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 510.0,
     "exp": "2026-12-11",
-    "dte": 36,
+    "dte": 35,
     "delta": 0.16,
     "mid": 6.38,
-    "roc": 16.0,
+    "roc": 16.4,
     "capital": 40440
    },
    "callFails": [
@@ -123,7 +123,7 @@ window.SCANNER_DATA = {
    "rsi": 54.4,
    "adx": 21.9,
    "bar": "2026-11-05",
-   "peg": 1.54,
+   "peg": 1.64,
    "earnings": [
     "2027-01-27"
    ],
@@ -134,10 +134,10 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 495.0,
     "exp": "2026-12-18",
-    "dte": 43,
+    "dte": 42,
     "delta": -0.23,
     "mid": 9.07,
-    "roc": 15.6,
+    "roc": 15.9,
     "capital": 49500
    },
    "putFails": [
@@ -148,16 +148,16 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 570.0,
     "exp": "2026-12-18",
-    "dte": 43,
+    "dte": 42,
     "delta": 0.29,
     "mid": 8.72,
-    "roc": 13.8,
+    "roc": 14.1,
     "capital": 53593
    },
    "callFails": [
     "ADX 21.9 not above 25",
     "IV rank 29.3 not above 30",
-    "best ROC 13.8% below 15%"
+    "best ROC 14.1% below 15%"
    ],
    "result": "Fail"
   },
@@ -169,7 +169,7 @@ window.SCANNER_DATA = {
    "rsi": 34.9,
    "adx": 26.7,
    "bar": "2026-11-05",
-   "peg": 0.81,
+   "peg": 0.82,
    "earnings": [
     "2027-01-27"
    ],
@@ -180,22 +180,22 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 525.0,
     "exp": "2026-12-11",
-    "dte": 36,
+    "dte": 35,
     "delta": -0.15,
     "mid": 8.12,
-    "roc": 15.7,
+    "roc": 16.1,
     "capital": 52500
    },
    "putFails": [
     "below 200-day SMA"
    ],
    "call": {
-    "strike": 675.0,
+    "strike": 680.0,
     "exp": "2026-12-11",
-    "dte": 36,
-    "delta": 0.23,
-    "mid": 9.55,
-    "roc": 16.0,
+    "dte": 35,
+    "delta": 0.22,
+    "mid": 8.9,
+    "roc": 15.3,
     "capital": 60508
    },
    "callFails": [
@@ -218,13 +218,13 @@ window.SCANNER_DATA = {
    "ivr": 35.1,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-04",
    "put": {
-    "strike": 260.0,
-    "exp": "2026-12-11",
-    "dte": 36,
-    "delta": -0.22,
-    "mid": 4.7,
-    "roc": 18.3,
-    "capital": 26000
+    "strike": 255.0,
+    "exp": "2026-12-18",
+    "dte": 42,
+    "delta": -0.2,
+    "mid": 4.45,
+    "roc": 15.2,
+    "capital": 25500
    },
    "putFails": [
     "below 200-day SMA",
@@ -233,10 +233,10 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 305.0,
     "exp": "2026-12-11",
-    "dte": 36,
+    "dte": 35,
     "delta": 0.27,
     "mid": 4.72,
-    "roc": 17.0,
+    "roc": 17.4,
     "capital": 28257
    },
    "callFails": [
@@ -260,13 +260,13 @@ window.SCANNER_DATA = {
    "ivr": 25.7,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-04",
    "put": {
-    "strike": 235.0,
+    "strike": 230.0,
     "exp": "2026-12-11",
-    "dte": 36,
-    "delta": -0.19,
-    "mid": 3.93,
-    "roc": 16.9,
-    "capital": 23500
+    "dte": 35,
+    "delta": -0.16,
+    "mid": 3.34,
+    "roc": 15.1,
+    "capital": 23000
    },
    "putFails": [
     "ADX 14.1 not above 25",
@@ -277,10 +277,10 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 280.0,
     "exp": "2026-12-11",
-    "dte": 36,
+    "dte": 35,
     "delta": 0.29,
     "mid": 4.53,
-    "roc": 17.6,
+    "roc": 18.1,
     "capital": 26021
    },
    "callFails": [
@@ -298,7 +298,7 @@ window.SCANNER_DATA = {
    "rsi": 35.8,
    "adx": 16.0,
    "bar": "2026-11-05",
-   "peg": 4.65,
+   "peg": 4.49,
    "earnings": [
     "2027-01-27"
    ],
@@ -309,30 +309,30 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 285.0,
     "exp": "2026-12-11",
-    "dte": 36,
+    "dte": 35,
     "delta": -0.15,
     "mid": 6.25,
-    "roc": 22.2,
+    "roc": 22.9,
     "capital": 28500
    },
    "putFails": [
     "below 200-day SMA",
     "ADX 16.0 not above 25",
-    "PEG 4.65 outside 0 to 2.5"
+    "PEG 4.49 outside 0 to 2.5"
    ],
    "call": {
     "strike": 400.0,
     "exp": "2026-12-11",
-    "dte": 36,
+    "dte": 35,
     "delta": 0.2,
     "mid": 5.33,
-    "roc": 15.7,
+    "roc": 16.2,
     "capital": 34369
    },
    "callFails": [
     "below 200-day SMA",
     "ADX 16.0 not above 25",
-    "PEG 4.65 outside 0 to 2.5"
+    "PEG 4.49 outside 0 to 2.5"
    ],
    "result": "Fail"
   },
@@ -344,7 +344,7 @@ window.SCANNER_DATA = {
    "rsi": 25.4,
    "adx": 25.4,
    "bar": "2026-11-05",
-   "peg": 1.59,
+   "peg": 1.56,
    "earnings": [
     "2027-02-01"
    ],
@@ -355,20 +355,20 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 130.0,
     "exp": "2026-12-11",
-    "dte": 36,
+    "dte": 35,
     "delta": -0.17,
     "mid": 3.17,
-    "roc": 24.7,
+    "roc": 25.4,
     "capital": 13000
    },
    "putFails": [],
    "call": {
     "strike": 185.0,
     "exp": "2026-12-11",
-    "dte": 36,
+    "dte": 35,
     "delta": 0.18,
     "mid": 2.33,
-    "roc": 15.2,
+    "roc": 15.6,
     "capital": 15499
    },
    "callFails": [],
@@ -382,7 +382,7 @@ window.SCANNER_DATA = {
    "rsi": 35.4,
    "adx": 17.1,
    "bar": "2026-11-05",
-   "peg": 6.31,
+   "peg": 6.22,
    "earnings": [
     "2026-12-01"
    ],
@@ -393,28 +393,28 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 170.0,
     "exp": "2026-12-18",
-    "dte": 43,
+    "dte": 42,
     "delta": -0.16,
     "mid": 5.68,
-    "roc": 28.3,
+    "roc": 29.0,
     "capital": 17000
    },
    "putFails": [
     "ADX 17.1 not above 25",
-    "PEG 6.31 outside 0 to 2.5"
+    "PEG 6.22 outside 0 to 2.5"
    ],
    "call": {
     "strike": 280.0,
     "exp": "2026-12-11",
-    "dte": 36,
+    "dte": 35,
     "delta": 0.15,
     "mid": 3.65,
-    "roc": 17.0,
+    "roc": 17.5,
     "capital": 21720
    },
    "callFails": [
     "ADX 17.1 not above 25",
-    "PEG 6.31 outside 0 to 2.5"
+    "PEG 6.22 outside 0 to 2.5"
    ],
    "result": "Fail"
   },
@@ -435,10 +435,10 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 110.0,
     "exp": "2026-12-18",
-    "dte": 43,
+    "dte": 42,
     "delta": -0.17,
     "mid": 3.52,
-    "roc": 27.2,
+    "roc": 27.8,
     "capital": 11000
    },
    "putFails": [
@@ -449,10 +449,10 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 175.0,
     "exp": "2026-12-18",
-    "dte": 43,
+    "dte": 42,
     "delta": 0.18,
     "mid": 2.76,
-    "roc": 17.2,
+    "roc": 17.6,
     "capital": 13682
    },
    "callFails": [
@@ -473,16 +473,16 @@ window.SCANNER_DATA = {
    "peg": 2.85,
    "earnings": [],
    "chainSource": "CBOE",
-   "iv30": 79.3,
+   "iv30": 79.45,
    "ivr": null,
    "ivrSource": null,
    "put": {
     "strike": 100.0,
     "exp": "2026-12-18",
-    "dte": 43,
+    "dte": 42,
     "delta": -0.16,
     "mid": 3.72,
-    "roc": 31.6,
+    "roc": 32.4,
     "capital": 10000
    },
    "putFails": [
@@ -495,11 +495,11 @@ window.SCANNER_DATA = {
    ],
    "call": {
     "strike": 170.0,
-    "exp": "2026-12-11",
-    "dte": 36,
-    "delta": 0.15,
-    "mid": 2.16,
-    "roc": 16.9,
+    "exp": "2026-12-18",
+    "dte": 42,
+    "delta": 0.18,
+    "mid": 2.83,
+    "roc": 19.1,
     "capital": 12930
    },
    "callFails": [
@@ -530,10 +530,10 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 4.5,
     "exp": "2026-12-11",
-    "dte": 36,
+    "dte": 35,
     "delta": -0.19,
     "mid": 0.29,
-    "roc": 66.5,
+    "roc": 68.4,
     "capital": 450
    },
    "putFails": [
@@ -543,10 +543,10 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 9.0,
     "exp": "2026-12-18",
-    "dte": 43,
+    "dte": 42,
     "delta": 0.17,
     "mid": 0.15,
-    "roc": 22.4,
+    "roc": 22.9,
     "capital": 588
    },
    "callFails": [
@@ -563,7 +563,7 @@ window.SCANNER_DATA = {
    "rsi": 27.8,
    "adx": 29.5,
    "bar": "2026-11-05",
-   "peg": 1.39,
+   "peg": 1.27,
    "earnings": [],
    "chainSource": "CBOE",
    "iv30": 72.11,
@@ -572,10 +572,10 @@ window.SCANNER_DATA = {
    "put": {
     "strike": 65.0,
     "exp": "2026-12-11",
-    "dte": 36,
+    "dte": 35,
     "delta": -0.19,
     "mid": 2.27,
-    "roc": 35.4,
+    "roc": 36.4,
     "capital": 6500
    },
    "putFails": [
@@ -586,10 +586,10 @@ window.SCANNER_DATA = {
    "call": {
     "strike": 99.0,
     "exp": "2026-12-11",
-    "dte": 36,
+    "dte": 35,
     "delta": 0.16,
     "mid": 1.21,
-    "roc": 15.7,
+    "roc": 16.1,
     "capital": 7839
    },
    "callFails": [
@@ -606,10 +606,10 @@ window.SCANNER_DATA = {
    "strategy": "Cash-Secured Put",
    "strike": 130.0,
    "exp": "2026-12-11",
-   "dte": 36,
+   "dte": 35,
    "delta": -0.17,
    "mid": 3.17,
-   "roc": 24.7,
+   "roc": 25.4,
    "capital": 13000,
    "ivr": 30.3,
    "rsi": 25.4,
@@ -623,10 +623,10 @@ window.SCANNER_DATA = {
    "strategy": "Covered Call",
    "strike": 185.0,
    "exp": "2026-12-11",
-   "dte": 36,
+   "dte": 35,
    "delta": 0.18,
    "mid": 2.33,
-   "roc": 15.2,
+   "roc": 15.6,
    "capital": 15499,
    "ivr": 30.3,
    "rsi": 25.4,

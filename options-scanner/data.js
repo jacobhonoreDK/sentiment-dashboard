@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-11-07T10:13:24Z",
+ "generatedAt": "2026-11-07T16:29:54Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -418,7 +418,7 @@ window.SCANNER_DATA = {
    "rsi": 33.4,
    "adx": 29.0,
    "bar": "2026-11-06",
-   "peg": 0.63,
+   "peg": 0.62,
    "earnings": [],
    "chainSource": "CBOE",
    "iv30": 69.23,
@@ -551,7 +551,7 @@ window.SCANNER_DATA = {
    "rsi": 32.0,
    "adx": 30.5,
    "bar": "2026-11-06",
-   "peg": 1.27,
+   "peg": 1.31,
    "earnings": [],
    "chainSource": "CBOE",
    "iv30": 67.4,

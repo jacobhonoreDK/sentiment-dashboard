@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-11-07T20:54:06Z",
+ "generatedAt": "2026-11-08T00:38:23Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -84,7 +84,7 @@ window.SCANNER_DATA = {
     "2027-02-02"
    ],
    "chainSource": "CBOE",
-   "iv30": 69.06,
+   "iv30": 69.07,
    "ivr": 67.5,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-05",
    "put": {
@@ -124,7 +124,7 @@ window.SCANNER_DATA = {
     "2027-01-27"
    ],
    "chainSource": "CBOE",
-   "iv30": 29.61,
+   "iv30": 29.57,
    "ivr": 47.4,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-05",
    "put": {
@@ -167,7 +167,7 @@ window.SCANNER_DATA = {
     "2027-01-27"
    ],
    "chainSource": "CBOE",
-   "iv30": 41.82,
+   "iv30": 41.86,
    "ivr": 64.3,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-05",
    "put": {
@@ -249,7 +249,7 @@ window.SCANNER_DATA = {
    "peg": 1.2,
    "earnings": [],
    "chainSource": "CBOE",
-   "iv30": 34.96,
+   "iv30": 34.97,
    "ivr": 53.1,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-05",
    "put": {
@@ -294,7 +294,7 @@ window.SCANNER_DATA = {
     "2027-01-27"
    ],
    "chainSource": "CBOE",
-   "iv30": 51.69,
+   "iv30": 51.78,
    "ivr": 92.2,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-05",
    "put": {
@@ -341,7 +341,7 @@ window.SCANNER_DATA = {
     "2027-02-01"
    ],
    "chainSource": "CBOE",
-   "iv30": 55.4,
+   "iv30": 55.42,
    "ivr": 58.6,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-05",
    "put": {
@@ -554,7 +554,7 @@ window.SCANNER_DATA = {
    "peg": 1.31,
    "earnings": [],
    "chainSource": "CBOE",
-   "iv30": 67.4,
+   "iv30": 67.34,
    "ivr": 55.8,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-05",
    "put": {

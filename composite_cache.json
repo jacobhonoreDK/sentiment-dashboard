@@ -723,5 +723,10 @@
     "fast": 45.3,
     "full": 47.4,
     "regime": "risk_off"
+  },
+  "2026-11-10": {
+    "fast": 47.4,
+    "full": 49.0,
+    "regime": "risk_off"
   }
 }

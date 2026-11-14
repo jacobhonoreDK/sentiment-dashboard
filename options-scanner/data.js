@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-11-13T22:39:11Z",
+ "generatedAt": "2026-11-14T03:17:40Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -419,7 +419,7 @@ window.SCANNER_DATA = {
   },
   {
    "ticker": "COIN",
-   "price": 127.64,
+   "price": 127.65,
    "sma50": 170.39,
    "sma200": 174.05,
    "rsi": 32.4,
@@ -451,7 +451,7 @@ window.SCANNER_DATA = {
     "delta": 0.17,
     "mid": 2.13,
     "roc": 17.4,
-    "capital": 12764
+    "capital": 12765
    },
    "callFails": [
     "below 200-day SMA",
@@ -470,7 +470,7 @@ window.SCANNER_DATA = {
    "peg": 2.85,
    "earnings": [],
    "chainSource": "CBOE",
-   "iv30": 74.28,
+   "iv30": 74.05,
    "ivr": 19.7,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-12",
    "put": {
@@ -561,7 +561,7 @@ window.SCANNER_DATA = {
    "peg": 1.32,
    "earnings": [],
    "chainSource": "CBOE",
-   "iv30": 64.1,
+   "iv30": 64.0,
    "ivr": 35.7,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-12",
    "put": {

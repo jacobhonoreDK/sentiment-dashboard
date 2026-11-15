@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-11-14T22:26:06Z",
+ "generatedAt": "2026-11-15T02:40:45Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -518,7 +518,7 @@ window.SCANNER_DATA = {
    "peg": 0.1,
    "earnings": [],
    "chainSource": "CBOE",
-   "iv30": 94.57,
+   "iv30": 94.63,
    "ivr": 37.2,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-12",
    "put": {

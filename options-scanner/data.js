@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-11-16T11:21:57Z",
+ "generatedAt": "2026-11-16T13:54:06Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -42,18 +42,32 @@ window.SCANNER_DATA = {
     "2026-11-17"
    ],
    "chainSource": "CBOE",
-   "iv30": 58.98,
-   "ivr": 92.6,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-12",
-   "put": null,
+   "iv30": 61.96,
+   "ivr": 93.5,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-13",
+   "put": {
+    "strike": 135.0,
+    "exp": "2026-12-18",
+    "dte": 32,
+    "delta": -0.19,
+    "mid": 3.4,
+    "roc": 28.7,
+    "capital": 13500
+   },
    "putFails": [
-    "below 200-day SMA",
-    "no liquid contract in the delta and DTE window"
+    "below 200-day SMA"
    ],
-   "call": null,
+   "call": {
+    "strike": 180.0,
+    "exp": "2026-12-18",
+    "dte": 32,
+    "delta": 0.24,
+    "mid": 3.8,
+    "roc": 26.6,
+    "capital": 16285
+   },
    "callFails": [
-    "below 200-day SMA",
-    "no liquid contract in the delta and DTE window"
+    "below 200-day SMA"
    ],
    "result": "Fail"
   },
@@ -71,8 +85,8 @@ window.SCANNER_DATA = {
    ],
    "chainSource": "CBOE",
    "iv30": 66.6,
-   "ivr": 49.7,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-12",
+   "ivr": 55.3,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-13",
    "put": null,
    "putFails": [
     "ADX 19.7 not above 25",
@@ -100,8 +114,8 @@ window.SCANNER_DATA = {
    ],
    "chainSource": "CBOE",
    "iv30": 27.23,
-   "ivr": 38.6,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-12",
+   "ivr": 34.6,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-13",
    "put": null,
    "putFails": [
     "ADX 17.0 not above 25",
@@ -129,8 +143,8 @@ window.SCANNER_DATA = {
    ],
    "chainSource": "CBOE",
    "iv30": 39.31,
-   "ivr": 47.9,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-12",
+   "ivr": 49.4,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-13",
    "put": null,
    "putFails": [
     "ADX 24.1 not above 25",
@@ -156,8 +170,8 @@ window.SCANNER_DATA = {
    "earnings": [],
    "chainSource": "CBOE",
    "iv30": 32.45,
-   "ivr": 49.5,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-12",
+   "ivr": 48.3,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-13",
    "put": null,
    "putFails": [
     "below 200-day SMA",
@@ -185,8 +199,8 @@ window.SCANNER_DATA = {
    "earnings": [],
    "chainSource": "CBOE",
    "iv30": 32.98,
-   "ivr": 34.2,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-12",
+   "ivr": 37.4,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-13",
    "put": null,
    "putFails": [
     "ADX 12.9 not above 25",
@@ -216,8 +230,8 @@ window.SCANNER_DATA = {
    ],
    "chainSource": "CBOE",
    "iv30": 44.9,
-   "ivr": 46.8,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-12",
+   "ivr": 43.9,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-13",
    "put": null,
    "putFails": [
     "ADX 13.8 not above 25",
@@ -247,8 +261,8 @@ window.SCANNER_DATA = {
    ],
    "chainSource": "CBOE",
    "iv30": 50.41,
-   "ivr": 32.6,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-12",
+   "ivr": 35.5,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-13",
    "put": null,
    "putFails": [
     "RSI 39.5 too high for a put",
@@ -274,8 +288,8 @@ window.SCANNER_DATA = {
    ],
    "chainSource": "CBOE",
    "iv30": 72.89,
-   "ivr": 88.9,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-12",
+   "ivr": 94.3,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-13",
    "put": {
     "strike": 185.0,
     "exp": "2026-12-18",
@@ -316,9 +330,9 @@ window.SCANNER_DATA = {
    "peg": 0.58,
    "earnings": [],
    "chainSource": "CBOE",
-   "iv30": 68.73,
-   "ivr": 46.4,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-12",
+   "iv30": 68.75,
+   "ivr": 45.2,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-13",
    "put": {
     "strike": 105.0,
     "exp": "2026-12-18",
@@ -359,8 +373,8 @@ window.SCANNER_DATA = {
    "earnings": [],
    "chainSource": "CBOE",
    "iv30": 74.97,
-   "ivr": 19.7,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-12",
+   "ivr": 19.8,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-13",
    "put": {
     "strike": 90.0,
     "exp": "2026-12-18",
@@ -374,7 +388,7 @@ window.SCANNER_DATA = {
     "below 200-day SMA",
     "ADX 19.8 not above 25",
     "PEG 2.85 outside 0 to 2.5",
-    "IV rank 19.7 not above 30",
+    "IV rank 19.8 not above 30",
     "next earnings date unavailable"
    ],
    "call": {
@@ -390,7 +404,7 @@ window.SCANNER_DATA = {
     "below 200-day SMA",
     "ADX 19.8 not above 25",
     "PEG 2.85 outside 0 to 2.5",
-    "IV rank 19.7 not above 30",
+    "IV rank 19.8 not above 30",
     "next earnings date unavailable"
    ],
    "result": "Fail"
@@ -407,8 +421,8 @@ window.SCANNER_DATA = {
    "earnings": [],
    "chainSource": "CBOE",
    "iv30": 93.88,
-   "ivr": 37.2,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-12",
+   "ivr": 36.0,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-13",
    "put": {
     "strike": 5.5,
     "exp": "2026-12-24",
@@ -450,8 +464,8 @@ window.SCANNER_DATA = {
    "earnings": [],
    "chainSource": "CBOE",
    "iv30": 64.76,
-   "ivr": 35.7,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-12",
+   "ivr": 35.0,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-13",
    "put": null,
    "putFails": [
     "below 200-day SMA",

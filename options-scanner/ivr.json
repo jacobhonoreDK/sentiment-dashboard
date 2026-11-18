@@ -1,8 +1,1 @@
-{
- "asOf": "2026-11-16",
- "source": "optionsanalysissuite.com",
- "values": {
-  "NVDA": 100.0, "AMD": 70.7, "MSFT": 45.3, "META": 58.6, "GOOGL": 66.4, "AMZN": 47.9, "TSLA": 69.5,
-  "PLTR": 53.7, "CRWD": 100.0, "COIN": 57.9, "MSTR": 32.8, "MARA": 48.3, "HOOD": 54.9
- }
-}
+{"asOf": "2026-11-17", "source": "optionsanalysissuite.com", "values": {"NVDA": 100.0, "AMD": 78.1, "MSFT": 57.5, "META": 63.1, "GOOGL": 74.0, "AMZN": 52.7, "TSLA": 76.1, "PLTR": 61.0, "CRWD": 100.0, "COIN": 59.0, "MSTR": 41.0, "MARA": 57.1, "HOOD": 56.6}}

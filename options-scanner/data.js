@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-11-18T21:58:14Z",
+ "generatedAt": "2026-11-19T03:29:53Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -84,29 +84,29 @@ window.SCANNER_DATA = {
     "2027-02-02"
    ],
    "chainSource": "CBOE",
-   "iv30": 71.42,
+   "iv30": 71.47,
    "ivr": 78.1,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-17",
    "put": {
-    "strike": 430.0,
+    "strike": 425.0,
     "exp": "2026-12-24",
     "dte": 36,
-    "delta": -0.16,
-    "mid": 12.75,
-    "roc": 30.1,
-    "capital": 43000
+    "delta": -0.15,
+    "mid": 11.9,
+    "roc": 28.4,
+    "capital": 42500
    },
    "putFails": [
     "ADX 17.6 not above 25",
     "RSI 50.3 too high for a put"
    ],
    "call": {
-    "strike": 650.0,
+    "strike": 660.0,
     "exp": "2026-12-18",
     "dte": 30,
-    "delta": 0.17,
-    "mid": 7.95,
-    "roc": 18.2,
+    "delta": 0.15,
+    "mid": 7.07,
+    "roc": 16.2,
     "capital": 53014
    },
    "callFails": [
@@ -127,7 +127,7 @@ window.SCANNER_DATA = {
     "2027-01-27"
    ],
    "chainSource": "CBOE",
-   "iv30": 32.51,
+   "iv30": 32.43,
    "ivr": 57.5,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-17",
    "put": {
@@ -213,7 +213,7 @@ window.SCANNER_DATA = {
    "peg": 0.99,
    "earnings": [],
    "chainSource": "CBOE",
-   "iv30": 34.99,
+   "iv30": 35.07,
    "ivr": 74.0,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-17",
    "put": {
@@ -255,7 +255,7 @@ window.SCANNER_DATA = {
    "peg": 1.2,
    "earnings": [],
    "chainSource": "CBOE",
-   "iv30": 36.06,
+   "iv30": 36.05,
    "ivr": 52.7,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-17",
    "put": {
@@ -300,7 +300,7 @@ window.SCANNER_DATA = {
     "2027-01-27"
    ],
    "chainSource": "CBOE",
-   "iv30": 48.58,
+   "iv30": 48.61,
    "ivr": 76.1,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-17",
    "put": {
@@ -345,7 +345,7 @@ window.SCANNER_DATA = {
     "2027-02-01"
    ],
    "chainSource": "CBOE",
-   "iv30": 55.45,
+   "iv30": 55.49,
    "ivr": 61.0,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-17",
    "put": {
@@ -555,7 +555,7 @@ window.SCANNER_DATA = {
    "peg": 1.12,
    "earnings": [],
    "chainSource": "CBOE",
-   "iv30": 70.6,
+   "iv30": 70.71,
    "ivr": 56.6,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-17",
    "put": {

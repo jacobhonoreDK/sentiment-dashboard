@@ -94,6 +94,33 @@ def bs_delta(spot, strike, iv, t_years, is_call, r=RULES["risk_free"]):
     return norm_cdf(d1) if is_call else norm_cdf(d1) - 1
 
 
+def iso_utc(ts) -> str | None:
+    """Any timestamp (naive = US/Eastern) as an ISO UTC string."""
+    try:
+        ts = pd.Timestamp(ts)
+    except Exception:
+        return None
+    if ts.tzinfo is None:
+        ts = ts.tz_localize(ET)
+    return ts.tz_convert("UTC").strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def market_open(now: datetime) -> bool:
+    et = now.astimezone(ET)
+    return et.weekday() < 5 and (9, 30) <= (et.hour, et.minute) < (16, 0)
+
+
+def quotes_fresh(as_of: str | None, now: datetime, bar_date: date) -> bool:
+    """During the session quotes must be under 45 minutes old; outside it
+    they must be from the latest trading day or later."""
+    if not as_of:
+        return False
+    q = datetime.fromisoformat(as_of.replace("Z", "+00:00"))
+    if market_open(now):
+        return now - q <= timedelta(minutes=45)
+    return q.astimezone(ET).date() >= bar_date
+
+
 def load_json(path: Path, default):
     try:
         return json.loads(path.read_text())
@@ -132,14 +159,24 @@ def fetch_technicals(tk: yf.Ticker) -> dict:
     if df is None or len(df) < 200:
         raise ValueError(f"only {0 if df is None else len(df)} daily bars")
     c, h, l = df["Close"].astype(float), df["High"].astype(float), df["Low"].astype(float)
-    return {
-        "price":  num(c.iloc[-1]),
-        "sma50":  num(c.rolling(50).mean().iloc[-1]),
-        "sma200": num(c.rolling(200).mean().iloc[-1]),
-        "rsi":    num(rsi(c).iloc[-1], 1),
-        "adx":    num(adx(h, l, c).iloc[-1], 1),
-        "bar":    str(df.index[-1].date()),
+    out = {
+        "price":     num(c.iloc[-1]),
+        "priceAsOf": None,
+        "sma50":     num(c.rolling(50).mean().iloc[-1]),
+        "sma200":    num(c.rolling(200).mean().iloc[-1]),
+        "rsi":       num(rsi(c).iloc[-1], 1),
+        "adx":       num(adx(h, l, c).iloc[-1], 1),
+        "bar":       str(df.index[-1].date()),
     }
+    # Latest 1-minute bar gives the actual time of the price
+    try:
+        m1 = tk.history(period="1d", interval="1m")
+        if m1 is not None and len(m1):
+            out["price"] = num(m1["Close"].iloc[-1])
+            out["priceAsOf"] = iso_utc(m1.index[-1])
+    except Exception:
+        pass
+    return out
 
 
 def fetch_peg(tk: yf.Ticker):
@@ -198,8 +235,10 @@ OPT_RE = re.compile(r"^([A-Z]+)(\d{6})([CP])(\d{8})$")
 
 def fetch_chain(ticker: str) -> dict:
     """CBOE delayed quotes: spot, iv30 and every contract with bid/ask/delta/iv."""
-    url = f"https://cdn.cboe.com/api/global/delayed_quotes/options/{ticker}.json"
-    r = requests.get(url, headers=UA, timeout=40)
+    # The CDN serves old cached copies of some symbols (seen up to a day old);
+    # a unique query string makes it fetch a fresh one.
+    url = f"https://cdn.cboe.com/api/global/delayed_quotes/options/{ticker}.json?_={int(time.time())}"
+    r = requests.get(url, headers={**UA, "Cache-Control": "no-cache"}, timeout=40)
     r.raise_for_status()
     js = r.json()
     data = js.get("data") or {}
@@ -221,14 +260,14 @@ def fetch_chain(ticker: str) -> dict:
     return {
         "spot":      num(data.get("current_price") or data.get("close")),
         "iv30":      num(data.get("iv30"), 2),
-        "timestamp": js.get("timestamp"),
+        "quotesAsOf": iso_utc(pd.Timestamp(js["timestamp"], tz="UTC")) if js.get("timestamp") else None,
         "rows":      rows,
     }
 
 
 def fetch_chain_yf(tk: yf.Ticker, spot: float, today: date) -> dict:
     """Fallback: yfinance chains, delta from Black-Scholes on each quote's IV."""
-    rows = []
+    rows, last_trade = [], None
     for exp_s in tk.options or ():
         exp = date.fromisoformat(exp_s)
         dte = (exp - today).days
@@ -236,6 +275,9 @@ def fetch_chain_yf(tk: yf.Ticker, spot: float, today: date) -> dict:
             continue
         ch = tk.option_chain(exp_s)
         for is_call, df in ((True, ch.calls), (False, ch.puts)):
+            if "lastTradeDate" in df and len(df):
+                lt = pd.to_datetime(df["lastTradeDate"], utc=True).max()
+                last_trade = lt if last_trade is None or lt > last_trade else last_trade
             for _, o in df.iterrows():
                 iv = num(o.get("impliedVolatility"), 4)
                 rows.append({
@@ -244,7 +286,8 @@ def fetch_chain_yf(tk: yf.Ticker, spot: float, today: date) -> dict:
                     "delta": num(bs_delta(spot, float(o["strike"]), iv, dte / 365, is_call), 4),
                     "iv": iv, "oi": o.get("openInterest"),
                 })
-    return {"spot": spot, "iv30": None, "timestamp": None, "rows": rows}
+    # Yahoo has no snapshot time; the chain's latest trade stands in for it
+    return {"spot": spot, "iv30": None, "quotesAsOf": iso_utc(last_trade) if last_trade is not None else None, "rows": rows}
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -318,7 +361,7 @@ def screen_ticker(t: str, row: dict, chain: dict | None, today: date):
     if not row.get("earnings"):
         common.append("next earnings date unavailable")
     if not chain or not chain.get("rows"):
-        common.append("option chain unavailable")
+        common.append("option quotes stale" if row.get("quotesAsOf") else "option chain unavailable")
 
     trades = []
     for strat in ("CSP", "CC"):
@@ -359,6 +402,7 @@ def main() -> int:
     daily = cache.setdefault("daily", {})
     ivh   = cache.setdefault("iv30_history", {})
     ivr_vals, ivr_src = load_ivr(today)
+    ivr_as_of = load_json(IVR_JSON, {}).get("asOf") if ivr_vals else None
     if not ivr_vals:
         print("  ⚠ ivr.json missing or stale; IV rank falls back to the scanner's own log")
 
@@ -387,18 +431,26 @@ def main() -> int:
                 daily[t] = d          # only cache a complete set; retry next hour otherwise
         row["peg"], row["earnings"] = d.get("peg"), d.get("earnings") or []
 
-        chain = None
-        try:
-            chain = fetch_chain(t)
-            row["chainSource"] = "CBOE"
-        except Exception as e:
-            errors.append(f"{t}: CBOE chain ({e})")
-        if (not chain or not chain["rows"]) and row.get("price"):
+        # Option chain: CBOE first, Yahoo as fallback; stale quotes are not used
+        chain, row["quotesAsOf"] = None, None
+        bar_date = date.fromisoformat(row["bar"]) if row.get("bar") else today
+        for src in ("CBOE", "Yahoo"):
+            if src == "Yahoo" and not row.get("price"):
+                continue
             try:
-                chain = fetch_chain_yf(tk, row["price"], today)
-                row["chainSource"] = "Yahoo"
+                c = fetch_chain(t) if src == "CBOE" else fetch_chain_yf(tk, row["price"], today)
             except Exception as e:
-                errors.append(f"{t}: Yahoo chain ({e})")
+                errors.append(f"{t}: {src} chain ({e})")
+                continue
+            if not c["rows"]:
+                errors.append(f"{t}: {src} chain empty")
+                continue
+            if not quotes_fresh(c["quotesAsOf"], now, bar_date):
+                errors.append(f"{t}: {src} quotes stale (as of {c['quotesAsOf']})")
+                row["quotesAsOf"] = row["quotesAsOf"] or c["quotesAsOf"]
+                continue
+            chain, row["chainSource"], row["quotesAsOf"] = c, src, c["quotesAsOf"]
+            break
         if chain and chain.get("iv30") is not None:
             row["iv30"] = chain["iv30"]
             ivh.setdefault(t, {})[today.isoformat()] = chain["iv30"]
@@ -414,11 +466,13 @@ def main() -> int:
         roc = lambda c: f"{c['roc']:.1f}%" if c else "-"
         print(f"  {t:5} {row['result']:9} px={row.get('price')} rsi={row.get('rsi')} adx={row.get('adx')} "
               f"peg={row.get('peg')} ivr={row.get('ivr')} earn={row.get('earnings')} "
-              f"put={roc(row.get('put'))} call={roc(row.get('call'))} chain={row.get('chainSource')}")
+              f"put={roc(row.get('put'))} call={roc(row.get('call'))} chain={row.get('chainSource')} "
+              f"priceAsOf={row.get('priceAsOf')} quotesAsOf={row.get('quotesAsOf')}")
         trades.extend(tr)
         time.sleep(0.5)
 
     payload = {
+        "ivrAsOf": ivr_as_of,
         "rules":   RULES,
         "tickers": TICKERS,
         "screen":  screen,
@@ -426,12 +480,17 @@ def main() -> int:
         "errors":  errors,
     }
 
-    # Skip the write when nothing but the clock moved (nights, weekends)
+    # Skip the write when nothing but timestamps moved (nights, weekends)
+    def stable(x):
+        if isinstance(x, dict):
+            return {k: stable(v) for k, v in x.items() if k not in ("generatedAt", "priceAsOf", "quotesAsOf")}
+        if isinstance(x, list):
+            return [stable(v) for v in x]
+        return x
     prev = DATA_JS.read_text() if DATA_JS.exists() else ""
     m = re.search(r"window\.SCANNER_DATA = (\{.*\});", prev, re.S)
     old = json.loads(m.group(1)) if m else {}
-    old.pop("generatedAt", None)
-    if old != json.loads(json.dumps(payload)):
+    if stable(old) != stable(json.loads(json.dumps(payload))):
         payload = {"generatedAt": now.strftime("%Y-%m-%dT%H:%M:%SZ"), **payload}
         DATA_JS.write_text("window.SCANNER_DATA = " + json.dumps(payload, indent=1) + ";\n")
         print(f"✓ wrote {DATA_JS.name}: {len(trades)} qualifying trade(s)")

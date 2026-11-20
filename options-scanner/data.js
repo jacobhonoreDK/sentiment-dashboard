@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-11-20T12:55:15Z",
+ "generatedAt": "2026-11-20T13:52:28Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -40,28 +40,28 @@ window.SCANNER_DATA = {
    "peg": 0.18,
    "earnings": [],
    "chainSource": "Yahoo",
-   "ivr": 59.5,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-18",
+   "ivr": 63.8,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-19",
    "put": {
-    "strike": 125.0,
-    "exp": "2026-12-24",
-    "dte": 34,
-    "delta": -0.18,
-    "mid": 3.45,
-    "roc": 29.6,
-    "capital": 12500
+    "strike": 120.0,
+    "exp": "2026-12-31",
+    "dte": 41,
+    "delta": -0.15,
+    "mid": 3.08,
+    "roc": 22.9,
+    "capital": 12000
    },
    "putFails": [
     "below 200-day SMA",
     "next earnings date unavailable"
    ],
    "call": {
-    "strike": 165.0,
+    "strike": 160.0,
     "exp": "2026-12-24",
     "dte": 34,
-    "delta": 0.22,
-    "mid": 2.15,
-    "roc": 15.8,
+    "delta": 0.27,
+    "mid": 2.76,
+    "roc": 20.3,
     "capital": 14598
    },
    "callFails": [
@@ -83,16 +83,16 @@ window.SCANNER_DATA = {
     "2027-02-02"
    ],
    "chainSource": "Yahoo",
-   "ivr": 65.2,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-18",
+   "ivr": 77.8,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-19",
    "put": {
-    "strike": 410.0,
+    "strike": 400.0,
     "exp": "2026-12-24",
     "dte": 34,
-    "delta": -0.22,
-    "mid": 22.9,
-    "roc": 60.0,
-    "capital": 41000
+    "delta": -0.21,
+    "mid": 21.9,
+    "roc": 58.8,
+    "capital": 40000
    },
    "putFails": [
     "ADX 17.3 not above 25",
@@ -118,15 +118,15 @@ window.SCANNER_DATA = {
     "2027-01-27"
    ],
    "chainSource": "Yahoo",
-   "ivr": 54.0,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-18",
+   "ivr": 58.3,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-19",
    "put": {
     "strike": 460.0,
-    "exp": "2026-12-31",
-    "dte": 41,
+    "exp": "2026-12-24",
+    "dte": 34,
     "delta": -0.26,
-    "mid": 11.3,
-    "roc": 21.9,
+    "mid": 11.5,
+    "roc": 26.8,
     "capital": 46000
    },
    "putFails": [
@@ -153,16 +153,16 @@ window.SCANNER_DATA = {
     "2027-01-27"
    ],
    "chainSource": "Yahoo",
-   "ivr": 54.7,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-18",
+   "ivr": 60.8,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-19",
    "put": {
-    "strike": 540.0,
+    "strike": 510.0,
     "exp": "2026-12-24",
     "dte": 34,
-    "delta": -0.24,
-    "mid": 16.07,
-    "roc": 32.0,
-    "capital": 54000
+    "delta": -0.16,
+    "mid": 10.0,
+    "roc": 21.0,
+    "capital": 51000
    },
    "putFails": [
     "below 200-day SMA",
@@ -187,8 +187,8 @@ window.SCANNER_DATA = {
    "peg": 1.0,
    "earnings": [],
    "chainSource": "Yahoo",
-   "ivr": 62.7,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-18",
+   "ivr": 77.8,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-19",
    "put": null,
    "putFails": [
     "below 200-day SMA",
@@ -216,8 +216,8 @@ window.SCANNER_DATA = {
    "peg": 1.24,
    "earnings": [],
    "chainSource": "Yahoo",
-   "ivr": 48.8,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-18",
+   "ivr": 55.6,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-19",
    "put": null,
    "putFails": [
     "ADX 11.5 not above 25",
@@ -246,16 +246,16 @@ window.SCANNER_DATA = {
     "2027-01-27"
    ],
    "chainSource": "Yahoo",
-   "ivr": 63.7,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-18",
+   "ivr": 73.7,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-19",
    "put": {
-    "strike": 340.0,
+    "strike": 335.0,
     "exp": "2026-12-24",
     "dte": 34,
-    "delta": -0.26,
-    "mid": 12.25,
-    "roc": 38.7,
-    "capital": 34000
+    "delta": -0.24,
+    "mid": 11.4,
+    "roc": 36.5,
+    "capital": 33500
    },
    "putFails": [
     "below 200-day SMA",
@@ -285,8 +285,8 @@ window.SCANNER_DATA = {
     "2027-02-01"
    ],
    "chainSource": "Yahoo",
-   "ivr": 54.5,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-18",
+   "ivr": 59.0,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-19",
    "put": null,
    "putFails": [
     "below 200-day SMA",
@@ -312,8 +312,8 @@ window.SCANNER_DATA = {
     "2026-12-01"
    ],
    "chainSource": "Yahoo",
-   "ivr": 94.1,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-18",
+   "ivr": 93.1,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-19",
    "put": null,
    "putFails": [
     "ADX 19.5 not above 25",
@@ -340,8 +340,8 @@ window.SCANNER_DATA = {
    "peg": 0.49,
    "earnings": [],
    "chainSource": "Yahoo",
-   "ivr": 59.1,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-18",
+   "ivr": 58.4,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-19",
    "put": null,
    "putFails": [
     "below 200-day SMA",
@@ -367,8 +367,8 @@ window.SCANNER_DATA = {
    "peg": 2.85,
    "earnings": [],
    "chainSource": "Yahoo",
-   "ivr": 46.4,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-18",
+   "ivr": 50.9,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-19",
    "put": null,
    "putFails": [
     "below 200-day SMA",
@@ -396,8 +396,8 @@ window.SCANNER_DATA = {
    "peg": 0.1,
    "earnings": [],
    "chainSource": "Yahoo",
-   "ivr": 42.4,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-18",
+   "ivr": 54.9,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-19",
    "put": null,
    "putFails": [
     "below 200-day SMA",
@@ -423,8 +423,8 @@ window.SCANNER_DATA = {
    "peg": 1.12,
    "earnings": [],
    "chainSource": "Yahoo",
-   "ivr": 50.3,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-18",
+   "ivr": 55.2,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-19",
    "put": null,
    "putFails": [
     "below 200-day SMA",

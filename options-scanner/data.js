@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-11-22T06:51:24Z",
+ "generatedAt": "2026-11-23T02:46:33Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -103,7 +103,7 @@ window.SCANNER_DATA = {
     "strike": 575.0,
     "exp": "2026-12-31",
     "dte": 39,
-    "delta": 0.15,
+    "delta": 0.16,
     "mid": 7.95,
     "roc": 17.5,
     "capital": 42439
@@ -130,13 +130,13 @@ window.SCANNER_DATA = {
    "ivr": 58.3,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-19",
    "put": {
-    "strike": 425.0,
-    "exp": "2026-12-31",
-    "dte": 39,
+    "strike": 430.0,
+    "exp": "2026-12-24",
+    "dte": 32,
     "delta": -0.19,
-    "mid": 8.4,
-    "roc": 18.5,
-    "capital": 42500
+    "mid": 8.22,
+    "roc": 21.8,
+    "capital": 43000
    },
    "putFails": [
     "ADX 18.3 not above 25"
@@ -171,13 +171,13 @@ window.SCANNER_DATA = {
    "ivr": 60.8,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-19",
    "put": {
-    "strike": 475.0,
-    "exp": "2026-12-24",
-    "dte": 32,
+    "strike": 470.0,
+    "exp": "2026-12-31",
+    "dte": 39,
     "delta": -0.15,
-    "mid": 9.62,
-    "roc": 23.1,
-    "capital": 47500
+    "mid": 9.7,
+    "roc": 19.3,
+    "capital": 47000
    },
    "putFails": [
     "below 200-day SMA",
@@ -229,7 +229,7 @@ window.SCANNER_DATA = {
     "strike": 295.0,
     "exp": "2026-12-24",
     "dte": 32,
-    "delta": 0.22,
+    "delta": 0.23,
     "mid": 3.58,
     "roc": 15.4,
     "capital": 26529
@@ -272,7 +272,7 @@ window.SCANNER_DATA = {
     "strike": 270.0,
     "exp": "2026-12-24",
     "dte": 32,
-    "delta": 0.27,
+    "delta": 0.28,
     "mid": 4.5,
     "roc": 20.8,
     "capital": 24682
@@ -316,7 +316,7 @@ window.SCANNER_DATA = {
     "strike": 405.0,
     "exp": "2026-12-24",
     "dte": 32,
-    "delta": 0.18,
+    "delta": 0.19,
     "mid": 5.03,
     "roc": 16.6,
     "capital": 34582
@@ -344,13 +344,13 @@ window.SCANNER_DATA = {
    "ivr": 59.0,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-19",
    "put": {
-    "strike": 120.0,
-    "exp": "2026-12-24",
-    "dte": 32,
-    "delta": -0.18,
-    "mid": 3.9,
-    "roc": 37.1,
-    "capital": 12000
+    "strike": 115.0,
+    "exp": "2026-12-31",
+    "dte": 39,
+    "delta": -0.15,
+    "mid": 3.28,
+    "roc": 26.7,
+    "capital": 11500
    },
    "putFails": [
     "below 200-day SMA"
@@ -359,7 +359,7 @@ window.SCANNER_DATA = {
     "strike": 170.0,
     "exp": "2026-12-24",
     "dte": 32,
-    "delta": 0.19,
+    "delta": 0.2,
     "mid": 2.43,
     "roc": 19.3,
     "capital": 14349
@@ -478,7 +478,7 @@ window.SCANNER_DATA = {
     "strike": 105.0,
     "exp": "2026-12-24",
     "dte": 32,
-    "delta": 0.19,
+    "delta": 0.2,
     "mid": 2.18,
     "roc": 32.0,
     "capital": 7780

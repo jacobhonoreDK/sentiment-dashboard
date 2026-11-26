@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-11-26T09:32:10Z",
+ "generatedAt": "2026-11-26T13:52:48Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -40,8 +40,8 @@ window.SCANNER_DATA = {
    "peg": 0.15,
    "earnings": [],
    "chainSource": "Yahoo",
-   "ivr": 86.5,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-24",
+   "ivr": 96.2,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
    "put": {
     "strike": 125.0,
     "exp": "2026-12-31",
@@ -83,8 +83,8 @@ window.SCANNER_DATA = {
     "2027-02-02"
    ],
    "chainSource": "Yahoo",
-   "ivr": 90.6,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-24",
+   "ivr": 91.3,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
    "put": {
     "strike": 315.0,
     "exp": "2026-12-31",
@@ -126,8 +126,8 @@ window.SCANNER_DATA = {
     "2027-01-27"
    ],
    "chainSource": "Yahoo",
-   "ivr": 57.4,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-24",
+   "ivr": 62.8,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
    "put": {
     "strike": 440.0,
     "exp": "2026-12-31",
@@ -168,8 +168,8 @@ window.SCANNER_DATA = {
     "2027-01-27"
    ],
    "chainSource": "Yahoo",
-   "ivr": 65.7,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-24",
+   "ivr": 67.7,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
    "put": {
     "strike": 530.0,
     "exp": "2026-12-31",
@@ -210,8 +210,8 @@ window.SCANNER_DATA = {
     "2027-02-03"
    ],
    "chainSource": "Yahoo",
-   "ivr": 63.3,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-24",
+   "ivr": 70.6,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
    "put": {
     "strike": 240.0,
     "exp": "2026-12-31",
@@ -253,8 +253,8 @@ window.SCANNER_DATA = {
     "2027-02-04"
    ],
    "chainSource": "Yahoo",
-   "ivr": 57.2,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-24",
+   "ivr": 65.8,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
    "put": {
     "strike": 215.0,
     "exp": "2026-12-31",
@@ -297,8 +297,8 @@ window.SCANNER_DATA = {
     "2027-01-27"
    ],
    "chainSource": "Yahoo",
-   "ivr": 65.9,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-24",
+   "ivr": 76.3,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
    "put": {
     "strike": 320.0,
     "exp": "2026-12-31",
@@ -343,8 +343,8 @@ window.SCANNER_DATA = {
     "2027-02-01"
    ],
    "chainSource": "Yahoo",
-   "ivr": 57.8,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-24",
+   "ivr": 59.3,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
    "put": {
     "strike": 140.0,
     "exp": "2026-12-31",
@@ -380,8 +380,8 @@ window.SCANNER_DATA = {
    "peg": 5.92,
    "earnings": [],
    "chainSource": "Yahoo",
-   "ivr": 58.5,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-24",
+   "ivr": 59.8,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
    "put": {
     "strike": 175.0,
     "exp": "2026-12-31",
@@ -427,7 +427,7 @@ window.SCANNER_DATA = {
    ],
    "chainSource": "Yahoo",
    "ivr": 69.6,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-24",
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
    "put": {
     "strike": 85.0,
     "exp": "2026-12-31",
@@ -467,8 +467,8 @@ window.SCANNER_DATA = {
     "2027-02-04"
    ],
    "chainSource": "Yahoo",
-   "ivr": 61.4,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-24",
+   "ivr": 66.6,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
    "put": {
     "strike": 60.0,
     "exp": "2026-12-31",
@@ -508,8 +508,8 @@ window.SCANNER_DATA = {
    "peg": null,
    "earnings": [],
    "chainSource": "Yahoo",
-   "ivr": 70.8,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-24",
+   "ivr": 69.2,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
    "put": {
     "strike": 4.0,
     "exp": "2026-12-31",
@@ -553,8 +553,8 @@ window.SCANNER_DATA = {
     "2027-02-10"
    ],
    "chainSource": "Yahoo",
-   "ivr": 64.7,
-   "ivrSource": "optionsanalysissuite.com, as of 2026-11-24",
+   "ivr": 60.7,
+   "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
    "put": {
     "strike": 55.0,
     "exp": "2026-12-31",
@@ -593,7 +593,7 @@ window.SCANNER_DATA = {
    "mid": 2.82,
    "roc": 18.0,
    "capital": 16359,
-   "ivr": 57.8,
+   "ivr": 59.3,
    "rsi": 45.1,
    "adx": 27.8,
    "price": 163.59,

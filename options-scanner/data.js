@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-11-27T13:52:35Z",
+ "generatedAt": "2026-11-27T21:58:45Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -31,31 +31,39 @@ window.SCANNER_DATA = {
  "screen": [
   {
    "ticker": "NVDA",
-   "price": 149.3,
-   "sma50": 203.65,
-   "sma200": 202.87,
-   "rsi": 37.5,
-   "adx": 47.9,
-   "bar": "2026-11-25",
+   "price": 150.49,
+   "sma50": 202.28,
+   "sma200": 202.68,
+   "rsi": 38.1,
+   "adx": 47.2,
+   "bar": "2026-11-27",
    "peg": 0.15,
    "earnings": [],
    "chainSource": "Yahoo",
    "ivr": 96.2,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
-   "put": null,
+   "put": {
+    "strike": 125.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": -0.16,
+    "mid": 3.12,
+    "roc": 26.8,
+    "capital": 12500
+   },
    "putFails": [
     "below 200-day SMA",
     "next earnings date unavailable",
-    "no liquid contract in the delta and DTE window"
+    "RSI 38.1 too high for a put"
    ],
    "call": {
-    "strike": 175.0,
+    "strike": 180.0,
     "exp": "2026-12-31",
     "dte": 34,
-    "delta": 0.27,
-    "mid": 4.75,
-    "roc": 34.2,
-    "capital": 14930
+    "delta": 0.19,
+    "mid": 2.74,
+    "roc": 19.5,
+    "capital": 15049
    },
    "callFails": [
     "below 200-day SMA",
@@ -65,12 +73,12 @@ window.SCANNER_DATA = {
   },
   {
    "ticker": "AMD",
-   "price": 406.03,
-   "sma50": 548.35,
-   "sma200": 432.96,
-   "rsi": 38.0,
-   "adx": 20.7,
-   "bar": "2026-11-25",
+   "price": 424.54,
+   "sma50": 545.94,
+   "sma200": 434.01,
+   "rsi": 40.8,
+   "adx": 21.4,
+   "bar": "2026-11-27",
    "peg": 0.4,
    "earnings": [
     "2027-02-02"
@@ -78,28 +86,43 @@ window.SCANNER_DATA = {
    "chainSource": "Yahoo",
    "ivr": 91.3,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
-   "put": null,
+   "put": {
+    "strike": 335.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": -0.15,
+    "mid": 10.93,
+    "roc": 35.0,
+    "capital": 33500
+   },
    "putFails": [
     "below 200-day SMA",
-    "ADX 20.7 not above 25",
-    "no liquid contract in the delta and DTE window"
+    "ADX 21.4 not above 25",
+    "RSI 40.8 too high for a put"
    ],
-   "call": null,
+   "call": {
+    "strike": 540.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": 0.15,
+    "mid": 6.65,
+    "roc": 16.8,
+    "capital": 42454
+   },
    "callFails": [
     "below 200-day SMA",
-    "ADX 20.7 not above 25",
-    "no liquid contract in the delta and DTE window"
+    "ADX 21.4 not above 25"
    ],
    "result": "Fail"
   },
   {
    "ticker": "MSFT",
-   "price": 489.93,
-   "sma50": 519.55,
-   "sma200": 444.89,
-   "rsi": 38.7,
-   "adx": 19.1,
-   "bar": "2026-11-25",
+   "price": 492.85,
+   "sma50": 519.45,
+   "sma200": 445.33,
+   "rsi": 40.4,
+   "adx": 19.2,
+   "bar": "2026-11-27",
    "peg": 1.43,
    "earnings": [
     "2027-01-27"
@@ -107,27 +130,42 @@ window.SCANNER_DATA = {
    "chainSource": "Yahoo",
    "ivr": 62.8,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
-   "put": null,
+   "put": {
+    "strike": 450.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": -0.19,
+    "mid": 6.28,
+    "roc": 15.0,
+    "capital": 45000
+   },
    "putFails": [
-    "ADX 19.1 not above 25",
-    "RSI 38.7 too high for a put",
-    "no liquid contract in the delta and DTE window"
+    "ADX 19.2 not above 25",
+    "RSI 40.4 too high for a put"
    ],
-   "call": null,
+   "call": {
+    "strike": 525.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": 0.27,
+    "mid": 6.75,
+    "roc": 14.7,
+    "capital": 49285
+   },
    "callFails": [
-    "ADX 19.1 not above 25",
-    "no liquid contract in the delta and DTE window"
+    "ADX 19.2 not above 25",
+    "best ROC 14.7% below 15%"
    ],
    "result": "Fail"
   },
   {
    "ticker": "META",
-   "price": 609.89,
-   "sma50": 672.42,
-   "sma200": 627.53,
-   "rsi": 45.7,
-   "adx": 27.1,
-   "bar": "2026-11-25",
+   "price": 628.96,
+   "sma50": 671.35,
+   "sma200": 627.33,
+   "rsi": 50.3,
+   "adx": 26.6,
+   "bar": "2026-11-27",
    "peg": 0.73,
    "earnings": [
     "2027-01-27"
@@ -135,27 +173,38 @@ window.SCANNER_DATA = {
    "chainSource": "Yahoo",
    "ivr": 67.7,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
-   "put": null,
+   "put": {
+    "strike": 550.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": -0.15,
+    "mid": 8.15,
+    "roc": 15.9,
+    "capital": 55000
+   },
    "putFails": [
-    "below 200-day SMA",
-    "RSI 45.7 too high for a put",
-    "no liquid contract in the delta and DTE window"
+    "RSI 50.3 too high for a put"
    ],
-   "call": null,
-   "callFails": [
-    "below 200-day SMA",
-    "no liquid contract in the delta and DTE window"
-   ],
-   "result": "Fail"
+   "call": {
+    "strike": 695.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": 0.24,
+    "mid": 9.52,
+    "roc": 16.3,
+    "capital": 62896
+   },
+   "callFails": [],
+   "result": "Qualifies"
   },
   {
    "ticker": "GOOGL",
-   "price": 273.1,
-   "sma50": 318.24,
-   "sma200": 336.32,
-   "rsi": 36.9,
-   "adx": 22.5,
-   "bar": "2026-11-25",
+   "price": 274.96,
+   "sma50": 316.79,
+   "sma200": 336.14,
+   "rsi": 38.3,
+   "adx": 22.1,
+   "bar": "2026-11-27",
    "peg": 0.94,
    "earnings": [
     "2027-02-03"
@@ -163,28 +212,43 @@ window.SCANNER_DATA = {
    "chainSource": "Yahoo",
    "ivr": 70.6,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
-   "put": null,
+   "put": {
+    "strike": 245.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": -0.17,
+    "mid": 3.5,
+    "roc": 15.3,
+    "capital": 24500
+   },
    "putFails": [
     "below 200-day SMA",
-    "ADX 22.5 not above 25",
-    "no liquid contract in the delta and DTE window"
+    "ADX 22.1 not above 25",
+    "RSI 38.3 too high for a put"
    ],
-   "call": null,
+   "call": {
+    "strike": 295.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": 0.29,
+    "mid": 4.9,
+    "roc": 19.1,
+    "capital": 27496
+   },
    "callFails": [
     "below 200-day SMA",
-    "ADX 22.5 not above 25",
-    "no liquid contract in the delta and DTE window"
+    "ADX 22.1 not above 25"
    ],
    "result": "Fail"
   },
   {
    "ticker": "AMZN",
-   "price": 244.43,
-   "sma50": 255.12,
-   "sma200": 245.78,
-   "rsi": 42.0,
-   "adx": 10.2,
-   "bar": "2026-11-25",
+   "price": 254.12,
+   "sma50": 255.17,
+   "sma200": 246.03,
+   "rsi": 48.6,
+   "adx": 9.9,
+   "bar": "2026-11-27",
    "peg": 1.15,
    "earnings": [
     "2027-02-04"
@@ -192,29 +256,41 @@ window.SCANNER_DATA = {
    "chainSource": "Yahoo",
    "ivr": 65.8,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
-   "put": null,
+   "put": {
+    "strike": 230.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": -0.19,
+    "mid": 3.77,
+    "roc": 17.6,
+    "capital": 23000
+   },
    "putFails": [
-    "below 200-day SMA",
-    "ADX 10.2 not above 25",
-    "RSI 42.0 too high for a put",
-    "no liquid contract in the delta and DTE window"
+    "ADX 9.9 not above 25",
+    "RSI 48.6 too high for a put"
    ],
-   "call": null,
+   "call": {
+    "strike": 275.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": 0.26,
+    "mid": 3.98,
+    "roc": 16.8,
+    "capital": 25412
+   },
    "callFails": [
-    "below 200-day SMA",
-    "ADX 10.2 not above 25",
-    "no liquid contract in the delta and DTE window"
+    "ADX 9.9 not above 25"
    ],
    "result": "Fail"
   },
   {
    "ticker": "TSLA",
-   "price": 380.14,
-   "sma50": 377.17,
-   "sma200": 381.15,
-   "rsi": 50.3,
-   "adx": 11.3,
-   "bar": "2026-11-25",
+   "price": 400.0,
+   "sma50": 377.84,
+   "sma200": 381.0,
+   "rsi": 56.4,
+   "adx": 10.8,
+   "bar": "2026-11-27",
    "peg": 4.5,
    "earnings": [
     "2027-01-27"
@@ -222,31 +298,43 @@ window.SCANNER_DATA = {
    "chainSource": "Yahoo",
    "ivr": 76.3,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
-   "put": null,
+   "put": {
+    "strike": 345.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": -0.17,
+    "mid": 7.0,
+    "roc": 21.8,
+    "capital": 34500
+   },
    "putFails": [
-    "below 200-day SMA",
-    "ADX 11.3 not above 25",
+    "ADX 10.8 not above 25",
     "PEG 4.50 outside 0 to 2.5",
-    "RSI 50.3 too high for a put",
-    "no liquid contract in the delta and DTE window"
+    "RSI 56.4 too high for a put"
    ],
-   "call": null,
+   "call": {
+    "strike": 450.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": 0.23,
+    "mid": 6.42,
+    "roc": 17.2,
+    "capital": 40000
+   },
    "callFails": [
-    "below 200-day SMA",
-    "ADX 11.3 not above 25",
-    "PEG 4.50 outside 0 to 2.5",
-    "no liquid contract in the delta and DTE window"
+    "ADX 10.8 not above 25",
+    "PEG 4.50 outside 0 to 2.5"
    ],
    "result": "Fail"
   },
   {
    "ticker": "PLTR",
-   "price": 163.59,
-   "sma50": 182.54,
-   "sma200": 154.3,
-   "rsi": 45.1,
-   "adx": 27.8,
-   "bar": "2026-11-25",
+   "price": 172.17,
+   "sma50": 182.46,
+   "sma200": 154.48,
+   "rsi": 51.5,
+   "adx": 26.4,
+   "bar": "2026-11-27",
    "peg": 1.26,
    "earnings": [
     "2027-02-01"
@@ -254,55 +342,82 @@ window.SCANNER_DATA = {
    "chainSource": "Yahoo",
    "ivr": 59.3,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
-   "put": null,
+   "put": {
+    "strike": 150.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": -0.19,
+    "mid": 3.77,
+    "roc": 27.0,
+    "capital": 15000
+   },
    "putFails": [
-    "RSI 45.1 too high for a put",
-    "no liquid contract in the delta and DTE window"
+    "RSI 51.5 too high for a put"
    ],
-   "call": null,
-   "callFails": [
-    "no liquid contract in the delta and DTE window"
-   ],
-   "result": "Fail"
+   "call": {
+    "strike": 195.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": 0.23,
+    "mid": 2.92,
+    "roc": 18.2,
+    "capital": 17217
+   },
+   "callFails": [],
+   "result": "Qualifies"
   },
   {
    "ticker": "CRWD",
-   "price": 209.3,
-   "sma50": 245.24,
-   "sma200": 177.82,
-   "rsi": 38.3,
-   "adx": 19.8,
-   "bar": "2026-11-25",
+   "price": 217.2,
+   "sma50": 244.67,
+   "sma200": 178.38,
+   "rsi": 43.1,
+   "adx": 20.0,
+   "bar": "2026-11-27",
    "peg": 5.92,
    "earnings": [],
    "chainSource": "Yahoo",
    "ivr": 59.8,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
-   "put": null,
+   "put": {
+    "strike": 185.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": -0.17,
+    "mid": 4.58,
+    "roc": 26.5,
+    "capital": 18500
+   },
    "putFails": [
-    "ADX 19.8 not above 25",
+    "ADX 20.0 not above 25",
     "PEG 5.92 outside 0 to 2.5",
     "next earnings date unavailable",
-    "RSI 38.3 too high for a put",
-    "no liquid contract in the delta and DTE window"
+    "RSI 43.1 too high for a put"
    ],
-   "call": null,
+   "call": {
+    "strike": 255.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": 0.19,
+    "mid": 3.45,
+    "roc": 17.1,
+    "capital": 21720
+   },
    "callFails": [
-    "ADX 19.8 not above 25",
+    "ADX 20.0 not above 25",
     "PEG 5.92 outside 0 to 2.5",
-    "next earnings date unavailable",
-    "no liquid contract in the delta and DTE window"
+    "next earnings date unavailable"
    ],
    "result": "Fail"
   },
   {
    "ticker": "COIN",
-   "price": 103.72,
-   "sma50": 159.53,
-   "sma200": 171.55,
-   "rsi": 28.7,
-   "adx": 45.8,
-   "bar": "2026-11-25",
+   "price": 107.04,
+   "sma50": 158.19,
+   "sma200": 171.32,
+   "rsi": 32.0,
+   "adx": 46.6,
+   "bar": "2026-11-27",
    "peg": 0.45,
    "earnings": [
     "2027-02-11"
@@ -310,26 +425,40 @@ window.SCANNER_DATA = {
    "chainSource": "Yahoo",
    "ivr": 69.6,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
-   "put": null,
+   "put": {
+    "strike": 90.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": -0.2,
+    "mid": 3.35,
+    "roc": 40.0,
+    "capital": 9000
+   },
    "putFails": [
-    "below 200-day SMA",
-    "no liquid contract in the delta and DTE window"
+    "below 200-day SMA"
    ],
-   "call": null,
+   "call": {
+    "strike": 135.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": 0.16,
+    "mid": 1.69,
+    "roc": 16.9,
+    "capital": 10704
+   },
    "callFails": [
-    "below 200-day SMA",
-    "no liquid contract in the delta and DTE window"
+    "below 200-day SMA"
    ],
    "result": "Fail"
   },
   {
    "ticker": "MSTR",
-   "price": 79.96,
-   "sma50": 135.89,
-   "sma200": 130.94,
-   "rsi": 27.0,
-   "adx": 36.0,
-   "bar": "2026-11-25",
+   "price": 81.62,
+   "sma50": 134.88,
+   "sma200": 130.71,
+   "rsi": 28.7,
+   "adx": 37.3,
+   "bar": "2026-11-27",
    "peg": null,
    "earnings": [
     "2027-02-04"
@@ -337,57 +466,85 @@ window.SCANNER_DATA = {
    "chainSource": "Yahoo",
    "ivr": 66.6,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
-   "put": null,
+   "put": {
+    "strike": 65.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": -0.19,
+    "mid": 3.35,
+    "roc": 55.3,
+    "capital": 6500
+   },
    "putFails": [
     "below 200-day SMA",
-    "PEG unavailable",
-    "no liquid contract in the delta and DTE window"
+    "PEG unavailable"
    ],
-   "call": null,
+   "call": {
+    "strike": 110.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": 0.16,
+    "mid": 1.63,
+    "roc": 21.4,
+    "capital": 8162
+   },
    "callFails": [
     "below 200-day SMA",
-    "PEG unavailable",
-    "no liquid contract in the delta and DTE window"
+    "PEG unavailable"
    ],
    "result": "Fail"
   },
   {
    "ticker": "MARA",
-   "price": 5.42,
-   "sma50": 8.62,
-   "sma200": 10.52,
-   "rsi": 34.9,
-   "adx": 32.7,
-   "bar": "2026-11-25",
+   "price": 5.59,
+   "sma50": 8.5,
+   "sma200": 10.51,
+   "rsi": 37.1,
+   "adx": 33.1,
+   "bar": "2026-11-27",
    "peg": null,
    "earnings": [],
    "chainSource": "Yahoo",
    "ivr": 69.2,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
-   "put": null,
+   "put": {
+    "strike": 4.5,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": -0.21,
+    "mid": 0.29,
+    "roc": 70.4,
+    "capital": 450
+   },
    "putFails": [
     "below 200-day SMA",
     "PEG unavailable",
-    "next earnings date unavailable",
-    "no liquid contract in the delta and DTE window"
+    "next earnings date unavailable"
    ],
-   "call": null,
+   "call": {
+    "strike": 8.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": 0.16,
+    "mid": 0.12,
+    "roc": 24.0,
+    "capital": 559
+   },
    "callFails": [
     "below 200-day SMA",
     "PEG unavailable",
-    "next earnings date unavailable",
-    "no liquid contract in the delta and DTE window"
+    "next earnings date unavailable"
    ],
    "result": "Fail"
   },
   {
    "ticker": "HOOD",
-   "price": 65.78,
-   "sma50": 95.86,
-   "sma200": 90.69,
-   "rsi": 30.6,
+   "price": 67.92,
+   "sma50": 95.02,
+   "sma200": 90.64,
+   "rsi": 34.3,
    "adx": 35.1,
-   "bar": "2026-11-25",
+   "bar": "2026-11-27",
    "peg": 1.09,
    "earnings": [
     "2027-02-10"
@@ -395,20 +552,69 @@ window.SCANNER_DATA = {
    "chainSource": "Yahoo",
    "ivr": 60.7,
    "ivrSource": "optionsanalysissuite.com, as of 2026-11-25",
-   "put": null,
+   "put": {
+    "strike": 55.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": -0.15,
+    "mid": 1.55,
+    "roc": 30.3,
+    "capital": 5500
+   },
    "putFails": [
-    "below 200-day SMA",
-    "no liquid contract in the delta and DTE window"
+    "below 200-day SMA"
    ],
-   "call": null,
+   "call": {
+    "strike": 84.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": 0.16,
+    "mid": 1.02,
+    "roc": 16.1,
+    "capital": 6792
+   },
    "callFails": [
-    "below 200-day SMA",
-    "no liquid contract in the delta and DTE window"
+    "below 200-day SMA"
    ],
    "result": "Fail"
   }
  ],
- "trades": [],
+ "trades": [
+  {
+   "ticker": "PLTR",
+   "strategy": "Covered Call",
+   "strike": 195.0,
+   "exp": "2026-12-31",
+   "dte": 34,
+   "delta": 0.23,
+   "mid": 2.92,
+   "roc": 18.2,
+   "capital": 17217,
+   "ivr": 59.3,
+   "rsi": 51.5,
+   "adx": 26.4,
+   "price": 172.17,
+   "sma50": 182.46,
+   "sma200": 154.48
+  },
+  {
+   "ticker": "META",
+   "strategy": "Covered Call",
+   "strike": 695.0,
+   "exp": "2026-12-31",
+   "dte": 34,
+   "delta": 0.24,
+   "mid": 9.52,
+   "roc": 16.3,
+   "capital": 62896,
+   "ivr": 67.7,
+   "rsi": 50.3,
+   "adx": 26.6,
+   "price": 628.96,
+   "sma50": 671.35,
+   "sma200": 627.33
+  }
+ ],
  "errors": [
   "NVDA: CBOE chain (403 Client Error: Forbidden for url: https://cdn-api.cboe.com/api/global/delayed_quotes/options/NVDA.json)",
   "AMD: CBOE chain (403 Client Error: Forbidden for url: https://cdn-api.cboe.com/api/global/delayed_quotes/options/AMD.json)",

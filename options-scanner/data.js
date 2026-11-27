@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-11-26T13:52:48Z",
+ "generatedAt": "2026-11-27T02:51:56Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -46,7 +46,7 @@ window.SCANNER_DATA = {
     "strike": 125.0,
     "exp": "2026-12-31",
     "dte": 35,
-    "delta": -0.18,
+    "delta": -0.19,
     "mid": 4.1,
     "roc": 34.2,
     "capital": 12500
@@ -273,7 +273,7 @@ window.SCANNER_DATA = {
     "strike": 265.0,
     "exp": "2026-12-31",
     "dte": 35,
-    "delta": 0.28,
+    "delta": 0.29,
     "mid": 4.53,
     "roc": 19.3,
     "capital": 24443
@@ -303,7 +303,7 @@ window.SCANNER_DATA = {
     "strike": 320.0,
     "exp": "2026-12-31",
     "dte": 35,
-    "delta": -0.15,
+    "delta": -0.16,
     "mid": 6.72,
     "roc": 21.9,
     "capital": 32000
@@ -318,7 +318,7 @@ window.SCANNER_DATA = {
     "strike": 440.0,
     "exp": "2026-12-31",
     "dte": 35,
-    "delta": 0.21,
+    "delta": 0.2,
     "mid": 5.97,
     "roc": 16.4,
     "capital": 38014
@@ -401,7 +401,7 @@ window.SCANNER_DATA = {
     "strike": 250.0,
     "exp": "2026-12-31",
     "dte": 35,
-    "delta": 0.19,
+    "delta": 0.2,
     "mid": 3.67,
     "roc": 18.3,
     "capital": 20930
@@ -444,7 +444,7 @@ window.SCANNER_DATA = {
     "strike": 130.0,
     "exp": "2026-12-31",
     "dte": 35,
-    "delta": 0.18,
+    "delta": 0.19,
     "mid": 2.05,
     "roc": 20.6,
     "capital": 10372
@@ -486,7 +486,7 @@ window.SCANNER_DATA = {
     "strike": 110.0,
     "exp": "2026-12-31",
     "dte": 35,
-    "delta": 0.17,
+    "delta": 0.18,
     "mid": 1.95,
     "roc": 25.4,
     "capital": 7996
@@ -514,7 +514,7 @@ window.SCANNER_DATA = {
     "strike": 4.0,
     "exp": "2026-12-31",
     "dte": 35,
-    "delta": -0.15,
+    "delta": -0.16,
     "mid": 0.21,
     "roc": 53.4,
     "capital": 400
@@ -528,7 +528,7 @@ window.SCANNER_DATA = {
     "strike": 8.0,
     "exp": "2026-12-31",
     "dte": 35,
-    "delta": 0.15,
+    "delta": 0.16,
     "mid": 0.12,
     "roc": 24.1,
     "capital": 542
@@ -559,7 +559,7 @@ window.SCANNER_DATA = {
     "strike": 55.0,
     "exp": "2026-12-31",
     "dte": 35,
-    "delta": -0.19,
+    "delta": -0.2,
     "mid": 2.08,
     "roc": 39.3,
     "capital": 5500

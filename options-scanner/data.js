@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-11-27T12:24:23Z",
+ "generatedAt": "2026-11-27T13:52:35Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -48,11 +48,18 @@ window.SCANNER_DATA = {
     "next earnings date unavailable",
     "no liquid contract in the delta and DTE window"
    ],
-   "call": null,
+   "call": {
+    "strike": 175.0,
+    "exp": "2026-12-31",
+    "dte": 34,
+    "delta": 0.27,
+    "mid": 4.75,
+    "roc": 34.2,
+    "capital": 14930
+   },
    "callFails": [
     "below 200-day SMA",
-    "next earnings date unavailable",
-    "no liquid contract in the delta and DTE window"
+    "next earnings date unavailable"
    ],
    "result": "Fail"
   },

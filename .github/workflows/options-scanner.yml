@@ -2,7 +2,8 @@ name: Options scanner (hourly)
 
 on:
   schedule:
-    - cron: '15 * * * *'  # Every hour at :15, between the sentiment runs
+    - cron: '15 * * * *'  # Every hour at :15, between the sentiment runs. GitHub often skips these,
+                          # so during market hours each run also starts the next one (job "next").
   workflow_dispatch:      # Can be run manually from GitHub
   pull_request:           # Test run on PRs: scans, but never commits or deploys
     paths:
@@ -13,14 +14,14 @@ permissions:
   contents: write
   pages: write
   id-token: write
-
-concurrency:
-  group: options-scanner-${{ github.event_name == 'pull_request' && github.ref || 'main' }}
-  cancel-in-progress: false
+  actions: write   # lets a run start the next one (job "next")
 
 jobs:
   scan:
     runs-on: ubuntu-latest
+    concurrency:
+      group: options-scanner-${{ github.event_name == 'pull_request' && github.ref || 'main' }}
+      cancel-in-progress: false
     outputs:
       changed: ${{ steps.commit.outputs.changed }}
     steps:
@@ -82,3 +83,34 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  next:
+    # GitHub runs scheduled workflows late or not at all (in practice every 4-5 hours), so
+    # during market hours each run waits for the next :15 and starts the next scan itself.
+    needs: [scan, deploy]
+    if: always() && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Wait for the next :15 and start the next scan
+        run: |
+          sleep 30
+          # If another run is already active, it starts the next scan; don't start a second chain.
+          others=$(gh run list --workflow options-scanner.yml --branch main --limit 20 --json databaseId,status \
+            --jq '[.[] | select(.databaseId != ${{ github.run_id }} and .status != "completed")] | length')
+          if [ "$others" != "0" ]; then echo "Another scanner run is active; it will start the next scan."; exit 0; fi
+          now=$(date -u +%s)
+          next=$(( (now - 900) / 3600 * 3600 + 3600 + 900 ))
+          if [ $(( next - now )) -lt 600 ]; then next=$(( next + 3600 )); fi
+          dow=$(TZ=America/New_York date -d @$next +%u)
+          hm=$(( 10#$(TZ=America/New_York date -d @$next +%H%M) ))
+          if [ "$dow" -gt 5 ] || [ "$hm" -lt 915 ] || [ "$hm" -gt 1615 ]; then
+            echo "Next slot $(TZ=America/New_York date -d @$next '+%a %H:%M %Z') is outside market hours; the hourly schedule covers it."
+            exit 0
+          fi
+          echo "Next scan at $(TZ=America/New_York date -d @$next '+%a %H:%M %Z')"
+          sleep $(( next - now ))
+          gh workflow run options-scanner.yml --ref main

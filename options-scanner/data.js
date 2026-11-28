@@ -1,5 +1,5 @@
 window.SCANNER_DATA = {
- "generatedAt": "2026-11-27T21:58:45Z",
+ "generatedAt": "2026-11-28T03:54:41Z",
  "rules": {
   "dte_min": 30,
   "dte_max": 45,
@@ -60,7 +60,7 @@ window.SCANNER_DATA = {
     "strike": 180.0,
     "exp": "2026-12-31",
     "dte": 34,
-    "delta": 0.19,
+    "delta": 0.2,
     "mid": 2.74,
     "roc": 19.5,
     "capital": 15049
@@ -101,11 +101,11 @@ window.SCANNER_DATA = {
     "RSI 40.8 too high for a put"
    ],
    "call": {
-    "strike": 540.0,
+    "strike": 535.0,
     "exp": "2026-12-31",
     "dte": 34,
-    "delta": 0.15,
-    "mid": 6.65,
+    "delta": 0.16,
+    "mid": 6.62,
     "roc": 16.8,
     "capital": 42454
    },
@@ -147,7 +147,7 @@ window.SCANNER_DATA = {
     "strike": 525.0,
     "exp": "2026-12-31",
     "dte": 34,
-    "delta": 0.27,
+    "delta": 0.28,
     "mid": 6.75,
     "roc": 14.7,
     "capital": 49285
@@ -177,7 +177,7 @@ window.SCANNER_DATA = {
     "strike": 550.0,
     "exp": "2026-12-31",
     "dte": 34,
-    "delta": -0.15,
+    "delta": -0.16,
     "mid": 8.15,
     "roc": 15.9,
     "capital": 55000
@@ -230,7 +230,7 @@ window.SCANNER_DATA = {
     "strike": 295.0,
     "exp": "2026-12-31",
     "dte": 34,
-    "delta": 0.29,
+    "delta": 0.3,
     "mid": 4.9,
     "roc": 19.1,
     "capital": 27496
@@ -260,7 +260,7 @@ window.SCANNER_DATA = {
     "strike": 230.0,
     "exp": "2026-12-31",
     "dte": 34,
-    "delta": -0.19,
+    "delta": -0.2,
     "mid": 3.77,
     "roc": 17.6,
     "capital": 23000
@@ -273,7 +273,7 @@ window.SCANNER_DATA = {
     "strike": 275.0,
     "exp": "2026-12-31",
     "dte": 34,
-    "delta": 0.26,
+    "delta": 0.27,
     "mid": 3.98,
     "roc": 16.8,
     "capital": 25412
@@ -358,7 +358,7 @@ window.SCANNER_DATA = {
     "strike": 195.0,
     "exp": "2026-12-31",
     "dte": 34,
-    "delta": 0.23,
+    "delta": 0.24,
     "mid": 2.92,
     "roc": 18.2,
     "capital": 17217
@@ -556,7 +556,7 @@ window.SCANNER_DATA = {
     "strike": 55.0,
     "exp": "2026-12-31",
     "dte": 34,
-    "delta": -0.15,
+    "delta": -0.16,
     "mid": 1.55,
     "roc": 30.3,
     "capital": 5500
@@ -586,7 +586,7 @@ window.SCANNER_DATA = {
    "strike": 195.0,
    "exp": "2026-12-31",
    "dte": 34,
-   "delta": 0.23,
+   "delta": 0.24,
    "mid": 2.92,
    "roc": 18.2,
    "capital": 17217,
